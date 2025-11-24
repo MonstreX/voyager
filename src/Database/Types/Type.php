@@ -11,6 +11,7 @@ use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Platforms\SQLServerPlatform;
 use Doctrine\DBAL\Types\Type as DoctrineType;
+use InvalidArgumentException;
 use TCG\Voyager\Database\Platforms\Platform;
 use TCG\Voyager\Database\Schema\SchemaManager;
 use ReflectionClass;
@@ -369,6 +370,52 @@ abstract class Type extends DoctrineType
         } catch (Throwable $exception) {
             return (new ReflectionClass($type))->getShortName();
         }
+    }
+
+    public static function resolveDoctrineColumnType(string $typeName): DoctrineType
+    {
+        $typeName = trim($typeName);
+
+        $tryType = static function (string $candidate) {
+            if ($candidate === '') {
+                return null;
+            }
+
+            if (DoctrineType::hasType($candidate)) {
+                return DoctrineType::getType($candidate);
+            }
+
+            return null;
+        };
+
+        foreach ([$typeName, strtolower($typeName)] as $candidate) {
+            if ($type = $tryType($candidate)) {
+                return $type;
+            }
+        }
+
+        static::registerCustomPlatformTypes(true);
+
+        foreach ([$typeName, strtolower($typeName)] as $candidate) {
+            if ($type = $tryType($candidate)) {
+                return $type;
+            }
+        }
+
+        $aliases = [
+            'varchar'  => 'string',
+            'nvarchar' => 'string',
+            'varchar2' => 'string',
+            'bpchar'   => 'string',
+        ];
+
+        foreach ([$typeName, strtolower($typeName)] as $candidate) {
+            if (isset($aliases[$candidate]) && $type = $tryType($aliases[$candidate])) {
+                return $type;
+            }
+        }
+
+        throw new InvalidArgumentException("Column type [{$typeName}] is not supported by Doctrine.");
     }
 
     /**
