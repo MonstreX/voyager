@@ -75,6 +75,17 @@ class VoyagerDatabaseController extends Controller
             if (!is_array($request->table)) {
                 $table = json_decode($request->table, true);
             }
+            logger()->debug('voyager.database.store.input', [
+                'table' => $table['name'] ?? null,
+                'columns' => array_map(function ($column) {
+                    return [
+                        'name'          => $column['name'] ?? null,
+                        'type'          => $column['type']['name'] ?? ($column['type'] ?? null),
+                        'autoincrement' => $column['autoincrement'] ?? null,
+                        'unsigned'      => $column['unsigned'] ?? null,
+                    ];
+                }, $table['columns'] ?? []),
+            ]);
             $table['options']['collate'] = config($conn.'.collation', 'utf8mb4_unicode_ci');
             $table['options']['charset'] = config($conn.'.charset', 'utf8mb4');
             $table = Table::make($table);
