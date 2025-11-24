@@ -83,7 +83,7 @@ class VoyagerDatabaseController extends Controller
             if (isset($request->create_model) && $request->create_model == 'on') {
                 $modelNamespace = config('voyager.models.namespace', app()->getNamespace());
                 $params = [
-                    'name' => $modelNamespace.Str::studly(Str::singular($table->name)),
+                    'name' => $modelNamespace.Str::studly(Str::singular($table->getName())),
                 ];
 
                 // if (in_array('deleted_at', $request->input('field.*'))) {
@@ -97,8 +97,8 @@ class VoyagerDatabaseController extends Controller
                 Artisan::call('voyager:make:model', $params);
             } elseif (isset($request->create_migration) && $request->create_migration == 'on') {
                 Artisan::call('make:migration', [
-                    'name'    => 'create_'.$table->name.'_table',
-                    '--table' => $table->name,
+                    'name'    => 'create_'.$table->getName().'_table',
+                    '--table' => $table->getName(),
                 ]);
             }
 
