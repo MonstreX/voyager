@@ -26,16 +26,14 @@ class AssetsTest extends TestCase
     public static function urlProvider()
     {
         return [
-            [
-                '../dummy_content/pages/page1.jpg',
-                '..../dummy_content/pages/page1.jpg',
-                'images/../../dummy_content/pages/page1.jpg',
-                '....//dummy_content/pages/page1.jpg',
-                '..\dummy_content/pages/page1.jpg',
-                '....\dummy_content/pages/page1.jpg',
-                'images/..\..\dummy_content/pages/page1.jpg',
-                'images/....\\....\\dummy_content/pages/page1.jpg',
-            ],
+            ['../dummy_content/pages/page1.jpg'],
+            ['..../dummy_content/pages/page1.jpg'],
+            ['images/../../dummy_content/pages/page1.jpg'],
+            ['....//dummy_content/pages/page1.jpg'],
+            ['..\\dummy_content/pages/page1.jpg'],
+            ['....\\dummy_content/pages/page1.jpg'],
+            ['images/..\\..\\dummy_content/pages/page1.jpg'],
+            ['images/....\\....\\dummy_content/pages/page1.jpg'],
         ];
     }
 
