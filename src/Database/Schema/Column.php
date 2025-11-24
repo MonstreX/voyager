@@ -16,6 +16,18 @@ abstract class Column
             $typeName = is_array($type) ? ($type['name'] ?? '') : (string) $type;
             $type = Type::resolveDoctrineColumnType($typeName);
         }
+        $typeLabel = strtolower(Type::getTypeLabel($type));
+        $numericAutoIncrement = ['tinyint', 'smallint', 'mediumint', 'integer', 'int', 'bigint'];
+        $numericUnsigned = array_merge($numericAutoIncrement, ['decimal', 'numeric', 'float', 'double', 'double precision', 'real']);
+
+        if (!in_array($typeLabel, $numericAutoIncrement, true)) {
+            $column['autoincrement'] = false;
+        }
+
+        if (!in_array($typeLabel, $numericUnsigned, true)) {
+            $column['unsigned'] = false;
+        }
+
         $type->tableName = $tableName;
 
         $options = array_diff_key($column, array_flip(['name', 'composite', 'oldName', 'null', 'extra', 'type', 'charset', 'collation']));
