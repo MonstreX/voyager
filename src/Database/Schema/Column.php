@@ -49,6 +49,16 @@ abstract class Column
 
         $type->tableName = $tableName;
 
+        $lengthRequired = ['varchar', 'nvarchar', 'varchar2', 'bpchar', 'string'];
+        if (in_array($typeLabel, $lengthRequired, true) && empty($column['length'])) {
+            $column['length'] = 191;
+            Log::debug('voyager.column.make.length.default', [
+                'name' => $name,
+                'type' => $typeLabel,
+                'length' => $column['length'],
+            ]);
+        }
+
         $options = array_diff_key($column, array_flip(['name', 'composite', 'oldName', 'null', 'extra', 'type', 'charset', 'collation']));
 
         $doctrineColumn = new DoctrineColumn($name, $type, $options);
