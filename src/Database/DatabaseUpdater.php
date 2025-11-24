@@ -3,6 +3,7 @@
 namespace TCG\Voyager\Database;
 
 use Doctrine\DBAL\Schema\Column;
+use Doctrine\DBAL\Schema\ColumnDiff;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\TableDiff;
 use TCG\Voyager\Database\Schema\SchemaManager;
@@ -52,13 +53,17 @@ class DatabaseUpdater
     public function updateTable()
     {
         // Get table new name
-        if (($newName = $this->table->getName()) != $this->originalTable->getName()) {
+        $newName = null;
+        if (($nextName = $this->table->getName()) != $this->originalTable->getName()) {
             // Make sure the new name doesn't already exist
-            if (SchemaManager::tableExists($newName)) {
-                throw SchemaException::tableAlreadyExists($newName);
+            if (SchemaManager::tableExists($nextName)) {
+                throw SchemaException::tableAlreadyExists($nextName);
             }
-        } else {
-            $newName = false;
+
+            $newName = $nextName;
+            SchemaManager::renameTable($this->originalTable->getName(), $newName);
+            $this->tableArr['oldName'] = $newName;
+            $this->originalTable = SchemaManager::listTableDetails($newName);
         }
 
         // Rename columns
@@ -70,16 +75,6 @@ class DatabaseUpdater
         }
 
         $tableDiff = $this->originalTable->diff($this->table);
-
-        // Add new table name to tableDiff
-        if ($newName) {
-            if (!$tableDiff) {
-                $tableDiff = new TableDiff($this->tableArr['oldName']);
-                $tableDiff->fromTable = $this->originalTable;
-            }
-
-            $tableDiff->newName = $newName;
-        }
 
         // Update the table
         if ($tableDiff) {
@@ -100,14 +95,16 @@ class DatabaseUpdater
             return false;
         }
 
-        $renamedColumnsDiff = new TableDiff($this->tableArr['oldName']);
-        $renamedColumnsDiff->fromTable = $this->originalTable;
+        $changed = [];
 
         foreach ($renamedColumns as $oldName => $newName) {
-            $renamedColumnsDiff->renamedColumns[$oldName] = $this->table->getColumn($newName);
+            $changed[$oldName] = new ColumnDiff(
+                $this->originalTable->getColumn($oldName),
+                $this->table->getColumn($newName)
+            );
         }
 
-        return $renamedColumnsDiff;
+        return new TableDiff($this->originalTable, [], $changed);
     }
 
     /**
