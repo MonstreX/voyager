@@ -119,6 +119,12 @@ class VoyagerDatabaseController extends Controller
                ->route('voyager.database.index')
                ->with($this->alertSuccess(__('voyager::database.success_create_table', ['table' => $table->name])));
         } catch (Exception $e) {
+            logger()->error('voyager.database.store.error', [
+                'table' => $table['name'] ?? null,
+                'message' => $e->getMessage(),
+                'exception' => $e,
+            ]);
+
             return back()->with($this->alertException($e))->withInput();
         }
     }
