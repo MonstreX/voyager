@@ -81,7 +81,7 @@ class VoyagerDatabaseController extends Controller
             SchemaManager::createTable($table);
 
             if (isset($request->create_model) && $request->create_model == 'on') {
-                $modelNamespace = config('voyager.models.namespace', app()->getNamespace());
+                $modelNamespace = rtrim(config('voyager.models.namespace', app()->getNamespace().'Models\\'), '\\').'\\';
                 $params = [
                     'name' => $modelNamespace.Str::studly(Str::singular($table->getName())),
                 ];

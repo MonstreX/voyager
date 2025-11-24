@@ -65,7 +65,7 @@ class VoyagerBreadController extends Controller
     private function prepopulateBreadInfo($table)
     {
         $displayName = Str::singular(implode(' ', explode('_', Str::title($table))));
-        $modelNamespace = config('voyager.models.namespace', app()->getNamespace());
+        $modelNamespace = rtrim(config('voyager.models.namespace', app()->getNamespace().'Models\\'), '\\').'\\';
         if (empty($modelNamespace)) {
             $modelNamespace = app()->getNamespace();
         }
