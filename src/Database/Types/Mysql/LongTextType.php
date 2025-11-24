@@ -9,8 +9,9 @@ class LongTextType extends Type
 {
     public const NAME = 'longtext';
 
-    public function getSQLDeclaration(array $field, AbstractPlatform $platform)
+    public function getSQLDeclaration(array $field, AbstractPlatform $platform): string
     {
         return 'longtext';
     }
 }
+

@@ -9,7 +9,7 @@ class BitType extends Type
 {
     public const NAME = 'bit';
 
-    public function getSQLDeclaration(array $field, AbstractPlatform $platform)
+    public function getSQLDeclaration(array $field, AbstractPlatform $platform): string
     {
         $length = empty($field['length']) ? 1 : $field['length'];
         $length = $length > 64 ? 64 : $length;
@@ -17,3 +17,4 @@ class BitType extends Type
         return "bit({$length})";
     }
 }
+

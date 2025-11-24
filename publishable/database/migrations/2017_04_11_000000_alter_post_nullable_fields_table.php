@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use TCG\Voyager\Database\Schema\SchemaManager;
 
 class AlterPostNullableFieldsTable extends Migration
 {
@@ -13,7 +14,7 @@ class AlterPostNullableFieldsTable extends Migration
      */
     public function up()
     {
-        $platform = \DB::getDoctrineSchemaManager()->getDatabasePlatform();
+        $platform = SchemaManager::getDatabasePlatform();
         $platform->registerDoctrineTypeMapping('enum', 'string');
 
         Schema::table('posts', function (Blueprint $table) {

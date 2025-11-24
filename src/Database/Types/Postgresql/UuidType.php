@@ -9,8 +9,9 @@ class UuidType extends Type
 {
     public const NAME = 'uuid';
 
-    public function getSQLDeclaration(array $field, AbstractPlatform $platform)
+    public function getSQLDeclaration(array $field, AbstractPlatform $platform): string
     {
         return 'uuid';
     }
 }
+

@@ -9,8 +9,9 @@ class MultiPolygonType extends Type
 {
     public const NAME = 'multipolygon';
 
-    public function getSQLDeclaration(array $field, AbstractPlatform $platform)
+    public function getSQLDeclaration(array $field, AbstractPlatform $platform): string
     {
         return 'multipolygon';
     }
 }
+

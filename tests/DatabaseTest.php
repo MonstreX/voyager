@@ -61,8 +61,8 @@ class DatabaseTest extends TestCase
         $id = $dbTable->getColumn('id');
         $details = $dbTable->getColumn('details');
         // Column Type
-        $this->assertEquals('integer', $id->getType()->getName());
-        $this->assertEquals('json', $details->getType()->getName());
+        $this->assertEquals('integer', Type::getTypeLabel($id->getType()));
+        $this->assertEquals('json', Type::getTypeLabel($details->getType()));
         // Column auto increment
         $this->assertTrue($id->getAutoIncrement());
         // Column not null
@@ -146,7 +146,7 @@ class DatabaseTest extends TestCase
         $dbTable = $this->update_table($dbTable->toArray());
 
         $this->assertTrue($dbTable->hasColumn($column));
-        $this->assertEquals('text', $dbTable->getColumn($column)->getType()->getName());
+        $this->assertEquals('text', Type::getTypeLabel($dbTable->getColumn($column)->getType()));
     }
 
     protected function can_rename_column()
@@ -175,7 +175,7 @@ class DatabaseTest extends TestCase
 
         $dbTable = $this->update_table($this->table);
 
-        $this->assertEquals($newType, $dbTable->getColumn($columnName)->getType()->getName());
+        $this->assertEquals($newType, Type::getTypeLabel($dbTable->getColumn($columnName)->getType()));
     }
 
     protected function can_change_column_options()

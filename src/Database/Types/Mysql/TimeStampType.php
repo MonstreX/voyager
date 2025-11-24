@@ -9,7 +9,7 @@ class TimeStampType extends Type
 {
     public const NAME = 'timestamp';
 
-    public function getSQLDeclaration(array $field, AbstractPlatform $platform)
+    public function getSQLDeclaration(array $field, AbstractPlatform $platform): string
     {
         if (isset($field['default'])) {
             return 'timestamp';
@@ -18,3 +18,4 @@ class TimeStampType extends Type
         return 'timestamp null';
     }
 }
+

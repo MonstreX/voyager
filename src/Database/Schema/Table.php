@@ -84,12 +84,16 @@ class Table extends DoctrineTable
 
     public function diff(DoctrineTable $compareTable)
     {
-        return (new Comparator())->diffTable($this, $compareTable);
+        $comparator = new Comparator(SchemaManager::getDatabasePlatform());
+
+        return $comparator->compareTables($this, $compareTable);
     }
 
     public function diffOriginal()
     {
-        return (new Comparator())->diffTable(SchemaManager::getDoctrineTable($this->_name), $this);
+        $comparator = new Comparator(SchemaManager::getDatabasePlatform());
+
+        return $comparator->compareTables(SchemaManager::getDoctrineTable($this->_name), $this);
     }
 
     /**
@@ -154,7 +158,7 @@ class Table extends DoctrineTable
         $exportedForeignKeys = [];
 
         foreach ($this->getForeignKeys() as $name => $fk) {
-            $exportedForeignKeys[$name] = ForeignKey::toArray($fk);
+            $exportedForeignKeys[$name] = ForeignKey::toArray($fk, $this->_name);
         }
 
         return $exportedForeignKeys;
