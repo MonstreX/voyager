@@ -6,9 +6,11 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use PHPUnit\Framework\Attributes\Group;
 use TCG\Voyager\Models\Role;
 use TCG\Voyager\Models\User;
 
+#[Group('ui-legacy')]
 class UserProfileTest extends TestCase
 {
     use DatabaseTransactions;

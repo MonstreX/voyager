@@ -3,8 +3,10 @@
 namespace TCG\Voyager\Tests;
 
 use Illuminate\Support\Facades\Auth;
+use PHPUnit\Framework\Attributes\Group;
 use TCG\Voyager\Models\Menu;
 
+#[Group('ui-legacy')]
 class MenuTest extends TestCase
 {
     public function setUp(): void

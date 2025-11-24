@@ -53,9 +53,7 @@ class TestCase extends OrchestraTestCase
 
     public function tearDown(): void
     {
-        //parent::tearDown();
-
-        //$this->artisan('migrate:reset');
+        parent::tearDown();
     }
 
     /**
@@ -80,6 +78,13 @@ class TestCase extends OrchestraTestCase
 
         // Setup Authentication configuration
         $app['config']->set('auth.providers.users.model', User::class);
+
+        // Avoid logging to vendor paths that are read-only in CI
+        $app['config']->set('logging.default', 'errorlog');
+        $app['config']->set('logging.channels.errorlog', [
+            'driver' => 'errorlog',
+            'level' => 'debug',
+        ]);
     }
 
     protected function install()

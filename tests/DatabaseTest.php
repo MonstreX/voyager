@@ -2,7 +2,7 @@
 
 namespace TCG\Voyager\Tests;
 
-use Doctrine\DBAL\Schema\SchemaException;
+use Doctrine\DBAL\Schema\Exception\TableDoesNotExist;
 use Illuminate\Support\Facades\Auth;
 use TCG\Voyager\Database\Schema\SchemaManager;
 use TCG\Voyager\Database\Schema\Table;
@@ -120,7 +120,7 @@ class DatabaseTest extends TestCase
         ]);
 
         $this->assertSessionHasAll(
-            $this->alertException(SchemaException::tableDoesNotExist($table['name']))
+            $this->alertException(TableDoesNotExist::new($table['name']))
         );
     }
 

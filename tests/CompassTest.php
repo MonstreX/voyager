@@ -3,7 +3,9 @@
 namespace TCG\Voyager\Tests;
 
 use Illuminate\Support\Facades\Auth;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('ui-legacy')]
 class CompassTest extends TestCase
 {
     public function setUp(): void

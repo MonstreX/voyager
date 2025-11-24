@@ -2,6 +2,9 @@
 
 namespace TCG\Voyager\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
+
+#[Group('ui-legacy')]
 class RouteTest extends TestCase
 {
     /**

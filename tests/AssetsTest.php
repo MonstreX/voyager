@@ -3,6 +3,7 @@
 namespace TCG\Voyager\Tests;
 
 use Illuminate\Support\Facades\Auth;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class AssetsTest extends TestCase
 {
@@ -37,9 +38,7 @@ class AssetsTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider  urlProvider
-     */
+    #[DataProvider('urlProvider')]
     public function testCannotOpenFileOutsideAssets($url)
     {
         $response = $this->call('GET', route('voyager.dashboard').$this->prefix.$url);

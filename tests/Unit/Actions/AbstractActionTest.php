@@ -37,18 +37,10 @@ class AbstractActionTest extends TestCase
      */
     public function testGetRouteWithEmptyKey()
     {
-        $stub = $this->getMockBuilder(AbstractAction::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getDefaultRoute'])
-            ->getMockForAbstractClass();
+        $action = new StubAction($this->userDataType, $this->user);
+        $action->defaultRouteResult = true;
 
-        // The `getDefaultRoute` method is called as default inside the
-        // `getRoute` method to retrieve the route.
-        $stub->expects($this->any())
-             ->method('getDefaultRoute')
-             ->will($this->returnValue(true));
-
-        $this->assertTrue($stub->getRoute($this->userDataType->name));
+        $this->assertTrue($action->getRoute($this->userDataType->name));
     }
 
     /**
@@ -57,19 +49,13 @@ class AbstractActionTest extends TestCase
      */
     public function testGetRouteWithCustomKey()
     {
-        $stub = $this->getMockBuilder(AbstractAction::class)
-            ->disableOriginalConstructor()
-            ->addMethods(['getCustomRoute'])
-            ->getMockForAbstractClass();
+        $action = new StubAction($this->userDataType, $this->user);
+        $action->customRouteResult = true;
 
         // The key that's passed to the `getRoute` method will be capitalized
-        // and putted between 'get' and 'Route'. Calling `getRoute('custom')`
+        // and placed between 'get' and 'Route'. Calling `getRoute('custom')`
         // will call the `getCustomRoute` method if it's defined.
-        $stub->expects($this->any())
-             ->method('getCustomRoute')
-             ->will($this->returnValue(true));
-
-        $this->assertTrue($stub->getRoute('custom'));
+        $this->assertTrue($action->getRoute('custom'));
     }
 
     /**
@@ -78,20 +64,14 @@ class AbstractActionTest extends TestCase
      */
     public function testConvertAttributesToHtml()
     {
-        $stub = $this->getMockBuilder(AbstractAction::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getAttributes'])
-            ->getMockForAbstractClass();
+        $action = new StubAction($this->userDataType, $this->user);
+        $action->attributesResult = [
+            'class'   => 'class1 class2',
+            'data-id' => 5,
+            'id'      => 'delete-5',
+        ];
 
-        $stub->expects($this->any())
-             ->method('getAttributes')
-             ->will($this->returnValue([
-                 'class'   => 'class1 class2',
-                 'data-id' => 5,
-                 'id'      => 'delete-5',
-             ]));
-
-        $this->assertEquals('class="class1 class2" data-id="5" id="delete-5"', $stub->convertAttributesToHtml());
+        $this->assertEquals('class="class1 class2" data-id="5" id="delete-5"', $action->convertAttributesToHtml());
     }
 
     /**
@@ -100,11 +80,9 @@ class AbstractActionTest extends TestCase
      */
     public function testShouldActionDisplayOnDataTypeWithDefaultDataType()
     {
-        $stub = $this->getMockBuilder(AbstractAction::class)
-            ->setConstructorArgs([$this->userDataType, $this->user])
-            ->getMockForAbstractClass();
+        $action = new StubAction($this->userDataType, $this->user);
 
-        $this->assertTrue($stub->shouldActionDisplayOnDataType());
+        $this->assertTrue($action->shouldActionDisplayOnDataType());
     }
 
     /**
@@ -113,16 +91,10 @@ class AbstractActionTest extends TestCase
      */
     public function testTrueIsReturnedIfDataTypeMatchesTheOneWhereTheActionWasCreatedFor()
     {
-        $stub = $this->getMockBuilder(AbstractAction::class)
-            ->setConstructorArgs([$this->userDataType, $this->user])
-            ->onlyMethods(['getDataType'])
-            ->getMockForAbstractClass();
+        $action = new StubAction($this->userDataType, $this->user);
+        $action->forcedDataType = $this->userDataType->name;
 
-        $stub->expects($this->any())
-             ->method('getDataType')
-             ->will($this->returnValue($this->userDataType->name));
-
-        $this->assertTrue($stub->shouldActionDisplayOnDataType());
+        $this->assertTrue($action->shouldActionDisplayOnDataType());
     }
 
     /**
@@ -131,15 +103,52 @@ class AbstractActionTest extends TestCase
      */
     public function testFalseIsReturnedIfDataTypeDoesNotMatchesTheOneWhereTheActionWasCreatedFor()
     {
-        $stub = $this->getMockBuilder(AbstractAction::class)
-            ->setConstructorArgs([$this->userDataType, $this->user])
-            ->onlyMethods(['getDataType'])
-            ->getMockForAbstractClass();
+        $action = new StubAction($this->userDataType, $this->user);
+        $action->forcedDataType = 'not users'; // different data type
 
-        $stub->expects($this->any())
-             ->method('getDataType')
-             ->will($this->returnValue('not users')); // different data type
+        $this->assertFalse($action->shouldActionDisplayOnDataType());
+    }
+}
 
-        $this->assertFalse($stub->shouldActionDisplayOnDataType());
+class StubAction extends AbstractAction
+{
+    public bool $defaultRouteResult = false;
+    public bool $customRouteResult = false;
+    public array $attributesResult = [];
+    public ?string $forcedDataType = null;
+
+    public function getTitle()
+    {
+        return 'Test';
+    }
+
+    public function getIcon()
+    {
+        return 'voyager-test';
+    }
+
+    public function getPolicy()
+    {
+        return 'browse';
+    }
+
+    public function getDefaultRoute()
+    {
+        return $this->defaultRouteResult;
+    }
+
+    public function getCustomRoute()
+    {
+        return $this->customRouteResult;
+    }
+
+    public function getAttributes()
+    {
+        return $this->attributesResult;
+    }
+
+    public function getDataType()
+    {
+        return $this->forcedDataType;
     }
 }

@@ -4,8 +4,10 @@ namespace TCG\Voyager\Tests;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Auth;
+use PHPUnit\Framework\Attributes\Group;
 use TCG\Voyager\Models\Role;
 
+#[Group('ui-legacy')]
 class RolesTest extends TestCase
 {
     use DatabaseTransactions;

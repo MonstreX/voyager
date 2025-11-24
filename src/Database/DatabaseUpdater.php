@@ -4,7 +4,8 @@ namespace TCG\Voyager\Database;
 
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\ColumnDiff;
-use Doctrine\DBAL\Schema\SchemaException;
+use Doctrine\DBAL\Schema\Exception\TableAlreadyExists;
+use Doctrine\DBAL\Schema\Exception\TableDoesNotExist;
 use Doctrine\DBAL\Schema\TableDiff;
 use TCG\Voyager\Database\Schema\SchemaManager;
 use TCG\Voyager\Database\Schema\Table;
@@ -37,7 +38,7 @@ class DatabaseUpdater
         }
 
         if (!SchemaManager::tableExists($table['oldName'])) {
-            throw SchemaException::tableDoesNotExist($table['oldName']);
+            throw TableDoesNotExist::new($table['oldName']);
         }
 
         $updater = new self($table);
@@ -57,7 +58,7 @@ class DatabaseUpdater
         if (($nextName = $this->table->getName()) != $this->originalTable->getName()) {
             // Make sure the new name doesn't already exist
             if (SchemaManager::tableExists($nextName)) {
-                throw SchemaException::tableAlreadyExists($nextName);
+                throw TableAlreadyExists::new($nextName);
             }
 
             $newName = $nextName;

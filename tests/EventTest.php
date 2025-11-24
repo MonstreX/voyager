@@ -362,5 +362,7 @@ class EventTest extends TestCase
         if (file_exists(public_path('storage/nested/test.png'))) {
             unlink(public_path('storage/nested/test.png'));
         }
+
+        parent::tearDown();
     }
 }

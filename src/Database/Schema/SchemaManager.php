@@ -2,7 +2,7 @@
 
 namespace TCG\Voyager\Database\Schema;
 
-use Doctrine\DBAL\Schema\SchemaException;
+use Doctrine\DBAL\Schema\Exception\TableDoesNotExist;
 use Doctrine\DBAL\Schema\Table as DoctrineTable;
 use TCG\Voyager\Database\DoctrineManager;
 use TCG\Voyager\Database\Types\Type;
@@ -136,7 +136,7 @@ abstract class SchemaManager
         $table = trim($table);
 
         if (!static::tableExists($table)) {
-            throw SchemaException::tableDoesNotExist($table);
+            throw TableDoesNotExist::new($table);
         }
 
         return static::getDatabaseConnection()

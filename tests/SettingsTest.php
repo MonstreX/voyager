@@ -3,8 +3,10 @@
 namespace TCG\Voyager\Tests;
 
 use Illuminate\Support\Facades\Auth;
+use PHPUnit\Framework\Attributes\Group;
 use TCG\Voyager\Models\Setting;
 
+#[Group('ui-legacy')]
 class SettingsTest extends TestCase
 {
     protected $user;

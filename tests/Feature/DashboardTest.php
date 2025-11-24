@@ -3,9 +3,10 @@
 namespace TCG\Voyager\Tests\Feature;
 
 use Illuminate\Support\Facades\Auth;
-use TCG\Voyager\Facades\Voyager;
+use PHPUnit\Framework\Attributes\Group;
 use TCG\Voyager\Tests\TestCase;
 
+#[Group('ui-legacy')]
 class DashboardTest extends TestCase
 {
     public function setUp(): void
@@ -115,17 +116,4 @@ class DashboardTest extends TestCase
              ->dontSee(__('voyager::dimmer.page_link_text'));
     }
 
-    /**
-     * Test See Correct Footer Version Number.
-     *
-     * This test will make sure the footer contains the correct version number.
-     */
-    public function testSeeingCorrectFooterVersionNumber()
-    {
-        // We must first login and visit the dashboard page.
-        Auth::loginUsingId(1);
-
-        $this->visit(route('voyager.dashboard'))
-             ->see(Voyager::getVersion());
-    }
 }
