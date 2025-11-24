@@ -120,7 +120,7 @@ class VoyagerDatabaseController extends Controller
                ->with($this->alertSuccess(__('voyager::database.success_create_table', ['table' => $table->name])));
         } catch (Exception $e) {
             logger()->error('voyager.database.store.error', [
-                'table' => $table['name'] ?? null,
+                'table' => $table instanceof \TCG\Voyager\Database\Schema\Table ? $table->getName() : ($table['name'] ?? null),
                 'message' => $e->getMessage(),
                 'exception' => $e,
             ]);
