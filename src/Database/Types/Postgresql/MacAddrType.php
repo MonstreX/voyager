@@ -9,8 +9,9 @@ class MacAddrType extends Type
 {
     public const NAME = 'macaddr';
 
-    public function getSQLDeclaration(array $field, AbstractPlatform $platform)
+    public function getSQLDeclaration(array $field, AbstractPlatform $platform): string
     {
         return 'macaddr';
     }
 }
+

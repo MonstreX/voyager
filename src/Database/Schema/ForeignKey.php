@@ -36,21 +36,17 @@ abstract class ForeignKey
             $options
         );
 
-        if (isset($localTable)) {
-            $doctrineForeignKey->setLocalTable($localTable);
-        }
-
         return $doctrineForeignKey;
     }
 
     /**
      * @return array
      */
-    public static function toArray(DoctrineForeignKey $fk)
+    public static function toArray(DoctrineForeignKey $fk, ?string $localTable = null)
     {
         return [
             'name'           => $fk->getName(),
-            'localTable'     => $fk->getLocalTableName(),
+            'localTable'     => $localTable,
             'localColumns'   => $fk->getLocalColumns(),
             'foreignTable'   => $fk->getForeignTableName(),
             'foreignColumns' => $fk->getForeignColumns(),

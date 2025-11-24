@@ -2,8 +2,10 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
+use TCG\Voyager\Database\Schema\SchemaManager;
+use TCG\Voyager\Database\Types\Type;
 
 class CreateUserRolesTable extends Migration
 {
@@ -18,13 +20,8 @@ class CreateUserRolesTable extends Migration
             $type = null;
 
             try {
-                $connection = DB::connection();
-
-                if (method_exists($connection, 'getDoctrineColumn')) {
-                    $type = $connection->getDoctrineColumn($connection->getTablePrefix().'users', 'id')
-                        ->getType()
-                        ->getName();
-                }
+                $column = SchemaManager::getDoctrineColumn(DB::getTablePrefix().'users', 'id');
+                $type = Type::getTypeLabel($column->getType());
             } catch (\Throwable $exception) {
                 $type = null;
             }

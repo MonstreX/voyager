@@ -3,9 +3,18 @@
 namespace TCG\Voyager\Database\Types;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform as DoctrineAbstractPlatform;
+use Doctrine\DBAL\Platforms\DB2Platform;
+use Doctrine\DBAL\Platforms\MariaDBPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
+use Doctrine\DBAL\Platforms\OraclePlatform;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
+use Doctrine\DBAL\Platforms\SQLServerPlatform;
 use Doctrine\DBAL\Types\Type as DoctrineType;
 use TCG\Voyager\Database\Platforms\Platform;
 use TCG\Voyager\Database\Schema\SchemaManager;
+use ReflectionClass;
+use Throwable;
 
 abstract class Type extends DoctrineType
 {
@@ -34,7 +43,7 @@ abstract class Type extends DoctrineType
         $customTypeOptions = $type->customOptions ?? [];
 
         return array_merge([
-            'name' => $type->getName(),
+            'name' => static::getTypeLabel($type),
         ], $customTypeOptions);
     }
 
@@ -49,9 +58,10 @@ abstract class Type extends DoctrineType
         }
 
         $platform = SchemaManager::getDatabasePlatform();
+        $platformName = static::getPlatformName($platform);
 
         static::$platformTypes = Platform::getPlatformTypes(
-            $platform->getName(),
+            $platformName,
             static::getPlatformTypeMapping($platform)
         );
 
@@ -82,7 +92,7 @@ abstract class Type extends DoctrineType
         }
 
         $platform = SchemaManager::getDatabasePlatform();
-        $platformName = ucfirst($platform->getName());
+        $platformName = ucfirst(static::getPlatformName($platform));
 
         $customTypes = array_merge(
             static::getPlatformCustomTypes('Common'),
@@ -329,5 +339,56 @@ abstract class Type extends DoctrineType
         ];
 
         return static::$typeCategories;
+    }
+
+    /**
+     * Reset cached platform metadata so it can be rebuilt for a new Doctrine connection.
+     */
+    public static function flushCache(): void
+    {
+        static::$customTypesRegistered = false;
+        static::$platformTypeMapping = [];
+        static::$platformTypes = [];
+    }
+
+    /**
+     * Resolve printable name for Doctrine type regardless of API version.
+     */
+    public static function getTypeLabel(DoctrineType $type): string
+    {
+        if (method_exists($type, 'getName')) {
+            return $type->getName();
+        }
+
+        if ($type instanceof self) {
+            return $type::NAME;
+        }
+
+        try {
+            return DoctrineType::getTypeRegistry()->lookupName($type);
+        } catch (Throwable $exception) {
+            return (new ReflectionClass($type))->getShortName();
+        }
+    }
+
+    /**
+     * Resolve printable name for Doctrine platform regardless of API version.
+     */
+    public static function getPlatformName(DoctrineAbstractPlatform $platform): string
+    {
+        if (method_exists($platform, 'getName')) {
+            return $platform->getName();
+        }
+
+        return match (true) {
+            $platform instanceof MySQLPlatform => 'mysql',
+            $platform instanceof MariaDBPlatform => 'mariadb',
+            $platform instanceof PostgreSQLPlatform => 'postgresql',
+            $platform instanceof SQLitePlatform => 'sqlite',
+            $platform instanceof SQLServerPlatform => 'sqlserver',
+            $platform instanceof OraclePlatform => 'oracle',
+            $platform instanceof DB2Platform => 'db2',
+            default => strtolower(str_replace('platform', '', (new ReflectionClass($platform))->getShortName())),
+        };
     }
 }

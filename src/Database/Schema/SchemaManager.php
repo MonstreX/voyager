@@ -4,7 +4,7 @@ namespace TCG\Voyager\Database\Schema;
 
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Table as DoctrineTable;
-use Illuminate\Support\Facades\DB;
+use TCG\Voyager\Database\DoctrineManager;
 use TCG\Voyager\Database\Types\Type;
 
 abstract class SchemaManager
@@ -18,12 +18,17 @@ abstract class SchemaManager
 
     public static function manager()
     {
-        return DB::connection()->getDoctrineSchemaManager();
+        return DoctrineManager::schemaManager();
     }
 
     public static function getDatabaseConnection()
     {
-        return DB::connection()->getDoctrineConnection();
+        return DoctrineManager::connection();
+    }
+
+    public static function getDatabasePlatform()
+    {
+        return DoctrineManager::connection()->getDatabasePlatform();
     }
 
     public static function tableExists($table)
@@ -55,8 +60,9 @@ abstract class SchemaManager
     {
         $columns = static::manager()->listTableColumns($tableName);
 
+        $platform = static::getDatabasePlatform();
         $foreignKeys = [];
-        if (static::manager()->getDatabasePlatform()->supportsForeignKeyConstraints()) {
+        if (static::platformSupportsForeignKeys($platform)) {
             $foreignKeys = static::manager()->listTableForeignKeys($tableName);
         }
 
@@ -133,11 +139,22 @@ abstract class SchemaManager
             throw SchemaException::tableDoesNotExist($table);
         }
 
-        return static::manager()->listTableDetails($table);
+        return static::getDatabaseConnection()
+            ->createSchemaManager()
+            ->introspectTable($table);
     }
 
     public static function getDoctrineColumn($table, $column)
     {
         return static::getDoctrineTable($table)->getColumn($column);
+    }
+
+    protected static function platformSupportsForeignKeys($platform): bool
+    {
+        if (method_exists($platform, 'supportsForeignKeyConstraints')) {
+            return $platform->supportsForeignKeyConstraints();
+        }
+
+        return Type::getPlatformName($platform) !== 'sqlite';
     }
 }
