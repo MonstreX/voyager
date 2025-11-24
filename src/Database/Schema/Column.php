@@ -4,7 +4,6 @@ namespace TCG\Voyager\Database\Schema;
 
 use Doctrine\DBAL\Schema\Column as DoctrineColumn;
 use Doctrine\DBAL\Types\Type as DoctrineType;
-use Illuminate\Support\Facades\Log;
 use TCG\Voyager\Database\Types\Type;
 
 abstract class Column
@@ -13,12 +12,6 @@ abstract class Column
     {
         $name = Identifier::validate($column['name'], 'Column');
         $type = $column['type'];
-        Log::debug('voyager.column.make.input', [
-            'name'          => $name,
-            'type'          => $type instanceof DoctrineType ? get_class($type) : ($type['name'] ?? $type),
-            'autoincrement' => $column['autoincrement'] ?? null,
-            'unsigned'      => $column['unsigned'] ?? null,
-        ]);
         if (!($type instanceof DoctrineType)) {
             $typeName = is_array($type) ? ($type['name'] ?? '') : (string) $type;
             $type = Type::resolveDoctrineColumnType($typeName);
@@ -28,22 +21,10 @@ abstract class Column
         $numericUnsigned = array_merge($numericAutoIncrement, ['decimal', 'numeric', 'float', 'double', 'double precision', 'real']);
 
         if (!in_array($typeLabel, $numericAutoIncrement, true)) {
-            if (!empty($column['autoincrement'])) {
-                Log::debug('voyager.column.make.autoincrement.reset', [
-                    'name' => $name,
-                    'type' => $typeLabel,
-                ]);
-            }
             $column['autoincrement'] = false;
         }
 
         if (!in_array($typeLabel, $numericUnsigned, true)) {
-            if (!empty($column['unsigned'])) {
-                Log::debug('voyager.column.make.unsigned.reset', [
-                    'name' => $name,
-                    'type' => $typeLabel,
-                ]);
-            }
             $column['unsigned'] = false;
         }
 
@@ -52,24 +33,11 @@ abstract class Column
         $lengthRequired = ['varchar', 'nvarchar', 'varchar2', 'bpchar', 'string'];
         if (in_array($typeLabel, $lengthRequired, true) && empty($column['length'])) {
             $column['length'] = 191;
-            Log::debug('voyager.column.make.length.default', [
-                'name' => $name,
-                'type' => $typeLabel,
-                'length' => $column['length'],
-            ]);
         }
 
         $options = array_diff_key($column, array_flip(['name', 'composite', 'oldName', 'null', 'extra', 'type', 'charset', 'collation']));
 
-        $doctrineColumn = new DoctrineColumn($name, $type, $options);
-        Log::debug('voyager.column.make.output', [
-            'name'          => $name,
-            'type'          => $typeLabel,
-            'autoincrement' => $doctrineColumn->getAutoincrement(),
-            'unsigned'      => $doctrineColumn->getUnsigned(),
-        ]);
-
-        return $doctrineColumn;
+        return new DoctrineColumn($name, $type, $options);
     }
 
     /**

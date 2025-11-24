@@ -75,17 +75,6 @@ class VoyagerDatabaseController extends Controller
             if (!is_array($request->table)) {
                 $table = json_decode($request->table, true);
             }
-            logger()->debug('voyager.database.store.input', [
-                'table' => $table['name'] ?? null,
-                'columns' => array_map(function ($column) {
-                    return [
-                        'name'          => $column['name'] ?? null,
-                        'type'          => $column['type']['name'] ?? ($column['type'] ?? null),
-                        'autoincrement' => $column['autoincrement'] ?? null,
-                        'unsigned'      => $column['unsigned'] ?? null,
-                    ];
-                }, $table['columns'] ?? []),
-            ]);
             $table['options']['collate'] = config($conn.'.collation', 'utf8mb4_unicode_ci');
             $table['options']['charset'] = config($conn.'.charset', 'utf8mb4');
             $table = Table::make($table);
@@ -119,12 +108,6 @@ class VoyagerDatabaseController extends Controller
                ->route('voyager.database.index')
                ->with($this->alertSuccess(__('voyager::database.success_create_table', ['table' => $table->name])));
         } catch (Exception $e) {
-            logger()->error('voyager.database.store.error', [
-                'table' => $table instanceof \TCG\Voyager\Database\Schema\Table ? $table->getName() : ($table['name'] ?? null),
-                'message' => $e->getMessage(),
-                'exception' => $e,
-            ]);
-
             return back()->with($this->alertException($e))->withInput();
         }
     }
