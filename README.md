@@ -1,27 +1,5 @@
 <p align="center"><a href="https://voyager.devdojo.com" target="_blank"><img width="400" src="https://s3.amazonaws.com/thecontrolgroup/voyager.png"></a></p>
 
-> [!Warning]
-> We have decided to archive Voyager as there are many more modern options available. You may still use Voyager, but it will not be receiving any more updates. Here are some alternatives that we recommend:
-
-- [Wave SaaS Starter Kit](https://devdojo.com/wave)
-- [FilamentPHP Admin Panel & More](https://filamentphp.com)
-- [Genesis Starter Kit](https://github.com/thedevdojo/genesis)
-
-Of course, you may also wish to reach for Laravels admin panel [Nova](https://nova.laravel.com/), or you may want to reach for one of their many [Starter Kits](https://laravel.com/docs/starter-kits).
-
-Thanks for all the wonderful times 🕺
-
-> Voyager is built with Vue and Bootstrap. If you are looking for a Laravel Starter Kit built that uses Livewire and Tailwind, you may be interested in checking out [Genesis](https://github.com/thedevdojo/genesis)
-
-<p align="center"><a href="https://github.com/thedevdojo/genesis" target="_blank"><img src="https://github.com/thedevdojo/voyager/assets/601261/6ffa6ac4-ea1e-4c8a-8360-b347377b8201" height="auto" width="100%"></a></p>
-
-<p align="center">
-<a href="https://packagist.org/packages/tcg/voyager"><img src="https://poser.pugx.org/tcg/voyager/downloads.svg?format=flat" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/tcg/voyager"><img src="https://poser.pugx.org/tcg/voyager/v/stable.svg?format=flat" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/tcg/voyager"><img src="https://poser.pugx.org/tcg/voyager/license.svg?format=flat" alt="License"></a>
-<a href="https://github.com/larapack/awesome-voyager"><img src="https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg" alt="Awesome Voyager"></a>
-</p>
-
 # **V**oyager - The Missing Laravel Admin
 Made with ❤️ by [The Control Group](https://www.thecontrolgroup.com)
 
