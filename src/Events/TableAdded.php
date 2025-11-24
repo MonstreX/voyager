@@ -15,6 +15,6 @@ class TableAdded
     {
         $this->table = $table;
 
-        event(new TableChanged($table->name, 'Added'));
+        event(new TableChanged($table->getName(), 'Added'));
     }
 }

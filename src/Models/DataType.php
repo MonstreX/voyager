@@ -136,7 +136,8 @@ class DataType extends Model
 
                 // It seems everything was fine. Let's check if we need to generate permissions
                 if ($this->generate_permissions) {
-                    Voyager::model('Permission')->generateFor($this->name);
+                    $tableName = Arr::get($requestData, 'name', $this->name);
+                    Voyager::model('Permission')->generateFor($tableName);
                 }
 
                 DB::commit();
