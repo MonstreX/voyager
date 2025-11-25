@@ -94,7 +94,7 @@
 @include('voyager::tools.database.vue-components.database-table-helper-buttons')
 
 <script>
-    Vue.component('database-table-editor', {
+    window.VueRegisterComponent('database-table-editor', {
         props: {
             table: {
                 type: Object,

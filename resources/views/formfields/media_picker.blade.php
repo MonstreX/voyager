@@ -28,8 +28,6 @@
 </div>
 @push('javascript')
 <script>
-new Vue({
-    el: '#media_picker_{{ $row->field }}'
-});
+window.createVueApp({}).mount('#media_picker_{{ $row->field }}');
 </script>
 @endpush

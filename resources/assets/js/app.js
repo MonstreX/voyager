@@ -1,38 +1,47 @@
-import Vue from 'vue';
-window.Vue = Vue;
-import jQuery from 'jquery';
-window.jQuery = jQuery;
-window.$ = jQuery;
+import '../sass/app.scss';
+
+// All jQuery and jQuery plugins loaded via CDN in master.blade.php
+// Only non-jQuery dependencies here
 import PerfectScrollbar from 'perfect-scrollbar';
-window.Cropper = require('cropperjs');
-window.Cropper = 'default' in window.Cropper ? window.Cropper['default'] : window.Cropper;
-window.toastr = require('toastr');
-window.DataTable = require('datatables');
-require('datatables-bootstrap3-plugin/media/js/datatables-bootstrap3');
-window.EasyMDE = require('easymde');
-require('dropzone');
-require('jquery-match-height');
-require('bootstrap-toggle');
-require('nestable2');
-require('bootstrap');
-require('select2');
-require('eonasdan-bootstrap-datetimepicker/src/js/bootstrap-datetimepicker');
-var brace = require('brace');
-require('brace/mode/json');
-require('brace/theme/github');
-require('./slugify');
-window.TinyMCE = window.tinymce = require('tinymce');
-require('./multilingual');
-require('./voyager_tinymce');
-window.voyagerTinyMCE = require('./voyager_tinymce_config');
-require('./voyager_ace_editor');
-window.helpers = require('./helpers.js');
+import Cropper from 'cropperjs';
+window.Cropper = Cropper;
+import toastr from 'toastr';
+window.toastr = toastr;
+import EasyMDE from 'easymde';
+window.EasyMDE = EasyMDE;
+import * as brace from 'brace';
+import 'brace/mode/json';
+import 'brace/theme/github';
+import './slugify';
+import tinymce from 'tinymce';
+window.TinyMCE = window.tinymce = tinymce;
+import './multilingual';
+import './voyager_tinymce';
+import voyagerTinyMCE from './voyager_tinymce_config';
+window.voyagerTinyMCE = voyagerTinyMCE;
+import './voyager_ace_editor';
+import * as helpers from './helpers.js';
+window.helpers = helpers;
 
-Vue.component('admin-menu', require('./components/admin_menu.vue').default);
+import AdminMenu from './components/admin_menu.vue';
+import { createApp } from 'vue';
 
-var admin_menu = new Vue({
-    el: '#adminmenu',
-});
+// Setup Vue 3 global helpers for blade templates
+window.createVueApp = createApp;
+window.__vueGlobalApp = createApp({});
+window.VueRegisterComponent = function(name, definition) {
+    window.__vueGlobalApp.component(name, definition);
+};
+window.VueMountApp = function(selector) {
+    return window.__vueGlobalApp.mount(selector);
+};
+
+// Create Vue 3 app for admin menu
+if (document.getElementById('adminmenu')) {
+    const adminMenuApp = createApp({});
+    adminMenuApp.component('admin-menu', AdminMenu);
+    adminMenuApp.mount('#adminmenu');
+}
 
 $(document).ready(function () {
     var appContainer = $(".app-container"),
@@ -60,11 +69,11 @@ $(document).ready(function () {
             tags: $(this).hasClass('taggable'),
             createTag: function(params) {
                 var term = $.trim(params.term);
-    
+
                 if (term === '') {
                     return null;
                 }
-    
+
                 return {
                     id: term,
                     text: term,
@@ -110,11 +119,11 @@ $(document).ready(function () {
             var label = $el.data('label');
             var errorMessage = $el.data('error-message');
             var newTag = e.params.args.data.newTag;
-    
+
             if (!newTag) return;
-    
+
             $el.select2('close');
-    
+
             $.post(route, {
                 [label]: e.params.args.data.text,
                 _tagging: true,
@@ -124,7 +133,7 @@ $(document).ready(function () {
             }).fail(function(error) {
                 toastr.error(errorMessage);
             });
-    
+
             return false;
         });
     });

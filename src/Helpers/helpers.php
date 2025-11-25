@@ -15,9 +15,28 @@ if (!function_exists('menu')) {
 }
 
 if (!function_exists('voyager_asset')) {
-    function voyager_asset($path, $secure = null)
+    function voyager_asset($path = '', $secure = null)
     {
-        return route('voyager.voyager_assets').'?path='.urlencode($path);
+        $normalizedPath = str_replace('\\', '/', ltrim($path, '/'));
+        $segments = array_filter(explode('/', $normalizedPath), function ($segment) {
+            return $segment !== '' && $segment !== '.';
+        });
+        $safeSegments = [];
+        foreach ($segments as $segment) {
+            if ($segment === '..' || str_contains($segment, '..')) {
+                continue;
+            }
+            $safeSegments[] = $segment;
+        }
+
+        $cleanPath = implode('/', $safeSegments);
+        $publicRelativePath = trim('vendor/voyager/'.$cleanPath, '/');
+
+        if ($cleanPath === '') {
+            $publicRelativePath = 'vendor/voyager';
+        }
+
+        return asset($publicRelativePath, $secure);
     }
 }
 

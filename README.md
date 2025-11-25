@@ -97,6 +97,19 @@ php artisan voyager:admin your@email.com --create
 
 And you will be prompted for the user's name and password.
 
+## Frontend Assets
+
+Voyager's admin panel assets are built with [Vite](https://vitejs.dev/). When working on the UI locally run:
+
+```bash
+npm install
+npm run build
+php artisan vendor:publish --tag=voyager_assets --force
+```
+
+The `vendor:publish` step copies the compiled files from `publishable/assets` into your application's `public/vendor/voyager` directory so that the admin panel can serve them directly.
+This path is now the only runtime source of Voyager's CSS/JS, so rerun the publish command every time you rebuild assets.
+
 ## Sponsors
 
 Voyager is proudly supported by our amazing sponsors. A big thank you to:

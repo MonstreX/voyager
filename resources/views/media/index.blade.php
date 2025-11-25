@@ -32,8 +32,6 @@
 
 @section('javascript')
 <script>
-new Vue({
-    el: '#filemanager'
-});
+window.createVueApp({}).mount('#filemanager');
 </script>
 @endsection

@@ -70,4 +70,4 @@ var getConfig = function(options) {
     return $.extend({}, baseTinymceConfig, options);
 }
 
-exports.getConfig = getConfig;
+export default { getConfig };

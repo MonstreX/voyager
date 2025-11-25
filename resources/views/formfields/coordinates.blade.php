@@ -71,7 +71,7 @@
 
 @push('javascript')
     <script>
-        Vue.component('coordinates', {
+        const coordinatesComponent = {
             props: {
                 apiKey: {
                     type: String,
@@ -200,8 +200,10 @@
                     @endif
                 },
             }
-        });
+        };
 
-        var gMapVm = new Vue({ el: '#coordinates-formfield' });
+        const gMapVm = window.createVueApp({});
+        gMapVm.component('coordinates', coordinatesComponent);
+        gMapVm.mount('#coordinates-formfield');
     </script>
 @endpush

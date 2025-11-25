@@ -39,7 +39,7 @@
         return databaseTypes.Numbers[0];
     }
 
-    Vue.component('database-types', {
+    window.VueRegisterComponent('database-types', {
         props: {
             column: {
                 type: Object,

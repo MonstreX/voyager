@@ -4,7 +4,7 @@
     <title>@yield('page_title', setting('admin.title') . " - " . setting('admin.description'))</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}"/>
-    <meta name="assets-path" content="{{ route('voyager.voyager_assets') }}"/>
+    <meta name="assets-path" content="{{ voyager_asset() }}"/>
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
@@ -117,7 +117,11 @@ if (\Illuminate\Support\Str::startsWith(Auth::user()->avatar, 'http://') || \Ill
 <!-- Javascript Libs -->
 
 
-<script type="text/javascript" src="{{ voyager_asset('js/app.js') }}"></script>
+<!-- jQuery must be loaded BEFORE app.js -->
+<script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script><script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script><script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script><script src="https://cdn.jsdelivr.net/npm/bootstrap-toggle@2.2.2/js/bootstrap-toggle.min.js"></script><script src="https://cdn.jsdelivr.net/npm/nestable2@1.6.0/jquery.nestable.min.js"></script><script src="https://cdn.jsdelivr.net/npm/jquery-match-height@0.7.2/dist/jquery.matchHeight-min.js"></script><script src="https://cdn.jsdelivr.net/npm/dropzone@5.9.3/dist/min/dropzone.min.js"></script><script src="https://cdn.jsdelivr.net/npm/eonasdan-bootstrap-datetimepicker@4.17.49/build/js/bootstrap-datetimepicker.min.js"></script>
+<script src="{{ voyager_asset('js/app.js') }}"></script>
 
 <script>
     @if(Session::has('alerts'))
@@ -140,6 +144,12 @@ if (\Illuminate\Support\Str::startsWith(Auth::user()->avatar, 'http://') || \Ill
     @endif
 </script>
 @include('voyager::media.manager')
+<script>
+// Mount global Vue app for components registered in blade templates
+if (window.__vueGlobalApp && document.body) {
+    window.VueMountApp('body');
+}
+</script>
 @yield('javascript')
 @stack('javascript')
 @if(!empty(config('voyager.additional_js')))<!-- Additional Javascript -->

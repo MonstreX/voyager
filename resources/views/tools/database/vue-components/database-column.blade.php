@@ -56,11 +56,11 @@
 @include('voyager::tools.database.vue-components.database-column-default')
 
 <script>
-    Vue.component('database-column', {
-        data: function() {
+    window.VueRegisterComponent('database-column', {
+        data() {
             return {
                 lengthInputType: 'number'
-            }
+            };
         },
         props: {
             column: {

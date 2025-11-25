@@ -255,6 +255,9 @@ class VoyagerServiceProvider extends ServiceProvider
             'config' => [
                 "{$publishablePath}/config/voyager.php" => config_path('voyager.php'),
             ],
+            'voyager_assets' => [
+                "{$publishablePath}/assets/" => public_path('vendor/voyager'),
+            ],
 
         ];
 

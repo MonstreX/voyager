@@ -132,8 +132,5 @@ Route::group(['as' => 'voyager.'], function () {
         event(new RoutingAdminAfter());
     });
 
-    //Asset Routes
-    Route::get('voyager-assets', ['uses' => $namespacePrefix.'VoyagerController@assets', 'as' => 'voyager_assets']);
-
     event(new RoutingAfter());
 });

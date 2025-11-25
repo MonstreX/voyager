@@ -60,13 +60,14 @@
     @include('voyager::tools.database.vue-components.database-table-editor')
 
     <script>
-        new Vue({
-            el: '#dbManager',
-            data: {
-                table: {},
-                originalTable: {!! $db->table->toJson() !!}, // to do comparison later?
-                oldTable: {!! $db->oldTable !!},
-                tableJson: ''
+        window.createVueApp({
+            data() {
+                return {
+                    table: {},
+                    originalTable: {!! $db->table->toJson() !!}, // to do comparison later?
+                    oldTable: {!! $db->oldTable !!},
+                    tableJson: ''
+                };
             },
             created() {
                 // If old table is set, use it to repopulate the form
@@ -83,7 +84,7 @@
                     this.$nextTick(() => this.$refs.form.submit());
                 }
             }
-        });
+        }).mount('#dbManager');
     </script>
 
 @stop

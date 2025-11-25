@@ -2,26 +2,52 @@
 
 namespace TCG\Voyager\Tests;
 
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Auth;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 class AssetsTest extends TestCase
 {
-    protected $prefix = '/voyager-assets?path=';
+    protected static bool $assetsPublished = false;
 
     public function setUp(): void
     {
         parent::setUp();
 
+        $this->publishAssetsToPublic();
         Auth::loginUsingId(1);
     }
 
-    public function testCanOpenFileInAssets()
+    protected function publishAssetsToPublic(): void
     {
-        $url = route('voyager.dashboard').$this->prefix.'css/app.css';
+        if (self::$assetsPublished) {
+            return;
+        }
 
-        $response = $this->call('GET', $url);
-        $this->assertEquals(200, $response->status(), $url.' did not return a 200');
+        /** @var Filesystem $filesystem */
+        $filesystem = app(Filesystem::class);
+        $vendorPath = public_path('vendor');
+        $voyagerPath = $vendorPath.DIRECTORY_SEPARATOR.'voyager';
+
+        if (!$filesystem->isDirectory($vendorPath)) {
+            $filesystem->makeDirectory($vendorPath, 0755, true);
+        }
+
+        if ($filesystem->isDirectory($voyagerPath)) {
+            $filesystem->deleteDirectory($voyagerPath);
+        }
+
+        $filesystem->copyDirectory(dirname(__DIR__).'/publishable/assets', $voyagerPath);
+
+        self::$assetsPublished = true;
+    }
+
+    public function testVoyagerAssetHelperPointsToPublicPath(): void
+    {
+        $assetUrl = voyager_asset('css/app.css');
+
+        $this->assertSame(asset('vendor/voyager/css/app.css'), $assetUrl);
+        $this->assertFileExists(public_path('vendor/voyager/css/app.css'));
     }
 
     public static function urlProvider()
@@ -39,9 +65,11 @@ class AssetsTest extends TestCase
     }
 
     #[DataProvider('urlProvider')]
-    public function testCannotOpenFileOutsideAssets($url)
+    public function testVoyagerAssetHelperStripsTraversal($url)
     {
-        $response = $this->call('GET', route('voyager.dashboard').$this->prefix.$url);
-        $this->assertContains($response->status(), [404, 500], $url.' did not return a 404 or 500');
+        $assetUrl = voyager_asset($url);
+
+        $this->assertStringStartsWith(asset('vendor/voyager'), $assetUrl);
+        $this->assertStringNotContainsString('..', $assetUrl);
     }
 }

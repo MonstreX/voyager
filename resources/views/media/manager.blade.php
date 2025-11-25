@@ -356,7 +356,7 @@
 @endsection
 
 <script>
-    Vue.component('media-manager', {
+    window.VueRegisterComponent('media-manager', {
         template: `@yield('media-manager')`,
         props: {
             basePath: {
@@ -515,7 +515,7 @@
 
                 if (this.selected_files.length == 1) {
                     var vm = this;
-                    Vue.nextTick(function () {
+                    this.$nextTick(function () {
                         if (vm.fileIs(vm.selected_file, 'video')) {
                             vm.$refs.videoplayer.load();
                         } else if (vm.fileIs(vm.selected_file, 'audio')) {

@@ -23,7 +23,7 @@
         disabled: false
     };
 
-    Vue.component('database-column-default', {
+    window.VueRegisterComponent('database-column-default', {
         props: {
             column: {
                 type: Object,

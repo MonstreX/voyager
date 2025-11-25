@@ -7,7 +7,7 @@
 @endsection
 
 <script>
-    Vue.component('database-table-helper-buttons', {
+    window.VueRegisterComponent('database-table-helper-buttons', {
         template: `@yield('database-table-helper-buttons-template')`,
         methods: {
             addColumn(column) {
