@@ -356,7 +356,6 @@
 @endsection
 
 <script>
-    console.debug('[media-manager] registering component script injected');
     window.VueRegisterComponent('media-manager', {
         template: `@yield('media-manager')`,
         props: {
@@ -458,7 +457,6 @@
         computed: {
             selected_file: function() {
                 if (this.selected_files.length === 0) {
-                    console.debug('[media-manager] no selected files, returning placeholder');
                     return {
                         name: '',
                         path: '',
@@ -488,7 +486,6 @@
                         vm.selected_files.push(data[0]);
                     }
 					vm.is_loading = false;
-                    console.debug('[media-manager] files loaded', { count: vm.files.length, selected: vm.selected_files.length });
 				});
             },
             selectFile: function(file, e) {
@@ -977,7 +974,6 @@
             }
         },
         mounted: function() {
-            console.debug('[media-manager] mounted hook running', { basePath: this.basePath });
             this.getFiles();
             var vm = this;
 

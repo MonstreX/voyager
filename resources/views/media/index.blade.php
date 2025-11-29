@@ -38,7 +38,6 @@
 
 @section('javascript')
 <script>
-console.debug('[media-page] mounting filemanager app');
 window.createVueApp({
     data: () => ({})
 }).mount('#filemanager');

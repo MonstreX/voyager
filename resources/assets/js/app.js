@@ -41,13 +41,11 @@ const applyVoyagerComponents = (appInstance) => {
 window.createVueApp = function(rootComponent = {}) {
     const shouldClone = rootComponent && typeof rootComponent === 'object';
     const resolvedRootComponent = shouldClone ? { ...rootComponent } : rootComponent;
-    console.debug('[voyager] createVueApp invoked', { rootComponent: resolvedRootComponent });
     const appInstance = applyVoyagerComponents(createApp(resolvedRootComponent));
     const originalMount = appInstance.mount;
 
     appInstance.mount = function(target, ...args) {
         const mountTarget = typeof target === 'string' ? document.querySelector(target) : target;
-        console.debug('[voyager] Vue app mounting', { target: mountTarget });
 
         if (
             mountTarget &&
@@ -68,7 +66,6 @@ window.createVueApp = function(rootComponent = {}) {
 window.__vueGlobalApp = null;
 window.VueRegisterComponent = function(name, definition) {
     voyagerComponentRegistry[name] = definition;
-    console.debug('[voyager] component registered', name);
     voyagerActiveApps.forEach((appInstance) => {
         appInstance.component(name, definition);
     });
