@@ -9,7 +9,7 @@ var getConfig = function(options) {
     var baseTinymceConfig = {
         menubar: false,
         selector: 'textarea.richTextBox',
-        base_url: $('meta[name="assets-path"]').attr('content')+'?path=js/',
+        base_url: $('meta[name="assets-path"]').attr('content')+'/js',
         skin: 'oxide',
         min_height: 600,
         resize: true,
