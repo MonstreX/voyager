@@ -195,7 +195,6 @@
   float: right;
   padding: 9px 10px;
   margin-right: $navbar-padding-horizontal;
-  @include navbar-vertical-align(34px);
   background-color: transparent;
   background-image: none; // Reset unusual Firefox-on-Android default style; see https://github.com/necolas/normalize.css/issues/214
   border: 1px solid transparent;
@@ -221,6 +220,7 @@
   @media (min-width: $grid-float-breakpoint) {
     display: none;
   }
+  @include navbar-vertical-align(34px);
 }
 
 
@@ -293,10 +293,8 @@
   @include box-shadow($shadow);
 
   // Mixin behavior for optimum display
-  @include form-inline;
-
-  // Vertically center in expanded, horizontal navbar
   @include navbar-vertical-align($input-height-base);
+  @include form-inline;
 
   .form-group {
     @media (max-width: $grid-float-breakpoint-max) {
