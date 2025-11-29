@@ -32,6 +32,7 @@
 
 @section('javascript')
 <script>
+console.debug('[media-page] mounting filemanager app');
 window.createVueApp({}).mount('#filemanager');
 </script>
 @endsection

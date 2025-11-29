@@ -26,7 +26,7 @@
                     </div>
                     <div class="details">
                         <div class="folder">
-                            <h4>@{{ getFileName(file) }}</h4>
+                            <h4>@{{ file.name }}</h4>
                         </div>
                     </div>
                     <i class="voyager-x dd-nodrag" v-on:click="removeFileFromInput(file)"></i>
@@ -93,7 +93,7 @@
         <div class="flex">
             <div id="left">
                 <ul id="files">
-                    <li v-for="(file) in files" v-on:click="selectFile(file, $event)" v-on:dblclick="openFile(file)" v-if="filter(file)">
+                <li v-for="(file) in files" v-on:click="selectFile(file, $event)" v-on:dblclick="openFile(file)">
                         <div :class="'file_link ' + (isFileSelected(file) ? 'selected' : '')">
                             <div class="link_icon">
                                 <template v-if="fileIs(file, 'image')">
@@ -118,9 +118,9 @@
                             <div class="details">
                                 <div :class="file.type">
                                     <h4>@{{ file.name }}</h4>
-                                    <small v-if="!fileIs(file, 'folder')">
-                                        <span class="file_size">@{{ bytesToSize(file.size) }}</span>
-                                    </small>
+                        <small v-if="!fileIs(file, 'folder') && file && file.size">
+                            <span class="file_size">@{{ bytesToSize(file.size) }}</span>
+                        </small>
                                 </div>
                             </div>
                         </div>
@@ -356,6 +356,7 @@
 @endsection
 
 <script>
+    console.debug('[media-manager] registering component script injected');
     window.VueRegisterComponent('media-manager', {
         template: `@yield('media-manager')`,
         props: {
@@ -457,6 +458,7 @@
         computed: {
             selected_file: function() {
                 if (this.selected_files.length === 0) {
+                    console.debug('[media-manager] no selected files, returning placeholder');
                     return {
                         name: '',
                         path: '',
@@ -486,6 +488,7 @@
                         vm.selected_files.push(data[0]);
                     }
 					vm.is_loading = false;
+                    console.debug('[media-manager] files loaded', { count: vm.files.length, selected: vm.selected_files.length });
 				});
             },
             selectFile: function(file, e) {
@@ -588,6 +591,7 @@
             },
             filter: function(file) {
                 if (!file || typeof file !== 'object') {
+                    console.warn('[media-manager] filter received invalid file reference', file);
                     return false;
                 }
                 if (this.allowedTypes.length > 0) {
@@ -810,6 +814,7 @@
             }
         },
         mounted: function() {
+            console.debug('[media-manager] mounted hook running', { basePath: this.basePath });
             this.getFiles();
             var vm = this;
 
