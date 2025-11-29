@@ -2,11 +2,11 @@
 <div>
     <div v-if="hidden_element" :id="'dd_'+this._uid" class="dd">
         <ol id="files" class="dd-list">
-            <li v-for="file in getSelectedFiles()" class="dd-item" :data-url="file">
-                <div class="file_link selected" aria-hidden="true" data-toggle="tooltip" data-placement="auto" :title="file">
+            <li v-for="file in getSelectedFiles()" class="dd-item" :data-url="getFilePath(file)">
+                <div class="file_link selected" aria-hidden="true" data-toggle="tooltip" data-placement="auto" :title="getFilePath(file)">
                     <div class="link_icon">
                         <template v-if="fileIs(file, 'image')">
-                            <div class="img_icon" :style="imgIcon('{{ Storage::disk(config('voyager.storage.disk'))->url('/') }}'+file)"></div>
+                            <div class="img_icon" :style="imgIcon(getFilePath(file))"></div>
                         </template>
                         <template v-else-if="fileIs(file, 'video')">
                             <i class="icon voyager-video"></i>
@@ -25,11 +25,11 @@
                         </template>
                     </div>
                     <div class="details">
-                        <div class="folder">
-                            <h4>@{{ file.name }}</h4>
+                        <div class="folder" :class="getFileTypeClass(file)">
+                            <h4>@{{ getFileName(file) }}</h4>
                         </div>
                     </div>
-                    <i class="voyager-x dd-nodrag" v-on:click="removeFileFromInput(file)"></i>
+                    <i class="voyager-x dd-nodrag" v-on:click="removeSelectedFile(file)"></i>
                 </div>
             </li>
         </ol>
@@ -556,21 +556,43 @@
                 return this.selected_files.includes(file);
             },
             fileIs: function(file, type) {
-                if (!file) {
+                if (!file || !type) {
                     return false;
                 }
 
-                if (typeof file === 'string') {
-                    if (type == 'image') {
-                        return this.endsWithAny(['jpg', 'jpeg', 'png', 'bmp'], file.toLowerCase());
-                    }
-                    //Todo: add other types
-                } else {
-                    return file.type.includes(type);
+                var candidate = this.normalizeSelectionEntry(file);
+                if (!candidate) {
+                    return false;
+                }
+
+                var normalizedType = candidate.type || this.detectTypeFromPath(candidate.path || candidate.relative_path);
+                if (normalizedType && normalizedType.indexOf(type) !== -1) {
+                    return true;
+                }
+
+                var path = (candidate.path || candidate.relative_path || '').toLowerCase();
+                if (type === 'image') {
+                    return this.endsWithAny(['jpg', 'jpeg', 'png', 'bmp', 'gif', 'webp', 'svg'], path);
+                }
+
+                if (type === 'video') {
+                    return this.endsWithAny(['mp4', 'mov', 'ogg', 'webm'], path);
+                }
+
+                if (type === 'audio') {
+                    return this.endsWithAny(['mp3', 'wav', 'ogg'], path);
+                }
+
+                if (type === 'zip') {
+                    return this.endsWithAny(['zip', 'rar', '7z', 'tar', 'gz'], path);
+                }
+
+                if (type === 'folder') {
+                    return normalizedType === 'folder';
                 }
 
                 return false;
-			},
+            },
             getCurrentPath: function() {
                 var path = this.current_folder.replace(this.basePath, '').split('/').filter(function (el) {
                     return el != '';
@@ -616,53 +638,153 @@
                 return false;
             },
             addFileToInput: function(file) {
-                if (file.type != 'folder') {
-                    if (!this.allowMultiSelect) {
-                        this.hidden_element.value = file.relative_path;
-                    } else {
-                        var content = JSON.parse(this.hidden_element.value);
-                        if (content.indexOf(file.relative_path) !== -1) {
-                            return;
-                        }
-                        if (content.length >= this.maxSelectedFiles && this.maxSelectedFiles > 0) {
-                            var msg_sing = "{{ trans_choice('voyager::media.max_files_select', 1) }}";
-                            var msg_plur = "{{ trans_choice('voyager::media.max_files_select', 2) }}";
-                            if (this.maxSelectedFiles == 1) {
-                                toastr.error(msg_sing);
-                            } else {
-                                toastr.error(msg_plur.replace('2', this.maxSelectedFiles));
-                            }
-                        } else {
-                            content.push(file.relative_path);
-                            this.hidden_element.value = JSON.stringify(content);
-                        }
-                    }
-                    this.$forceUpdate();
+                if (!this.hidden_element || !file || file.type === 'folder') {
+                    return;
                 }
+
+                var path = file.relative_path || file.path || file.full_path || file.name || '';
+                if (!path) {
+                    return;
+                }
+
+                if (!this.allowMultiSelect) {
+                    this.hidden_element.value = path;
+                    this.$forceUpdate();
+                    return;
+                }
+
+                var content = this.getRawSelectedValues();
+                if (content.indexOf(path) !== -1) {
+                    return;
+                }
+
+                if (content.length >= this.maxSelectedFiles && this.maxSelectedFiles > 0) {
+                    var msg_sing = "{{ trans_choice('voyager::media.max_files_select', 1) }}";
+                    var msg_plur = "{{ trans_choice('voyager::media.max_files_select', 2) }}";
+                    if (this.maxSelectedFiles == 1) {
+                        toastr.error(msg_sing);
+                    } else {
+                        toastr.error(msg_plur.replace('2', this.maxSelectedFiles));
+                    }
+                    return;
+                }
+
+                content.push(path);
+                this.hidden_element.value = JSON.stringify(content);
+                this.$forceUpdate();
+            },
+            removeSelectedFile: function(file) {
+                if (!this.hidden_element) {
+                    return;
+                }
+
+                var targetPath = this.getFilePath(file);
+                if (!targetPath) {
+                    return;
+                }
+
+                if (!this.allowMultiSelect) {
+                    this.hidden_element.value = '';
+                } else {
+                    var entries = this.getRawSelectedValues().filter(function(entry) {
+                        return entry !== targetPath;
+                    });
+                    this.hidden_element.value = JSON.stringify(entries);
+                }
+
+                this.$forceUpdate();
             },
             removeFileFromInput: function(path) {
-                if (this.allowMultiSelect) {
-                    var content = JSON.parse(this.hidden_element.value);
-                    if (content.indexOf(path) !== -1) {
-                        content.splice(content.indexOf(path), 1);
-                        this.hidden_element.value = JSON.stringify(content);
-                        this.$forceUpdate();
-                    }
-                } else {
-                    this.hidden_element.value = '';
+                this.removeSelectedFile(path);
+            },
+            getRawSelectedValues: function() {
+                if (!this.hidden_element) {
+                    return [];
+                }
+
+                if (!this.allowMultiSelect) {
+                    return this.hidden_element.value ? [this.hidden_element.value] : [];
+                }
+
+                if (!this.hidden_element.value) {
+                    return [];
+                }
+
+                try {
+                    return JSON.parse(this.hidden_element.value);
+                } catch (error) {
+                    console.error('[media-manager] failed to parse selected files from hidden input', error);
+                    return [];
                 }
             },
             getSelectedFiles: function() {
-                if (!this.allowMultiSelect) {
-                    var content = [];
-                    if (this.hidden_element.value != '') {
-                        content.push(this.hidden_element.value);
+                var rawEntries = this.getRawSelectedValues();
+
+                return rawEntries
+                    .map(this.normalizeSelectionEntry.bind(this))
+                    .filter(function(entry) {
+                        return entry !== null;
+                    });
+            },
+            normalizeSelectionEntry: function(entry) {
+                if (!entry) {
+                    return null;
+                }
+
+                if (typeof entry === 'object') {
+                    if (!entry.name) {
+                        entry.name = this.extractNameFromPath(entry.path || entry.relative_path || '');
                     }
 
-                    return content;
-                } else {
-                    return JSON.parse(this.hidden_element.value);
+                    if (!entry.type) {
+                        entry.type = this.detectTypeFromPath(entry.path || entry.relative_path || '');
+                    }
+
+                    return entry;
                 }
+
+                var path = entry.toString();
+                return {
+                    path: path,
+                    relative_path: path,
+                    name: this.extractNameFromPath(path),
+                    type: this.detectTypeFromPath(path),
+                    size: null,
+                    thumbnails: [],
+                    last_modified: null,
+                };
+            },
+            getFilePath: function(file) {
+                if (!file) {
+                    return '';
+                }
+
+                if (typeof file === 'string') {
+                    return file;
+                }
+
+                return file.path || file.relative_path || '';
+            },
+            getFileTypeClass: function(file) {
+                if (file && typeof file === 'object' && file.type) {
+                    return file.type;
+                }
+
+                return '';
+            },
+                    try {
+                        rawEntries = JSON.parse(this.hidden_element.value);
+                    } catch (error) {
+                        console.error('[media-manager] failed to parse selected files from hidden input', error);
+                        rawEntries = [];
+                    }
+                }
+
+                return rawEntries
+                    .map(this.normalizeSelectionEntry)
+                    .filter(function(entry) {
+                        return entry !== null;
+                    });
             },
             renameFile: function(object) {
                 var vm = this;
@@ -785,14 +907,69 @@
 				var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
 				return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
 			},
-            getFileName: function(name) {
-                var name = name.split('/');
-                return name[name.length -1];
+            getFileName: function(file) {
+                if (!file) {
+                    return '';
+                }
+
+                if (typeof file === 'object' && file.name) {
+                    return file.name;
+                }
+
+                return this.extractNameFromPath(this.getFilePath(file));
             },
             imgIcon: function(path) {
-                path = path.replace(/\\/g,"/");
+                if (!path) {
+                    return '';
+                }
+
+                path = this.resolvePreviewPath(path);
 				return 'background-size: cover; background-image: url("' + path + '"); background-repeat:no-repeat; background-position:center center;display:inline-block; width:100%; height:100%;';
 			},
+            resolvePreviewPath: function(path) {
+                if (!path) {
+                    return '';
+                }
+
+                path = path.replace(/\\/g,"/");
+                if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
+                    return path;
+                }
+
+                path = path.replace(/^\/+/, '');
+                var basePath = "{{ addslashes(Storage::disk(config('voyager.storage.disk'))->url('/')) }}";
+                return basePath + path;
+            },
+            extractNameFromPath: function(path) {
+                if (!path) {
+                    return '';
+                }
+
+                path = path.replace(/\\/g,"/");
+                var segments = path.split('/');
+                return segments[segments.length -1];
+            },
+            detectTypeFromPath: function(path) {
+                if (!path) {
+                    return '';
+                }
+
+                var lower = path.toLowerCase();
+                if (this.endsWithAny(['jpg', 'jpeg', 'png', 'bmp', 'gif', 'webp', 'svg'], lower)) {
+                    return 'image';
+                }
+                if (this.endsWithAny(['mp4', 'mov', 'ogg', 'webm'], lower)) {
+                    return 'video';
+                }
+                if (this.endsWithAny(['mp3', 'wav', 'ogg'], lower)) {
+                    return 'audio';
+                }
+                if (this.endsWithAny(['zip', 'rar', '7z', 'tar', 'gz'], lower)) {
+                    return 'zip';
+                }
+
+                return '';
+            },
             dateFilter: function(date) {
                 if (!date) {
                     return null;
