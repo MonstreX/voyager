@@ -12,6 +12,12 @@
                     <h3><i class="voyager-images"></i> {{ __('voyager::generic.media') }}</h3>
                 </div>
                 <div class="clear"></div>
+                @php
+                    $detailsJson = json_encode([
+                        'thumbnails' => config('voyager.media.thumbnails', []),
+                        'watermark' => config('voyager.media.watermark', (object)[])
+                    ]);
+                @endphp
                 <div id="filemanager">
                     <media-manager
                         base-path="{{ config('voyager.media.path', '/') }}"
@@ -22,7 +28,7 @@
                         :allow-create-folder="{{ config('voyager.media.allow_create_folder', true) ? 'true' : 'false' }}"
                         :allow-rename="{{ config('voyager.media.allow_rename', true) ? 'true' : 'false' }}"
                         :allow-crop="{{ config('voyager.media.allow_crop', true) ? 'true' : 'false' }}"
-                        :details="{{ json_encode(['thumbnails' => config('voyager.media.thumbnails', []), 'watermark' => config('voyager.media.watermark', (object)[])]) }}"
+                        :details='{!! $detailsJson !!}'
                         ></media-manager>
                 </div>
             </div><!-- .row -->
@@ -33,6 +39,8 @@
 @section('javascript')
 <script>
 console.debug('[media-page] mounting filemanager app');
-window.createVueApp({}).mount('#filemanager');
+window.createVueApp({
+    data: () => ({})
+}).mount('#filemanager');
 </script>
 @endsection
