@@ -145,9 +145,12 @@ if (\Illuminate\Support\Str::startsWith(Auth::user()->avatar, 'http://') || \Ill
 </script>
 @include('voyager::media.manager')
 <script>
-// Mount global Vue app for components registered in blade templates
-if (window.__vueGlobalApp && document.body) {
-    window.VueMountApp('body');
+// Mount any declarative Vue roots (if present)
+if (window.VueMountApp) {
+    const autoVueRoots = document.querySelectorAll('[data-voyager-vue-root]');
+    if (autoVueRoots.length) {
+        window.VueMountApp(autoVueRoots);
+    }
 }
 </script>
 @yield('javascript')
