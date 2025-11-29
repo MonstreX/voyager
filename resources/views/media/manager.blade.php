@@ -146,7 +146,7 @@
                         <i class="voyager-list"></i>
                         <p>@{{ selected_files.length }} {{ __('voyager::media.files_selected') }}</p>
                     </div>
-                    <div v-else-if="selected_files.length == 1" class="right_details">
+                    <div v-else-if="selected_files.length == 1 && selected_file" class="right_details">
                         <div class="detail_img">
                             <div v-if="fileIs(selected_file, 'image')">
                                 <img :src="selected_file.path" />
@@ -456,6 +456,17 @@
         },
         computed: {
             selected_file: function() {
+                if (this.selected_files.length === 0) {
+                    return {
+                        name: '',
+                        path: '',
+                        type: '',
+                        size: 0,
+                        thumbnails: [],
+                        last_modified: null,
+                    };
+                }
+
                 return this.selected_files[0];
             }
         },
@@ -542,6 +553,10 @@
                 return this.selected_files.includes(file);
             },
             fileIs: function(file, type) {
+                if (!file) {
+                    return false;
+                }
+
                 if (typeof file === 'string') {
                     if (type == 'image') {
                         return this.endsWithAny(['jpg', 'jpeg', 'png', 'bmp'], file.toLowerCase());
@@ -572,6 +587,9 @@
                 this.getFiles();
             },
             filter: function(file) {
+                if (!file || typeof file !== 'object') {
+                    return false;
+                }
                 if (this.allowedTypes.length > 0) {
                     if (file.type != 'folder') {
                         for (var i = 0, type; type = this.allowedTypes[i]; i++) {
