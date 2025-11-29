@@ -9,7 +9,8 @@ export default defineConfig({
     vue(),
     inject({
       $: 'jquery',
-      jQuery: 'jquery'
+      jQuery: 'jquery',
+      include: '**/*.js',
     }),
     viteStaticCopy({
       targets: [
@@ -37,7 +38,8 @@ export default defineConfig({
         },
         format: 'iife',
         globals: {
-          moment: 'moment'
+          moment: 'moment',
+          jquery: '$'
         }
       },
       external: ['moment', 'jquery', 'select2', 'bootstrap', 'datatables.net', 'datatables-bootstrap3-plugin', 'bootstrap-toggle', 'nestable2', 'jquery-match-height', 'dropzone', 'eonasdan-bootstrap-datetimepicker']

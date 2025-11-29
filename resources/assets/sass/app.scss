@@ -1,13 +1,13 @@
 @import "_variables";
 @import "bootstrap/stylesheets/bootstrap";
 @import "animate.css/animate";
-@import "datatables/media/css/jquery.dataTables";
+@import "vendor/jquery.dataTables";
 @import "datatables-bootstrap3-plugin/media/css/datatables-bootstrap3";
 @import "select2/dist/css/select2";
 @import "toastr/build/toastr";
 @import "perfect-scrollbar/css/perfect-scrollbar";
 @import "bootstrap-toggle/css/bootstrap-toggle";
-@import "icheck/skins/flat/flat";
+@import "vendor/icheck-flat";
 @import "bootstrap-datepicker/dist/css/bootstrap-datepicker";
 @import "easymde/dist/easymde.min";
 @import "dropzone/dist/dropzone";
@@ -3860,7 +3860,6 @@ a.text-action{color:#a3afb7}a.text-action,a.text-action:focus,a.text-action:hove
 .voyager .tabs-left > .nav-tabs .active > a:hover,
 .voyager .tabs-left > .nav-tabs .active > a:focus {
     border-color: #E4E4E4 transparent #E4E4E4 #E4E4E4;
-    *border-right-color: #FFF;
 }
 
 .voyager .tabs-right > .nav-tabs {
@@ -3876,7 +3875,6 @@ a.text-action{color:#a3afb7}a.text-action,a.text-action:focus,a.text-action:hove
 .voyager .tabs-right > .nav-tabs .active > a:hover,
 .voyager .tabs-right > .nav-tabs .active > a:focus {
     border-color: #E4E4E4 #E4E4E4 #E4E4E4 transparent;
-    *border-left-color: #FFF;
 }
 
 .voyager .step .nav-tabs {
