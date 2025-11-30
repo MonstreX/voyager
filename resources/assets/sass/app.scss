@@ -1436,7 +1436,8 @@ table.dataTable.no-footer{
 }
 
 .select2-results__option--highlighted[aria-selected],
-.select2-results__option--highlighted[aria-selected="false"] {
+.select2-results__option--highlighted[aria-selected="false"],
+.select2-results__option:hover {
     background-color: #eef5ff !important;
     color: #1a202c !important;
 }
