@@ -1425,7 +1425,7 @@ table.dataTable.no-footer{
     z-index:9;
 }
 
-.select2-search--dropdown .select2-search__field,
+.select2-container--default .select2-search--dropdown .select2-search__field,
 .select2-dropdown .select2-search__field {
     border: 1px solid #dcdcdc;
 }
@@ -8542,12 +8542,14 @@ limitations under the License.
     .select2-results{
         text-align:center;
     }
-    .select2-results__option--highlighted[aria-selected] {
+    .select2-results__option--highlighted[aria-selected],
+    .select2-results__option--highlighted[aria-selected="false"] {
         background-color: #eef5ff;
         color: #1a202c;
     }
     .select2-results__option {
         text-align: left;
+        cursor: pointer;
     }
 
     #filter{
