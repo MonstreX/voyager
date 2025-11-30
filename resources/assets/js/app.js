@@ -5,7 +5,12 @@ import '../sass/app.scss';
 
 import 'jquery-ui-dist/jquery-ui';
 import 'bootstrap';
-import 'select2';
+import select2 from 'select2/dist/js/select2.full.js';
+if (typeof select2 === 'function' && typeof window !== 'undefined' && window.jQuery) {
+    select2(window, window.jQuery);
+    window.Select2 = window.jQuery.fn.select2;
+}
+
 import 'datatables.net';
 import 'datatables-bootstrap3-plugin';
 import 'bootstrap-toggle';
