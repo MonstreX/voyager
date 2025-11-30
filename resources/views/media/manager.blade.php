@@ -1013,7 +1013,7 @@
                 }
             };
             if (this.allowUpload) {
-                console.warn('Dropzone uploads are disabled. Please use alternative file management workflows.');
+                // Dropzone is removed for now; uploads must be handled via alternative flows.
             }
 
             //Cropper

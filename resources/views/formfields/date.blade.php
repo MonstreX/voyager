@@ -21,7 +21,7 @@
 
 <input type="text" class="form-control voyager-date-input" name="{{ $row->field }}"
        data-flatpickr-type="date"
-       data-flatpickr="{{ e(json_encode($flatpickrOptions, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)) }}"
+       data-flatpickr='@json($flatpickrOptions, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)'
        placeholder="{{ $row->getTranslatedAttribute('display_name') }}"
        autocomplete="off"
        value="{{ $rawValue }}">

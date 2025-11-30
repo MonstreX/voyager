@@ -25,7 +25,7 @@
 <input @if($row->required == 1) required @endif type="text" class="form-control voyager-datetime-input"
        name="{{ $row->field }}"
        data-flatpickr-type="datetime"
-       data-flatpickr="{{ e(json_encode($flatpickrOptions, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)) }}"
+       data-flatpickr='@json($flatpickrOptions, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)'
        placeholder="{{ $placeholder }}"
        autocomplete="off"
        value="{{ $rawValue }}">
