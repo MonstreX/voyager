@@ -21,8 +21,28 @@ if (typeof window !== 'undefined' && window.jQuery) {
     }
 }
 
-import 'datatables.net';
-import 'datatables-bootstrap3-plugin';
+import dataTablesSource from './vendor/jquery.dataTables.js?raw';
+import dataTablesBootstrapSource from './vendor/datatables-bootstrap3.js?raw';
+
+const executeLegacyScript = (source, sourceName) => {
+    if (typeof window === 'undefined') {
+        return;
+    }
+
+    const runner = new Function(
+        'window',
+        'document',
+        '$',
+        'jQuery',
+        'undefined',
+        `${source}\n//# sourceURL=${sourceName}`
+    );
+
+    runner(window, document, window.jQuery, window.jQuery);
+};
+
+executeLegacyScript(dataTablesSource, 'jquery.dataTables.js');
+executeLegacyScript(dataTablesBootstrapSource, 'datatables-bootstrap3.js');
 import 'bootstrap-toggle';
 import 'nestable2';
 import 'jquery-match-height';
