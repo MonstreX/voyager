@@ -3,7 +3,6 @@ import '../sass/app.scss';
 
 
 
-import 'jquery-ui-dist/jquery-ui';
 import 'bootstrap';
 import SimpleTable from './modules/simple-table';
 window.VoyagerSimpleTable = SimpleTable;
@@ -36,6 +35,18 @@ if (typeof window !== 'undefined' && window.jQuery) {
     }
 }
 
+import jqueryUiSource from './vendor/jquery-ui.js?raw';
+loadLegacyPlugin(jqueryUiSource, 'jquery-ui.js');
+
+import bootstrapToggleSource from './vendor/bootstrap-toggle.js?raw';
+loadLegacyPlugin(bootstrapToggleSource, 'bootstrap-toggle.js');
+
+import nestableSource from './vendor/jquery.nestable.js?raw';
+loadLegacyPlugin(nestableSource, 'jquery.nestable.js');
+
+import matchHeightSource from './vendor/jquery.matchHeight.js?raw';
+loadLegacyPlugin(matchHeightSource, 'jquery.matchHeight.js');
+
 const initSimpleTables = () => {
     if (typeof document === 'undefined') {
         return;
@@ -56,9 +67,6 @@ const initSimpleTables = () => {
 
 window.VoyagerInitSimpleTables = initSimpleTables;
 
-import 'bootstrap-toggle';
-import 'nestable2';
-import 'jquery-match-height';
 import * as Dropzone from 'dropzone';
 window.Dropzone = Dropzone;
 
