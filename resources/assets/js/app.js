@@ -1,6 +1,23 @@
+import './jquery-first';
 import '../sass/app.scss';
 
-// All jQuery and jQuery plugins loaded via CDN in master.blade.php
+
+
+import 'jquery-ui-dist/jquery-ui';
+import 'bootstrap';
+import 'select2';
+import 'datatables.net';
+import 'datatables-bootstrap3-plugin';
+import 'bootstrap-toggle';
+import 'nestable2';
+import 'jquery-match-height';
+import * as Dropzone from 'dropzone';
+window.Dropzone = Dropzone;
+
+
+import Chart from 'chart.js';
+window.Chart = Chart;
+
 // Only non-jQuery dependencies here
 import PerfectScrollbar from 'perfect-scrollbar';
 import Cropper from 'cropperjs';
@@ -38,13 +55,13 @@ const applyVoyagerComponents = (appInstance) => {
 };
 
 // Setup Vue 3 global helpers for blade templates
-window.createVueApp = function(rootComponent = {}) {
+window.createVueApp = function (rootComponent = {}) {
     const shouldClone = rootComponent && typeof rootComponent === 'object';
     const resolvedRootComponent = shouldClone ? { ...rootComponent } : rootComponent;
     const appInstance = applyVoyagerComponents(createApp(resolvedRootComponent));
     const originalMount = appInstance.mount;
 
-    appInstance.mount = function(target, ...args) {
+    appInstance.mount = function (target, ...args) {
         const mountTarget = typeof target === 'string' ? document.querySelector(target) : target;
 
         if (
@@ -64,13 +81,13 @@ window.createVueApp = function(rootComponent = {}) {
     return appInstance;
 };
 window.__vueGlobalApp = null;
-window.VueRegisterComponent = function(name, definition) {
+window.VueRegisterComponent = function (name, definition) {
     voyagerComponentRegistry[name] = definition;
     voyagerActiveApps.forEach((appInstance) => {
         appInstance.component(name, definition);
     });
 };
-window.VueMountApp = function(selector, rootComponent = {}) {
+window.VueMountApp = function (selector, rootComponent = {}) {
     const mountTargets = typeof selector === 'string'
         ? document.querySelectorAll(selector)
         : selector instanceof Element
@@ -121,12 +138,12 @@ $(document).ready(function () {
         }
     });
 
-    $('select.select2').select2({width: '100%'});
-    $('select.select2-ajax').each(function() {
+    $('select.select2').select2({ width: '100%' });
+    $('select.select2-ajax').each(function () {
         $(this).select2({
             width: '100%',
             tags: $(this).hasClass('taggable'),
-            createTag: function(params) {
+            createTag: function (params) {
                 var term = $.trim(params.term);
 
                 if (term === '') {
@@ -154,22 +171,22 @@ $(document).ready(function () {
             }
         });
 
-        $(this).on('select2:select',function(e){
+        $(this).on('select2:select', function (e) {
             var data = e.params.data;
             if (data.id == '') {
                 // "None" was selected. Clear all selected options
                 $(this).val([]).trigger('change');
             } else {
-                $(e.currentTarget).find("option[value='" + data.id + "']").attr('selected','selected');
+                $(e.currentTarget).find("option[value='" + data.id + "']").attr('selected', 'selected');
             }
         });
 
-        $(this).on('select2:unselect',function(e){
+        $(this).on('select2:unselect', function (e) {
             var data = e.params.data;
-            $(e.currentTarget).find("option[value='" + data.id + "']").attr('selected',false);
+            $(e.currentTarget).find("option[value='" + data.id + "']").attr('selected', false);
         });
 
-        $(this).on('select2:selecting', function(e) {
+        $(this).on('select2:selecting', function (e) {
             if (!$(this).hasClass('taggable')) {
                 return;
             }
@@ -186,10 +203,10 @@ $(document).ready(function () {
             $.post(route, {
                 [label]: e.params.args.data.text,
                 _tagging: true,
-            }).done(function(data) {
+            }).done(function (data) {
                 var newOption = new Option(e.params.args.data.text, data.data.id, false, true);
                 $el.append(newOption).trigger('change');
-            }).fail(function(error) {
+            }).fail(function (error) {
                 toastr.error(errorMessage);
             });
 
@@ -207,7 +224,7 @@ $(document).ready(function () {
         return $(".side-menu .nav .dropdown .collapse").collapse('hide');
     });
 
-    $('.panel-collapse').on('hide.bs.collapse', function(e) {
+    $('.panel-collapse').on('hide.bs.collapse', function (e) {
         var target = $(e.target);
         if (!target.is('a')) {
             target = target.parent();
@@ -247,7 +264,7 @@ $(document).ready(function () {
         $this.closest('.panel').toggleClass('is-fullscreen');
     });
 
-    $('.datepicker').datetimepicker();
+
 
     // Save shortcut
     $(document).keydown(function (e) {

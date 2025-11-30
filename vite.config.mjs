@@ -7,11 +7,6 @@ import path from 'path';
 export default defineConfig({
   plugins: [
     vue(),
-    inject({
-      $: 'jquery',
-      jQuery: 'jquery',
-      include: '**/*.js',
-    }),
     viteStaticCopy({
       targets: [
         { src: 'node_modules/tinymce/skins', dest: 'js' },
@@ -42,7 +37,7 @@ export default defineConfig({
           jquery: '$'
         }
       },
-      external: ['moment', 'jquery', 'select2', 'bootstrap', 'datatables.net', 'datatables-bootstrap3-plugin', 'bootstrap-toggle', 'nestable2', 'jquery-match-height', 'dropzone', 'eonasdan-bootstrap-datetimepicker']
+      external: []
     }
   },
   resolve: {

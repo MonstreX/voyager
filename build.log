@@ -1,0 +1,43 @@
+
+> build
+> vite build
+
+[36mvite v7.2.4 [32mbuilding client environment for production...[36m[39m
+transforming...
+
+../../img/app-header-bg.jpg referenced in ../../img/app-header-bg.jpg didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+../img/app-header-bg.jpg referenced in ../img/app-header-bg.jpg didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+../img/bg/picjumbo.com_HNCK3558.jpg referenced in ../img/bg/picjumbo.com_HNCK3558.jpg didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+../img/contact-us-bg.jpg referenced in ../img/contact-us-bg.jpg didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+../images/bg.jpg referenced in ../images/bg.jpg didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+../images/dashboard-bg.jpg referenced in ../images/dashboard-bg.jpg didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+/public/images/ga-mark-white.svg referenced in /public/images/ga-mark-white.svg didn't resolve at build time, it will remain unchanged to be resolved at runtime
+[32m✓[39m 143 modules transformed.
+[31m✗[39m Build failed in 7.41s
+[31merror during build:
+[31mresources/assets/js/app.js (18:7): "default" is not exported by "node_modules/dropzone/dist/dropzone.js", imported by "resources/assets/js/app.js".[31m
+file: [36mE:/www.osp6/voyager/voyager.package/resources/assets/js/app.js:18:7[31m
+[33m
+16: import 'nestable2';
+17: import 'jquery-match-height';
+18: import Dropzone from 'dropzone/dist/dropzone';
+           ^
+19: window.Dropzone = Dropzone;
+20: import 'eonasdan-bootstrap-datetimepicker';
+[31m
+    at getRollupError (file:///E:/www.osp6/voyager/voyager.package/node_modules/rollup/dist/es/shared/parseAst.js:401:41)
+    at error (file:///E:/www.osp6/voyager/voyager.package/node_modules/rollup/dist/es/shared/parseAst.js:397:42)
+    at Module.error (file:///E:/www.osp6/voyager/voyager.package/node_modules/rollup/dist/es/shared/node-entry.js:16956:16)
+    at Module.traceVariable (file:///E:/www.osp6/voyager/voyager.package/node_modules/rollup/dist/es/shared/node-entry.js:17412:29)
+    at ModuleScope.findVariable (file:///E:/www.osp6/voyager/voyager.package/node_modules/rollup/dist/es/shared/node-entry.js:15076:39)
+    at Identifier.bind (file:///E:/www.osp6/voyager/voyager.package/node_modules/rollup/dist/es/shared/node-entry.js:5423:40)
+    at AssignmentExpression.bind (file:///E:/www.osp6/voyager/voyager.package/node_modules/rollup/dist/es/shared/node-entry.js:2813:23)
+    at ExpressionStatement.bind (file:///E:/www.osp6/voyager/voyager.package/node_modules/rollup/dist/es/shared/node-entry.js:2813:23)
+    at Program.bind (file:///E:/www.osp6/voyager/voyager.package/node_modules/rollup/dist/es/shared/node-entry.js:2809:28)
+    at Module.bindReferences (file:///E:/www.osp6/voyager/voyager.package/node_modules/rollup/dist/es/shared/node-entry.js:16935:18)[39m

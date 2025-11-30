@@ -424,9 +424,6 @@
 @stop
 
 @section('javascript')
-    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/themes/smoothness/jquery-ui.css">
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.js"></script>
-
     <script>
         window.invalidEditors = [];
         var validationAlerts = $('.validation-error');
