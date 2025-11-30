@@ -17,14 +17,10 @@
   "dependencies": {
     "@vue/compiler-sfc": "^3.5.25",
     "ace-builds": "^1.12.3",
-    "brace": "^0.11.1",
-    "chart.js": "^1.1.1",
     "cropperjs": "^1.5.12",
-    "icheck": "^1.0.2",
     "jquery": "^3.6.1",
     "perfect-scrollbar": "^1.5.5",
     "tinymce": "^6.2.0",
-    "toastr": "^2.1.4",
     "vue": "^3.5.25",
     "vue-loader": "^17.4.2"
   }

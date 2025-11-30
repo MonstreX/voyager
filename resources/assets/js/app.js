@@ -83,20 +83,23 @@ import dropzoneSource from './vendor/dropzone.js?raw';
 loadLegacyPlugin(dropzoneSource, 'dropzone.js');
 
 
-import Chart from 'chart.js';
-window.Chart = Chart;
+import chartSource from './vendor/chart.js?raw';
+loadLegacyPlugin(chartSource, 'chart.js');
 
 // Only non-jQuery dependencies here
 import PerfectScrollbar from 'perfect-scrollbar';
 import Cropper from 'cropperjs';
 window.Cropper = Cropper;
-import toastr from 'toastr';
-window.toastr = toastr;
+import toastrSource from './vendor/toastr.js?raw';
+loadLegacyPlugin(toastrSource, 'toastr.js');
 import easyMdeSource from './vendor/easymde.js?raw';
 loadLegacyPlugin(easyMdeSource, 'easymde.js');
-import * as brace from 'brace';
-import 'brace/mode/json';
-import 'brace/theme/github';
+import aceSource from './vendor/ace.js?raw';
+loadLegacyPlugin(aceSource, 'ace.js');
+import aceModeJsonSource from './vendor/ace-mode-json.js?raw';
+loadLegacyPlugin(aceModeJsonSource, 'ace-mode-json.js');
+import aceThemeGithubSource from './vendor/ace-theme-github.js?raw';
+loadLegacyPlugin(aceThemeGithubSource, 'ace-theme-github.js');
 import './slugify';
 import tinymce from 'tinymce';
 window.TinyMCE = window.tinymce = tinymce;
