@@ -69,9 +69,6 @@
             </button>
         </div>
     </div>
-    <div class="alert alert-warning mt-3" v-if="allowUpload">
-        Drag-and-drop uploads are temporarily disabled while this feature is rebuilt. Please manage files manually for now.
-    </div>
     <div id="content" :style="isExpanded ? 'display:block' : 'display:none'">
         <div class="breadcrumb-container">
             <ol class="breadcrumb filemanager">
