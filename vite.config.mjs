@@ -9,11 +9,13 @@ export default defineConfig({
     vue(),
     viteStaticCopy({
       targets: [
+        { src: 'node_modules/tinymce/tinymce.min.js', dest: 'js/tinymce' },
         { src: 'node_modules/tinymce/skins', dest: 'js' },
         { src: 'resources/assets/js/skins', dest: 'js' },
         { src: 'node_modules/tinymce/themes/silver', dest: 'js/themes' },
         { src: 'node_modules/tinymce/models/dom', dest: 'js/models' },
         { src: 'node_modules/tinymce/icons/default', dest: 'js/icons' },
+        { src: 'node_modules/tinymce/plugins', dest: 'js' },
         { src: 'node_modules/ace-builds/src-noconflict', dest: 'js/ace/libs' }
       ]
     })

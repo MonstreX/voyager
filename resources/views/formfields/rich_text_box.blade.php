@@ -11,7 +11,15 @@
 
             $.extend(additionalConfig, {!! json_encode($options->tinymceOptions ?? (object)[]) !!})
 
-            tinymce.init(window.voyagerTinyMCE.getConfig(additionalConfig));
+            if (window.loadVoyagerTinyMCE) {
+                window.loadVoyagerTinyMCE()
+                    .then(function () {
+                        window.tinymce.init(window.voyagerTinyMCE.getConfig(additionalConfig));
+                    })
+                    .catch(function (error) {
+                        console.error('TinyMCE failed to load', error);
+                    });
+            }
         });
     </script>
 @endpush

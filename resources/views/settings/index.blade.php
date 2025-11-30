@@ -488,7 +488,15 @@
             });
 
             // Initiliaze rich text editor
-            tinymce.init(window.voyagerTinyMCE.getConfig());
+            if (window.loadVoyagerTinyMCE) {
+                window.loadVoyagerTinyMCE()
+                    .then(function () {
+                        window.tinymce.init(window.voyagerTinyMCE.getConfig());
+                    })
+                    .catch(function (error) {
+                        console.error('TinyMCE failed to load', error);
+                    });
+            }
         });
     </script>
     <script type="text/javascript">
