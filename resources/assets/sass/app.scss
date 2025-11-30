@@ -1,18 +1,19 @@
 @import "_variables";
 @import "bootstrap/stylesheets/bootstrap";
-@import "animate.css/animate";
+@import "vendor/animate";
 @import "vendor/select2/select2";
 @import "toastr/build/toastr";
 @import "perfect-scrollbar/css/perfect-scrollbar";
 @import "vendor/bootstrap-toggle";
 @import "vendor/icheck-flat";
-@import "bootstrap-datepicker/dist/css/bootstrap-datepicker";
+@import "vendor/bootstrap-datepicker";
+@import "vendor/datetimepicker";
 @import "vendor/jquery.nestable";
 @import "vendor/jquery-ui/jquery-ui.min";
-@import "easymde/dist/easymde.min";
-@import "dropzone/dist/dropzone";
+@import "vendor/easymde";
+@import "vendor/dropzone";
 @import "cropperjs/dist/cropper";
-@import "eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker";
+@import "vendor/bootstrap-datetimepicker";
 @import "fonts";
 
 .simple-table-controls {

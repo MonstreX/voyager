@@ -3,7 +3,7 @@ import '../sass/app.scss';
 
 
 
-import 'bootstrap';
+import '../sass/bootstrap/javascripts/bootstrap';
 import SimpleTable from './modules/simple-table';
 window.VoyagerSimpleTable = SimpleTable;
 
@@ -47,6 +47,18 @@ loadLegacyPlugin(nestableSource, 'jquery.nestable.js');
 import matchHeightSource from './vendor/jquery.matchHeight.js?raw';
 loadLegacyPlugin(matchHeightSource, 'jquery.matchHeight.js');
 
+import momentSource from './vendor/moment.js?raw';
+loadLegacyPlugin(momentSource, 'moment.js');
+
+import bootstrapDatepickerSource from './vendor/bootstrap-datepicker.js?raw';
+loadLegacyPlugin(bootstrapDatepickerSource, 'bootstrap-datepicker.js');
+
+import datetimePickerSource from './vendor/datetimepicker.js?raw';
+loadLegacyPlugin(datetimePickerSource, 'datetimepicker.js');
+
+import bootstrapDateTimePickerSource from './vendor/bootstrap-datetimepicker.js?raw';
+loadLegacyPlugin(bootstrapDateTimePickerSource, 'bootstrap-datetimepicker.js');
+
 const initSimpleTables = () => {
     if (typeof document === 'undefined') {
         return;
@@ -67,8 +79,8 @@ const initSimpleTables = () => {
 
 window.VoyagerInitSimpleTables = initSimpleTables;
 
-import * as Dropzone from 'dropzone';
-window.Dropzone = Dropzone;
+import dropzoneSource from './vendor/dropzone.js?raw';
+loadLegacyPlugin(dropzoneSource, 'dropzone.js');
 
 
 import Chart from 'chart.js';
@@ -80,8 +92,8 @@ import Cropper from 'cropperjs';
 window.Cropper = Cropper;
 import toastr from 'toastr';
 window.toastr = toastr;
-import EasyMDE from 'easymde';
-window.EasyMDE = EasyMDE;
+import easyMdeSource from './vendor/easymde.js?raw';
+loadLegacyPlugin(easyMdeSource, 'easymde.js');
 import * as brace from 'brace';
 import 'brace/mode/json';
 import 'brace/theme/github';
