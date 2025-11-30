@@ -529,7 +529,7 @@ class VoyagerSelect {
                 <ul class="select2-results__options" role="tree"></ul>
             </span>
         `;
-        document.body.appendChild(this.dropdown);
+        this.wrapper.appendChild(this.dropdown);
         this.searchContainer = this.dropdown.querySelector('.select2-search');
         this.searchInput = this.dropdown.querySelector('.select2-search__field');
         this.resultsList = this.dropdown.querySelector('.select2-results__options');
@@ -619,8 +619,8 @@ class VoyagerSelect {
         const rect = this.selectionEl.getBoundingClientRect();
         this.dropdown.style.position = 'absolute';
         this.dropdown.style.minWidth = `${rect.width}px`;
-        this.dropdown.style.left = `${rect.left + window.scrollX}px`;
-        this.dropdown.style.top = `${rect.bottom + window.scrollY}px`;
+        this.dropdown.style.left = '0px';
+        this.dropdown.style.top = `${this.selectionEl.offsetHeight}px`;
         this.dropdown.style.display = 'block';
         this.dropdown.classList.remove('select2-dropdown--above');
         this.dropdown.classList.add('select2-dropdown--below');
