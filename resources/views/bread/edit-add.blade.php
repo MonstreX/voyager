@@ -163,8 +163,10 @@
         $('document').ready(function () {
             $('.toggleswitch').bootstrapToggle();
 
-            //Init datepicker for date fields if data-datepicker attribute defined
-            //or if browser does not handle date inputs
+            // Initialize date/time pickers when Flatpickr is available
+            if (window.VoyagerInitDatePickers) {
+                window.VoyagerInitDatePickers();
+            }
             @if ($isModelTranslatable)
                 $('.side-body').multilingual({"editing": true});
             @endif

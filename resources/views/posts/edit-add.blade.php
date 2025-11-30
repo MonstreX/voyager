@@ -350,14 +350,10 @@
 
             $('.toggleswitch').bootstrapToggle();
 
-            //Init datepicker for date fields if data-datepicker attribute defined
-            //or if browser does not handle date inputs
-            $('.form-group input[type=date]').each(function (idx, elt) {
-                if (elt.type != 'date' || elt.hasAttribute('data-datepicker')) {
-                    elt.type = 'text';
-                    $(elt).datetimepicker($(elt).data('datepicker'));
-                }
-            });
+            // Initialize date/time pickers when Flatpickr is available
+            if (window.VoyagerInitDatePickers) {
+                window.VoyagerInitDatePickers();
+            }
 
             @if ($isModelTranslatable)
                 $('.side-body').multilingual({"editing": true});
