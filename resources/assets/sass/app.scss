@@ -1430,6 +1430,17 @@ table.dataTable.no-footer{
     border: 1px solid #dcdcdc;
 }
 
+.select2-results__option {
+    cursor: pointer;
+    text-align: left;
+}
+
+.select2-results__option--highlighted[aria-selected],
+.select2-results__option--highlighted[aria-selected="false"] {
+    background-color: #eef5ff;
+    color: #1a202c;
+}
+
 .select2-container--open .select2-dropdown--below{
     border: 0px;
     box-shadow: 0px 15px 15px -1px rgba(0, 0, 0, 0.15);
@@ -8542,16 +8553,6 @@ limitations under the License.
     .select2-results{
         text-align:center;
     }
-    .select2-results__option--highlighted[aria-selected],
-    .select2-results__option--highlighted[aria-selected="false"] {
-        background-color: #eef5ff;
-        color: #1a202c;
-    }
-    .select2-results__option {
-        text-align: left;
-        cursor: pointer;
-    }
-
     #filter{
         text-align:center;
         min-width:100px;
