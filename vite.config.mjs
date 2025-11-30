@@ -35,7 +35,6 @@ export default defineConfig({
         },
         format: 'iife',
         globals: {
-          moment: 'moment',
           jquery: '$'
         }
       },

@@ -47,18 +47,6 @@ loadLegacyPlugin(nestableSource, 'jquery.nestable.js');
 import matchHeightSource from './vendor/jquery.matchHeight.js?raw';
 loadLegacyPlugin(matchHeightSource, 'jquery.matchHeight.js');
 
-import momentSource from './vendor/moment.js?raw';
-loadLegacyPlugin(momentSource, 'moment.js');
-
-import bootstrapDatepickerSource from './vendor/bootstrap-datepicker.js?raw';
-loadLegacyPlugin(bootstrapDatepickerSource, 'bootstrap-datepicker.js');
-
-import datetimePickerSource from './vendor/datetimepicker.js?raw';
-loadLegacyPlugin(datetimePickerSource, 'datetimepicker.js');
-
-import bootstrapDateTimePickerSource from './vendor/bootstrap-datetimepicker.js?raw';
-loadLegacyPlugin(bootstrapDateTimePickerSource, 'bootstrap-datetimepicker.js');
-
 const initSimpleTables = () => {
     if (typeof document === 'undefined') {
         return;
@@ -79,21 +67,12 @@ const initSimpleTables = () => {
 
 window.VoyagerInitSimpleTables = initSimpleTables;
 
-import dropzoneSource from './vendor/dropzone.js?raw';
-loadLegacyPlugin(dropzoneSource, 'dropzone.js');
-
-
-import chartSource from './vendor/chart.js?raw';
-loadLegacyPlugin(chartSource, 'chart.js');
-
 // Only non-jQuery dependencies here
 import PerfectScrollbar from 'perfect-scrollbar';
 import Cropper from 'cropperjs';
 window.Cropper = Cropper;
 import toastrSource from './vendor/toastr.js?raw';
 loadLegacyPlugin(toastrSource, 'toastr.js');
-import easyMdeSource from './vendor/easymde.js?raw';
-loadLegacyPlugin(easyMdeSource, 'easymde.js');
 import './slugify';
 import './multilingual';
 import './voyager_tinymce';
@@ -339,13 +318,19 @@ $(document).ready(function () {
         }
     });
 
-    /********** MARKDOWN EDITOR **********/
+    /********** MARKDOWN EDITOR (DISABLED) **********/
 
-    $('textarea.easymde').each(function () {
-        var easymde = new EasyMDE({
-            element: this
-        });
-        easymde.render();
+    $('.easymde').each(function () {
+        if (this.dataset.voyagerEasymdeNoticeApplied) {
+            return;
+        }
+        this.dataset.voyagerEasymdeNoticeApplied = 'true';
+        const notice = document.createElement('div');
+        notice.className = 'alert alert-warning mt-2';
+        notice.innerText = 'Markdown editor is temporarily disabled pending rewrite. Please edit the raw markdown text below.';
+        if (this.parentNode) {
+            this.parentNode.insertBefore(notice, this.nextSibling);
+        }
     });
 
     /********** END MARKDOWN EDITOR **********/

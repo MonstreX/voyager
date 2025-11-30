@@ -274,6 +274,9 @@
                                     @elseif($setting->type == "rich_text_box")
                                         <textarea class="form-control richTextBox" name="{{ $setting->key }}">{{ $setting->value ?? '' }}</textarea>
                                     @elseif($setting->type == "markdown_editor")
+                                        <div class="alert alert-warning">
+                                            Markdown editor is temporarily disabled while we replace EasyMDE. Please edit the raw markdown below.
+                                        </div>
                                         <textarea class="form-control easymde" name="{{ $setting->key }}">{{ $setting->value ?? '' }}</textarea>
                                     @elseif($setting->type == "code_editor")
                                         <?php $options = json_decode($setting->details); ?>

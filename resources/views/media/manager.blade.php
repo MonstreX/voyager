@@ -42,10 +42,6 @@
     </div>
     <div id="toolbar" v-if="showToolbar" :style="isExpanded ? 'display:block' : 'display:none'">
         <div class="btn-group offset-right">
-            <button type="button" class="btn btn-primary" id="upload" v-if="allowUpload">
-                <i class="voyager-upload"></i>
-                {{ __('voyager::generic.upload') }}
-            </button>
             <button type="button" class="btn btn-primary" v-if="allowCreateFolder" data-toggle="modal" :data-target="'#create_dir_modal_'+this._uid">
                 <i class="voyager-folder"></i>
                 {{ __('voyager::generic.add_folder') }}
@@ -73,9 +69,8 @@
             </button>
         </div>
     </div>
-    <div id="uploadPreview" style="display:none;" v-if="allowUpload"></div>
-    <div id="uploadProgress" class="progress active progress-striped" v-if="allowUpload">
-        <div class="progress-bar progress-bar-success" style="width: 0"></div>
+    <div class="alert alert-warning mt-3" v-if="allowUpload">
+        Drag-and-drop uploads are temporarily disabled while this feature is rebuilt. Please manage files manually for now.
     </div>
     <div id="content" :style="isExpanded ? 'display:block' : 'display:none'">
         <div class="breadcrumb-container">
@@ -1020,46 +1015,8 @@
                     }
                 }
             };
-            //Dropzone
-            var dropzone = $(vm.$el).first().find('#upload').first();
-            var progress = $(vm.$el).first().find('#uploadProgress').first();
-            var progress_bar = $(vm.$el).first().find('#uploadProgress .progress-bar').first();
-            if (this.allowUpload && !dropzone.hasClass('dz-clickable')) {
-                dropzone.dropzone({
-                    timeout: 180000,
-                    url: '{{ route('voyager.media.upload') }}',
-                    previewsContainer: "#uploadPreview",
-                    totaluploadprogress: function(uploadProgress, totalBytes, totalBytesSent) {
-                        progress_bar.css('width', uploadProgress + '%');
-    					if (uploadProgress == 100) {
-    						progress.delay(1500).slideUp(function(){
-    							progress_bar.css('width', '0%');
-    						});
-    					}
-                    },
-                    processing: function(){
-                        progress.fadeIn();
-                    },
-                    sending: function(file, xhr, formData) {
-                        formData.append("_token", '{{ csrf_token() }}');
-                        formData.append("upload_path", vm.current_folder);
-                        formData.append("filename", vm.filename);
-                        formData.append("details", JSON.stringify(vm.details));
-                    },
-                    success: function(e, res) {
-                        if (res.success) {
-                            toastr.success(res.message, "{{ __('voyager::generic.sweet_success') }}");
-                        } else {
-                            toastr.error(res.message, "{{ __('voyager::generic.whoopsie') }}");
-                        }
-                    },
-                    error: function(e, res, xhr) {
-                        toastr.error(res, "{{ __('voyager::generic.whoopsie') }}");
-                    },
-                    queuecomplete: function() {
-                        vm.getFiles();
-                    }
-                });
+            if (this.allowUpload) {
+                console.warn('Dropzone uploads are disabled. Please use alternative file management workflows.');
             }
 
             //Cropper
