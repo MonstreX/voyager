@@ -5,10 +5,20 @@ import '../sass/app.scss';
 
 import 'jquery-ui-dist/jquery-ui';
 import 'bootstrap';
-import select2 from 'select2/dist/js/select2.full.js';
-if (typeof select2 === 'function' && typeof window !== 'undefined' && window.jQuery) {
-    select2(window, window.jQuery);
-    window.Select2 = window.jQuery.fn.select2;
+import select2Source from './vendor/select2.full.js?raw';
+if (typeof window !== 'undefined' && window.jQuery) {
+    const runSelect2 = new Function(
+        'window',
+        'document',
+        '$',
+        'jQuery',
+        'undefined',
+        `${select2Source}\n//# sourceURL=select2.full.js`
+    );
+    runSelect2(window, document, window.jQuery, window.jQuery);
+    if (window.jQuery.fn && window.jQuery.fn.select2) {
+        window.Select2 = window.jQuery.fn.select2;
+    }
 }
 
 import 'datatables.net';
