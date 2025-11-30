@@ -367,6 +367,16 @@ const initDatePickers = () => {
 
 window.VoyagerInitDatePickers = initDatePickers;
 
+const getSafeEventTarget = (event) => {
+    if (!event) {
+        return null;
+    }
+    if (event.target instanceof Element) {
+        return event.target;
+    }
+    return event.target && event.target.parentElement ? event.target.parentElement : null;
+};
+
 const getTargetSelector = (trigger) => {
     if (!trigger) {
         return null;
@@ -428,6 +438,9 @@ const showModalElement = (modal) => {
 const hideModalElement = (modal) => {
     if (!modal || !modal.classList.contains('voyager-modal-visible')) {
         return;
+    }
+    if (modal.contains(document.activeElement) && document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
     }
     modal.classList.remove('voyager-modal-visible');
     modal.classList.remove('in', 'show');
@@ -596,7 +609,8 @@ const initTooltips = (scope) => {
 
 const initBootstrapCompat = () => {
     document.addEventListener('click', (event) => {
-        const modalTrigger = event.target.closest('[data-toggle="modal"]');
+        const baseTarget = getSafeEventTarget(event);
+        const modalTrigger = baseTarget && baseTarget.closest('[data-toggle="modal"]');
         if (modalTrigger) {
             event.preventDefault();
             const modal = findTargetElement(modalTrigger);
@@ -606,7 +620,7 @@ const initBootstrapCompat = () => {
             return;
         }
 
-        const dismissTrigger = event.target.closest('[data-dismiss="modal"]');
+        const dismissTrigger = baseTarget && baseTarget.closest('[data-dismiss="modal"]');
         if (dismissTrigger) {
             event.preventDefault();
             const modal = dismissTrigger.closest('.modal');
@@ -616,14 +630,14 @@ const initBootstrapCompat = () => {
             return;
         }
 
-        const dropdownTrigger = event.target.closest('[data-toggle="dropdown"], .dropdown-toggle');
+        const dropdownTrigger = baseTarget && baseTarget.closest('[data-toggle="dropdown"], .dropdown-toggle');
         if (dropdownTrigger) {
             event.preventDefault();
             toggleDropdownFromTrigger(dropdownTrigger);
             return;
         }
 
-        const collapseTrigger = event.target.closest('[data-toggle="collapse"]');
+        const collapseTrigger = baseTarget && baseTarget.closest('[data-toggle="collapse"]');
         if (collapseTrigger) {
             event.preventDefault();
             const target = findTargetElement(collapseTrigger);
@@ -645,14 +659,14 @@ const initBootstrapCompat = () => {
             return;
         }
 
-        const tabTrigger = event.target.closest('[data-toggle="tab"]');
+        const tabTrigger = baseTarget && baseTarget.closest('[data-toggle="tab"]');
         if (tabTrigger) {
             event.preventDefault();
             activateTabTrigger(tabTrigger);
             return;
         }
 
-        const buttonToggle = event.target.closest('[data-toggle="buttons"] label');
+        const buttonToggle = baseTarget && baseTarget.closest('[data-toggle="buttons"] label');
         if (buttonToggle) {
             const input = buttonToggle.querySelector('input');
             const group = buttonToggle.closest('[data-toggle="buttons"]');
@@ -671,10 +685,11 @@ const initBootstrapCompat = () => {
 
     document.addEventListener('click', (event) => {
         const modal = currentModal();
-        if (modal && event.target === modal) {
+        const baseTarget = getSafeEventTarget(event);
+        if (modal && baseTarget === modal) {
             hideModalElement(modal);
         }
-        if (dropdownState.openDropdown && !event.target.closest('.dropdown')) {
+        if (dropdownState.openDropdown && (!baseTarget || !baseTarget.closest('.dropdown'))) {
             closeDropdownMenu(dropdownState.openDropdown);
         }
     });
@@ -693,7 +708,8 @@ const initBootstrapCompat = () => {
     });
 
     document.addEventListener('mouseenter', (event) => {
-        const trigger = event.target.closest('[data-toggle="tooltip"]');
+        const baseTarget = getSafeEventTarget(event);
+        const trigger = baseTarget && baseTarget.closest('[data-toggle="tooltip"]');
         if (!trigger) {
             return;
         }
@@ -701,7 +717,8 @@ const initBootstrapCompat = () => {
     }, true);
 
     document.addEventListener('mouseleave', (event) => {
-        const trigger = event.target.closest('[data-toggle="tooltip"]');
+        const baseTarget = getSafeEventTarget(event);
+        const trigger = baseTarget && baseTarget.closest('[data-toggle="tooltip"]');
         if (trigger) {
             hideTooltip();
         }
@@ -968,7 +985,8 @@ $(document).ready(function () {
     const sideMenuNav = document.querySelector('.side-menu .nav');
     if (sideMenuNav) {
         sideMenuNav.addEventListener('click', (event) => {
-            const trigger = event.target.closest('.dropdown [data-toggle="collapse"]');
+            const baseTarget = getSafeEventTarget(event);
+            const trigger = baseTarget && baseTarget.closest('.dropdown [data-toggle="collapse"]');
             if (!trigger) {
                 return;
             }
