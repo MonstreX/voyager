@@ -11,6 +11,24 @@
 @import "cropperjs/dist/cropper";
 @import "fonts";
 
+.toggle.btn-primary,
+.toggle-on.btn-primary {
+    background-color: #62a8ea;
+    border-color: #62a8ea;
+    color: #fff;
+}
+
+.toggle.btn-primary:focus,
+.toggle.btn-primary:hover {
+    background-color: #4f92d2;
+    border-color: #4f92d2;
+}
+
+.toggle.btn-primary .toggle-handle {
+    background-color: #fff;
+    border-color: rgba(0, 0, 0, 0.12);
+}
+
 .simple-table-controls {
     display: flex;
     flex-wrap: wrap;
