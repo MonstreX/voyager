@@ -32,7 +32,7 @@
                         <table
                             id="dataTable"
                             class="table table-hover"
-                            data-simple-table="{{ e(json_encode($menuTableConfig)) }}"
+                            data-simple-table='@json($menuTableConfig, JSON_HEX_APOS | JSON_HEX_QUOT)'
                         >
                             <thead>
                             <tr>

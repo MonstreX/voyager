@@ -26,7 +26,7 @@
     <table
         id="table-log"
         class="table table-striped"
-        data-simple-table="{{ e(json_encode($logTableConfig)) }}"
+        data-simple-table='@json($logTableConfig, JSON_HEX_APOS | JSON_HEX_QUOT)'
     >
       <thead>
       <tr>

@@ -86,7 +86,7 @@
                                 id="dataTable"
                                 class="table table-hover"
                                 @unless($dataType->server_side)
-                                    data-simple-table="{{ e(json_encode($simpleTableConfig)) }}"
+                                    data-simple-table='@json($simpleTableConfig, JSON_HEX_APOS | JSON_HEX_QUOT)'
                                 @endunless
                             >
                                 <thead>
