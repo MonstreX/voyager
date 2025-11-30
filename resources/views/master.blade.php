@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}"/>
     <meta name="assets-path" content="{{ voyager_asset() }}"/>
+    <meta name="voyager-ace-base" content="{{ voyager_asset('js/ace/libs') }}"/>
+    <script>
+        window.voyagerAceBase = "{{ voyager_asset('js/ace/libs') }}";
+    </script>
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
@@ -117,6 +121,7 @@ if (\Illuminate\Support\Str::startsWith(Auth::user()->avatar, 'http://') || \Ill
 <!-- Javascript Libs -->
 
 
+<script src="{{ voyager_asset('js/ace/libs/ace.js') }}"></script>
 <!-- jQuery must be loaded BEFORE app.js -->
 <script src="{{ voyager_asset('js/app.js') }}"></script>
 

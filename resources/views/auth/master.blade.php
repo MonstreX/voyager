@@ -5,6 +5,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="robots" content="none" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="assets-path" content="{{ voyager_asset() }}">
+    <meta name="voyager-ace-base" content="{{ voyager_asset('js/ace/libs') }}">
+    <script>
+        window.voyagerAceBase = "{{ voyager_asset('js/ace/libs') }}";
+    </script>
     <meta name="description" content="admin login">
     <title>@yield('title', 'Admin - '.Voyager::setting("admin.title"))</title>
     <link rel="stylesheet" href="{{ voyager_asset('css/app.css') }}">
