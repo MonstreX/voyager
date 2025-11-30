@@ -505,24 +505,69 @@ const isCollapseOpen = (element) => {
     return element.classList.contains('in') || element.classList.contains('show');
 };
 
+const collapseTransitionDuration = 350;
+
+const runTransition = (element, callback) => {
+    let called = false;
+    const handler = (event) => {
+        if (event && event.target !== element) {
+            return;
+        }
+        called = true;
+        element.removeEventListener('transitionend', handler);
+        callback();
+    };
+    element.addEventListener('transitionend', handler);
+    setTimeout(() => {
+        if (!called) {
+            handler({ target: element });
+        }
+    }, collapseTransitionDuration + 50);
+};
+
 const showCollapseElement = (element) => {
-    if (!element) {
+    if (!element || element.classList.contains('collapsing') || element.classList.contains('in')) {
         return;
     }
-    element.classList.add('in', 'show');
-    element.style.height = '';
+    element.classList.remove('collapse');
     element.style.display = 'block';
-    dispatchCustomEvent(element, 'shown.bs.collapse');
+    const height = element.scrollHeight;
+    element.style.height = '0px';
+    element.offsetHeight; // force reflow
+    element.classList.add('collapsing');
+    element.style.transition = `height ${collapseTransitionDuration}ms ease`;
+    requestAnimationFrame(() => {
+        element.style.height = `${height}px`;
+    });
+    runTransition(element, () => {
+        element.classList.remove('collapsing');
+        element.classList.add('collapse', 'in', 'show');
+        element.style.height = 'auto';
+        element.style.transition = '';
+        dispatchCustomEvent(element, 'shown.bs.collapse');
+    });
 };
 
 const hideCollapseElement = (element) => {
-    if (!element) {
+    if (!element || element.classList.contains('collapsing') || !element.classList.contains('in')) {
         return;
     }
-    element.classList.remove('in', 'show');
-    element.style.height = '';
-    element.style.display = 'none';
-    dispatchCustomEvent(element, 'hidden.bs.collapse');
+    element.style.height = `${element.scrollHeight}px`;
+    element.offsetHeight;
+    element.classList.add('collapsing');
+    element.classList.remove('collapse', 'in', 'show');
+    element.style.transition = `height ${collapseTransitionDuration}ms ease`;
+    requestAnimationFrame(() => {
+        element.style.height = '0px';
+    });
+    runTransition(element, () => {
+        element.classList.remove('collapsing');
+        element.classList.add('collapse');
+        element.style.display = 'none';
+        element.style.height = '';
+        element.style.transition = '';
+        dispatchCustomEvent(element, 'hidden.bs.collapse');
+    });
 };
 
 const toggleCollapseElement = (element) => {
