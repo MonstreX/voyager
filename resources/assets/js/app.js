@@ -504,10 +504,8 @@ const showCollapseElement = (element) => {
         return;
     }
     element.classList.add('in', 'show');
-    element.style.height = `${element.scrollHeight}px`;
-    requestAnimationFrame(() => {
-        element.style.height = 'auto';
-    });
+    element.style.height = '';
+    element.style.display = 'block';
     dispatchCustomEvent(element, 'shown.bs.collapse');
 };
 
@@ -516,7 +514,8 @@ const hideCollapseElement = (element) => {
         return;
     }
     element.classList.remove('in', 'show');
-    element.style.height = '0px';
+    element.style.height = '';
+    element.style.display = 'none';
     dispatchCustomEvent(element, 'hidden.bs.collapse');
 };
 
