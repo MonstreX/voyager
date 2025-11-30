@@ -338,8 +338,11 @@
     <script>
         $(document).ready(function () {
             @if ($dataType->server_side)
-                $('#search-input select').select2({
-                    minimumResultsForSearch: Infinity
+                document.querySelectorAll('#search-input select').forEach(function (select) {
+                    select.dataset.voyagerDisableSearch = 'true';
+                    if (window.VoyagerSelectRefresh) {
+                        window.VoyagerSelectRefresh(select);
+                    }
                 });
             @endif
 

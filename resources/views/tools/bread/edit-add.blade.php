@@ -615,24 +615,29 @@
             var tbl = dropdown.val();
 
             $.get('{{ route('voyager.database.index') }}/' + tbl, function(data){
-                var tbl_selected = $(dropdown).val();
-
                 $(dropdown).parent().parent().find('.rowDrop').each(function(){
                     var selected_value = $(this).data('selected');
-
                     var options = $.map(data, function (obj, key) {
                         return {id: key, text: key};
                     });
 
-                    $(this).empty().select2({
-                        data: options
-                    });
-
-                    if (selected_value == '' || !$(this).find("option[value='"+selected_value+"']").length) {
-                        selected_value = $(this).find("option:first-child").val();
+                    if (window.VoyagerSelectSetOptions) {
+                        window.VoyagerSelectSetOptions(this, options, selected_value);
+                        if (selected_value) {
+                            this.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    } else {
+                        var select = this;
+                        select.innerHTML = '';
+                        options.forEach(function(option) {
+                            var optionEl = document.createElement('option');
+                            optionEl.value = option.id;
+                            optionEl.text = option.text;
+                            select.appendChild(optionEl);
+                        });
+                        select.value = selected_value || (select.options[0] ? select.options[0].value : '');
+                        select.dispatchEvent(new Event('change', { bubbles: true }));
                     }
-
-                    $(this).val(selected_value).trigger('change');
                 });
             });
         }

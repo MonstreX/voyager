@@ -505,16 +505,19 @@
         });
     </script>
     <script type="text/javascript">
-    $(".group_select").not('.group_select_new').select2({
-        tags: true,
-        width: 'resolve'
+    document.querySelectorAll('.group_select').forEach(function (select) {
+        select.dataset.voyagerTaggable = 'true';
+        if (window.VoyagerSelectRefresh) {
+            window.VoyagerSelectRefresh(select);
+        }
     });
-    $(".group_select_new").select2({
-        tags: true,
-        width: 'resolve',
-        placeholder: '{{ __("voyager::generic.select_group") }}'
+    document.querySelectorAll('.group_select_new').forEach(function (select) {
+        select.dataset.placeholder = '{{ __("voyager::generic.select_group") }}';
+        select.value = '';
+        if (window.VoyagerSelectRefresh) {
+            window.VoyagerSelectRefresh(select);
+        }
     });
-    $(".group_select_new").val('').trigger('change');
     </script>
     <div style="display:none">
         <input type="hidden" id="upload_url" value="{{ route('voyager.upload') }}">
