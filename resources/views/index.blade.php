@@ -1,4 +1,4 @@
-@extends('voyager::master')
+﻿@extends('voyager::master')
 
 @section('content')
     <div class="page-content">
@@ -16,8 +16,64 @@
                 </p>
             @endif
 
-            <div class="alert alert-warning m-0 mt-4">
-                Analytics charts are temporarily disabled while we replace the legacy Chart.js implementation.
+            <div class="Dashboard Dashboard--full" id="analytics-dashboard" style="display:none">
+                <header class="Dashboard-header">
+                    <ul class="FlexGrid">
+                        <li class="FlexGrid-item">
+                            <div class="Titles">
+                                <h1 class="Titles-main" id="view-name">{{ __('voyager::analytics.select_view') }}</h1>
+                                <div class="Titles-sub">{{ __('voyager::analytics.various_visualizations') }}</div>
+                            </div>
+                        </li>
+                        <li class="FlexGrid-item FlexGrid-item--fixed">
+                            <div id="active-users-container"></div>
+                        </li>
+                    </ul>
+                    <div id="view-selector-container"></div>
+                </header>
+
+                <ul class="FlexGrid FlexGrid--halves">
+                    <li class="FlexGrid-item">
+                        <div class="Chartjs">
+                            <header class="Titles">
+                                <h1 class="Titles-main">{{ __('voyager::analytics.this_vs_last_week') }}</h1>
+                                <div class="Titles-sub">{{ __('voyager::analytics.by_users') }}</div>
+                            </header>
+                            <figure class="Chartjs-figure" id="chart-1-container"></figure>
+                            <ol class="Chartjs-legend" id="legend-1-container"></ol>
+                        </div>
+                    </li>
+                    <li class="FlexGrid-item">
+                        <div class="Chartjs">
+                            <header class="Titles">
+                                <h1 class="Titles-main">{{ __('voyager::analytics.this_vs_last_year') }}</h1>
+                                <div class="Titles-sub">{{ __('voyager::analytics.by_users') }}</div>
+                            </header>
+                            <figure class="Chartjs-figure" id="chart-2-container"></figure>
+                            <ol class="Chartjs-legend" id="legend-2-container"></ol>
+                        </div>
+                    </li>
+                    <li class="FlexGrid-item">
+                        <div class="Chartjs">
+                            <header class="Titles">
+                                <h1 class="Titles-main">{{ __('voyager::analytics.top_browsers') }}</h1>
+                                <div class="Titles-sub">{{ __('voyager::analytics.by_pageview') }}</div>
+                            </header>
+                            <figure class="Chartjs-figure" id="chart-3-container"></figure>
+                            <ol class="Chartjs-legend" id="legend-3-container"></ol>
+                        </div>
+                    </li>
+                    <li class="FlexGrid-item">
+                        <div class="Chartjs">
+                            <header class="Titles">
+                                <h1 class="Titles-main">{{ __('voyager::analytics.top_countries') }}</h1>
+                                <div class="Titles-sub">{{ __('voyager::analytics.by_sessions') }}</div>
+                            </header>
+                            <figure class="Chartjs-figure" id="chart-4-container"></figure>
+                            <ol class="Chartjs-legend" id="legend-4-container"></ol>
+                        </div>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
@@ -143,151 +199,118 @@
                  * overlays session data for the current week over session data for the
                  * previous week.
                  */
+                var voyagerAnalyticsNoDataText = @json(__('voyager::generic.no_results'));
+                var voyagerAnalyticsLocale = (document.documentElement && document.documentElement.lang) ? document.documentElement.lang : 'en';
+                var voyagerWeekdayFormatter = window.Intl && window.Intl.DateTimeFormat ? new window.Intl.DateTimeFormat(voyagerAnalyticsLocale, { weekday: 'short' }) : null;
+                var voyagerMonthFormatter = window.Intl && window.Intl.DateTimeFormat ? new window.Intl.DateTimeFormat(voyagerAnalyticsLocale, { month: 'short' }) : null;
+                var voyagerFallbackWeekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                var voyagerFallbackMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                var voyagerCategoryColors = ['#4D5360', '#949FB1', '#D4CCC5', '#E2EAE9', '#F7464A'];
+                var voyagerLineColors = {
+                    current: '#4299E1',
+                    previous: '#A0AEC0'
+                };
+
                 function renderWeekOverWeekChart(ids) {
+                    var ranges = getWeekRanges();
 
-                    // Adjust `now` to experiment with different days, for testing only...
-                    var now = moment(); // .subtract(3, 'day');
-
-                    var thisWeek = query({
+                    var currentWeek = query({
                         'ids': ids,
                         'dimensions': 'ga:date,ga:nthDay',
                         'metrics': 'ga:users',
-                        'start-date': moment(now).subtract(1, 'day').day(0).format('YYYY-MM-DD'),
-                        'end-date': moment(now).format('YYYY-MM-DD')
+                        'start-date': formatDate(ranges.thisWeekStart),
+                        'end-date': formatDate(ranges.thisWeekEnd)
                     });
 
                     var lastWeek = query({
                         'ids': ids,
                         'dimensions': 'ga:date,ga:nthDay',
                         'metrics': 'ga:users',
-                        'start-date': moment(now).subtract(1, 'day').day(0).subtract(1, 'week')
-                                .format('YYYY-MM-DD'),
-                        'end-date': moment(now).subtract(1, 'day').day(6).subtract(1, 'week')
-                                .format('YYYY-MM-DD')
+                        'start-date': formatDate(ranges.lastWeekStart),
+                        'end-date': formatDate(ranges.lastWeekEnd)
                     });
 
-                    Promise.all([thisWeek, lastWeek]).then(function (results) {
+                    Promise.all([currentWeek, lastWeek]).then(function (results) {
+                        var labels = buildWeekdayLabels(ranges.lastWeekStart, 7);
+                        var datasets = [
+                            {
+                                label: '{{ __('voyager::date.last_week') }}',
+                                color: voyagerLineColors.previous,
+                                values: normalizeMetricRows(results[1] && results[1].rows, labels.length)
+                            },
+                            {
+                                label: '{{ __('voyager::date.this_week') }}',
+                                color: voyagerLineColors.current,
+                                values: normalizeMetricRows(results[0] && results[0].rows, labels.length)
+                            }
+                        ];
 
-                        var data1 = results[0].rows.map(function (row) {
-                            return +row[2];
-                        });
-                        var data2 = results[1].rows.map(function (row) {
-                            return +row[2];
-                        });
-                        var labels = results[1].rows.map(function (row) {
-                            return +row[0];
-                        });
+                        if (!datasetsHaveValues(datasets)) {
+                            showNoData('chart-1-container');
+                            generateLegend('legend-1-container', []);
+                            return;
+                        }
 
-                        labels = labels.map(function (label) {
-                            return moment(label, 'YYYYMMDD').format('ddd');
+                        registerChartRenderer('chart-1-container', function () {
+                            drawLineChart('chart-1-container', 'legend-1-container', labels, datasets);
                         });
-
-                        var data = {
-                            labels: labels,
-                            datasets: [
-                                {
-                                    label: '{{ __('voyager::date.last_week') }}',
-                                    fillColor: 'rgba(220,220,220,0.5)',
-                                    strokeColor: 'rgba(220,220,220,1)',
-                                    pointColor: 'rgba(220,220,220,1)',
-                                    pointStrokeColor: '#fff',
-                                    data: data2
-                                },
-                                {
-                                    label: '{{ __('voyager::date.this_week') }}',
-                                    fillColor: 'rgba(151,187,205,0.5)',
-                                    strokeColor: 'rgba(151,187,205,1)',
-                                    pointColor: 'rgba(151,187,205,1)',
-                                    pointStrokeColor: '#fff',
-                                    data: data1
-                                }
-                            ]
-                        };
-
-                        new Chart(makeCanvas('chart-1-container')).Line(data);
-                        generateLegend('legend-1-container', data.datasets);
-                    });
+                    }).catch(handleChartError('chart-1-container'));
                 }
 
-
                 /**
-                 * Draw the a chart.js bar chart with data from the specified view that
-                 * overlays session data for the current year over session data for the
-                 * previous year, grouped by month.
+                 * Draw a comparison chart for the current year vs last year.
                  */
                 function renderYearOverYearChart(ids) {
-
-                    // Adjust `now` to experiment with different days, for testing only...
-                    var now = moment(); // .subtract(3, 'day');
+                    var ranges = getYearRanges();
 
                     var thisYear = query({
                         'ids': ids,
                         'dimensions': 'ga:month,ga:nthMonth',
                         'metrics': 'ga:users',
-                        'start-date': moment(now).date(1).month(0).format('YYYY-MM-DD'),
-                        'end-date': moment(now).format('YYYY-MM-DD')
+                        'start-date': formatDate(ranges.thisYearStart),
+                        'end-date': formatDate(ranges.thisYearEnd)
                     });
 
                     var lastYear = query({
                         'ids': ids,
                         'dimensions': 'ga:month,ga:nthMonth',
                         'metrics': 'ga:users',
-                        'start-date': moment(now).subtract(1, 'year').date(1).month(0)
-                                .format('YYYY-MM-DD'),
-                        'end-date': moment(now).date(1).month(0).subtract(1, 'day')
-                                .format('YYYY-MM-DD')
+                        'start-date': formatDate(ranges.lastYearStart),
+                        'end-date': formatDate(ranges.lastYearEnd)
                     });
 
                     Promise.all([thisYear, lastYear]).then(function (results) {
-                        var data1 = results[0].rows.map(function (row) {
-                            return +row[2];
-                        });
-                        var data2 = results[1].rows.map(function (row) {
-                            return +row[2];
-                        });
-                        var labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                        var labels = buildMonthLabels();
+                        var datasets = [
+                            {
+                                label: '{{ __('voyager::date.last_year') }}',
+                                color: voyagerLineColors.previous,
+                                values: mapMonthlyMetrics(results[1] && results[1].rows, labels.length)
+                            },
+                            {
+                                label: '{{ __('voyager::date.this_year') }}',
+                                color: voyagerLineColors.current,
+                                values: mapMonthlyMetrics(results[0] && results[0].rows, labels.length)
+                            }
+                        ];
 
-                        // Ensure the data arrays are at least as long as the labels array.
-                        // Chart.js bar charts don't (yet) accept sparse datasets.
-                        for (var i = 0, len = labels.length; i < len; i++) {
-                            if (data1[i] === undefined) data1[i] = null;
-                            if (data2[i] === undefined) data2[i] = null;
+                        if (!datasetsHaveValues(datasets)) {
+                            showNoData('chart-2-container');
+                            generateLegend('legend-2-container', []);
+                            return;
                         }
 
-                        var data = {
-                            labels: labels,
-                            datasets: [
-                                {
-                                    label: '{{ __('voyager::date.last_year') }}',
-                                    fillColor: 'rgba(220,220,220,0.5)',
-                                    strokeColor: 'rgba(220,220,220,1)',
-                                    data: data2
-                                },
-                                {
-                                    label: '{{ __('voyager::date.this_year') }}',
-                                    fillColor: 'rgba(151,187,205,0.5)',
-                                    strokeColor: 'rgba(151,187,205,1)',
-                                    data: data1
-                                }
-                            ]
-                        };
-
-                        new Chart(makeCanvas('chart-2-container')).Bar(data);
-                        generateLegend('legend-2-container', data.datasets);
-                    })
-                            .catch(function (err) {
-                                console.error(err.stack);
-                            });
+                        registerChartRenderer('chart-2-container', function () {
+                            drawBarChart('chart-2-container', 'legend-2-container', labels, datasets);
+                        });
+                    }).catch(handleChartError('chart-2-container'));
                 }
 
 
                 /**
-                 * Draw the a chart.js doughnut chart with data from the specified view that
-                 * show the top 5 browsers over the past seven days.
+                 * Render a donut chart for the top browsers.
                  */
                 function renderTopBrowsersChart(ids) {
-
                     query({
                         'ids': ids,
                         'dimensions': 'ga:browser',
@@ -296,24 +319,24 @@
                         'max-results': 5
                     })
                             .then(function (response) {
+                                var items = buildCategorySeries(response && response.rows);
 
-                                var data = [];
-                                var colors = ['#4D5360', '#949FB1', '#D4CCC5', '#E2EAE9', '#F7464A'];
+                                if (!items.length) {
+                                    showNoData('chart-3-container');
+                                    generateLegend('legend-3-container', []);
+                                    return;
+                                }
 
-                                response.rows.forEach(function (row, i) {
-                                    data.push({value: +row[1], color: colors[i], label: row[0]});
+                                registerChartRenderer('chart-3-container', function () {
+                                    drawDonutChart('chart-3-container', 'legend-3-container', items);
                                 });
-
-                                new Chart(makeCanvas('chart-3-container')).Doughnut(data);
-                                generateLegend('legend-3-container', data);
-                            });
+                            })
+                            .catch(handleChartError('chart-3-container'));
                 }
 
 
                 /**
-                 * Draw the a chart.js doughnut chart with data from the specified view that
-                 * compares sessions from mobile, desktop, and tablet over the past seven
-                 * days.
+                 * Render a donut chart for the top countries by sessions.
                  */
                 function renderTopCountriesChart(ids) {
                     query({
@@ -324,21 +347,19 @@
                         'max-results': 5
                     })
                             .then(function (response) {
+                                var items = buildCategorySeries(response && response.rows);
 
-                                var data = [];
-                                var colors = ['#4D5360', '#949FB1', '#D4CCC5', '#E2EAE9', '#F7464A'];
+                                if (!items.length) {
+                                    showNoData('chart-4-container');
+                                    generateLegend('legend-4-container', []);
+                                    return;
+                                }
 
-                                response.rows.forEach(function (row, i) {
-                                    data.push({
-                                        label: row[0],
-                                        value: +row[1],
-                                        color: colors[i]
-                                    });
+                                registerChartRenderer('chart-4-container', function () {
+                                    drawDonutChart('chart-4-container', 'legend-4-container', items);
                                 });
-
-                                new Chart(makeCanvas('chart-4-container')).Doughnut(data);
-                                generateLegend('legend-4-container', data);
-                            });
+                            })
+                            .catch(handleChartError('chart-4-container'));
                 }
 
 
@@ -370,12 +391,25 @@
                  */
                 function makeCanvas(id) {
                     var container = document.getElementById(id);
+                    if (!container) {
+                        return null;
+                    }
+
+                    var width = container.offsetWidth || container.clientWidth || 400;
+                    var height = container.offsetHeight || container.clientHeight || 200;
+                    var dpr = window.devicePixelRatio || 1;
+
                     var canvas = document.createElement('canvas');
                     var ctx = canvas.getContext('2d');
 
                     container.innerHTML = '';
-                    canvas.width = container.offsetWidth;
-                    canvas.height = container.offsetHeight;
+                    canvas.width = width * dpr;
+                    canvas.height = height * dpr;
+                    canvas.style.width = width + 'px';
+                    canvas.style.height = height + 'px';
+                    ctx.scale(dpr, dpr);
+                    ctx._voyagerWidth = width;
+                    ctx._voyagerHeight = height;
                     container.appendChild(canvas);
 
                     return ctx;
@@ -384,21 +418,385 @@
 
                 /**
                  * Create a visual legend inside the specified element based off of a
-                 * Chart.js dataset.
+                 * dataset definition.
                  * @param {string} id The id attribute of the element to host the legend.
                  * @param {Array.<Object>} items A list of labels and colors for the legend.
                  */
                 function generateLegend(id, items) {
                     var legend = document.getElementById(id);
-                    legend.innerHTML = items.map(function (item) {
+                    if (!legend) {
+                        return;
+                    }
+
+                    var list = (items || []).map(function (item) {
                         var color = item.color || item.fillColor;
                         var label = item.label;
                         return '<li><i style="background:' + color + '"></i>' + label + '</li>';
                     }).join('');
+
+                    legend.innerHTML = list;
                 }
 
+                var voyagerChartRegistry = {};
 
-                // Set some global Chart.js defaults.
+                function registerChartRenderer(containerId, renderer) {
+                    voyagerChartRegistry[containerId] = renderer;
+                    renderer();
+                }
+
+                if (!window.__voyagerAnalyticsResizeBound) {
+                    window.__voyagerAnalyticsResizeBound = true;
+                    window.addEventListener('resize', function () {
+                        Object.keys(voyagerChartRegistry).forEach(function (key) {
+                            var renderer = voyagerChartRegistry[key];
+                            if (typeof renderer === 'function') {
+                                try {
+                                    renderer();
+                                } catch (err) {
+                                    console.error('Failed to redraw chart', key, err);
+                                }
+                            }
+                        });
+                    });
+                }
+
+                function showNoData(containerId) {
+                    var container = document.getElementById(containerId);
+                    if (container) {
+                        container.innerHTML = '<div class="text-muted small">' + voyagerAnalyticsNoDataText + '</div>';
+                    }
+                }
+
+                function handleChartError(containerId) {
+                    return function (error) {
+                        console.error('Voyager analytics error:', error);
+                        showNoData(containerId);
+                    };
+                }
+
+                function formatDate(date) {
+                    var year = date.getFullYear();
+                    var month = date.getMonth() + 1;
+                    var day = date.getDate();
+                    return year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
+                }
+
+                function getWeekRanges() {
+                    var now = new Date();
+                    var yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+                    var thisWeekStart = startOfWeek(yesterday);
+                    var lastWeekStart = new Date(thisWeekStart.getTime());
+                    lastWeekStart.setDate(lastWeekStart.getDate() - 7);
+                    var lastWeekEnd = new Date(lastWeekStart.getTime());
+                    lastWeekEnd.setDate(lastWeekEnd.getDate() + 6);
+
+                    return {
+                        thisWeekStart: thisWeekStart,
+                        thisWeekEnd: now,
+                        lastWeekStart: lastWeekStart,
+                        lastWeekEnd: lastWeekEnd
+                    };
+                }
+
+                function startOfWeek(date) {
+                    var start = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+                    start.setDate(start.getDate() - start.getDay());
+                    return start;
+                }
+
+                function getYearRanges() {
+                    var now = new Date();
+                    var thisYearStart = new Date(now.getFullYear(), 0, 1);
+                    var lastYearStart = new Date(now.getFullYear() - 1, 0, 1);
+                    var lastYearEnd = new Date(now.getFullYear() - 1, 11, 31);
+
+                    return {
+                        thisYearStart: thisYearStart,
+                        thisYearEnd: now,
+                        lastYearStart: lastYearStart,
+                        lastYearEnd: lastYearEnd
+                    };
+                }
+
+                function buildWeekdayLabels(startDate, count) {
+                    var labels = [];
+                    for (var i = 0; i < count; i++) {
+                        var date = new Date(startDate.getTime());
+                        date.setDate(date.getDate() + i);
+                        if (voyagerWeekdayFormatter) {
+                            labels.push(voyagerWeekdayFormatter.format(date));
+                        } else {
+                            labels.push(voyagerFallbackWeekdays[date.getDay()]);
+                        }
+                    }
+                    return labels;
+                }
+
+                function buildMonthLabels() {
+                    var labels = [];
+                    for (var i = 0; i < 12; i++) {
+                        if (voyagerMonthFormatter) {
+                            labels.push(voyagerMonthFormatter.format(new Date(2000, i, 1)));
+                        } else {
+                            labels.push(voyagerFallbackMonths[i]);
+                        }
+                    }
+                    return labels;
+                }
+
+                function normalizeMetricRows(rows, length) {
+                    var values = new Array(length);
+                    rows = rows || [];
+                    for (var i = 0; i < length; i++) {
+                        var value = rows[i] ? Number(rows[i][rows[i].length - 1]) : null;
+                        values[i] = isNaN(value) ? null : value;
+                    }
+                    return values;
+                }
+
+                function mapMonthlyMetrics(rows, length) {
+                    var values = new Array(length);
+                    for (var i = 0; i < length; i++) {
+                        values[i] = null;
+                    }
+                    (rows || []).forEach(function (row) {
+                        var monthIndex = parseInt(row[0], 10) - 1;
+                        if (!isNaN(monthIndex) && monthIndex >= 0 && monthIndex < length) {
+                            var value = Number(row[row.length - 1]);
+                            values[monthIndex] = isNaN(value) ? null : value;
+                        }
+                    });
+                    return values;
+                }
+
+                function datasetsHaveValues(datasets) {
+                    if (!datasets || !datasets.length) {
+                        return false;
+                    }
+                    for (var i = 0; i < datasets.length; i++) {
+                        var series = datasets[i] && datasets[i].values;
+                        if (!series) {
+                            continue;
+                        }
+                        for (var j = 0; j < series.length; j++) {
+                            if (typeof series[j] === 'number' && !isNaN(series[j])) {
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                }
+
+                function buildCategorySeries(rows) {
+                    var items = [];
+                    (rows || []).forEach(function (row, index) {
+                        var value = Number(row[1]);
+                        items.push({
+                            label: row[0],
+                            value: isNaN(value) ? 0 : value,
+                            color: voyagerCategoryColors[index % voyagerCategoryColors.length]
+                        });
+                    });
+                    return items;
+                }
+
+                function drawLineChart(containerId, legendId, labels, datasets) {
+                    var ctx = makeCanvas(containerId);
+                    if (!ctx) {
+                        return;
+                    }
+
+                    var width = ctx._voyagerWidth;
+                    var height = ctx._voyagerHeight;
+                    var padding = 32;
+                    var chartWidth = Math.max(10, width - padding * 2);
+                    var chartHeight = Math.max(10, height - padding * 2);
+                    var maxValue = 0;
+
+                    datasets.forEach(function (dataset) {
+                        (dataset.values || []).forEach(function (value) {
+                            if (typeof value === 'number' && value > maxValue) {
+                                maxValue = value;
+                            }
+                        });
+                    });
+
+                    if (maxValue === 0) {
+                        maxValue = 1;
+                    }
+
+                    var stepX = labels.length > 1 ? chartWidth / (labels.length - 1) : chartWidth;
+                    var originY = padding + chartHeight;
+
+                    ctx.strokeStyle = '#E2E8F0';
+                    ctx.lineWidth = 1;
+                    for (var i = 0; i <= 4; i++) {
+                        var y = padding + (chartHeight / 4) * i;
+                        ctx.beginPath();
+                        ctx.moveTo(padding, y);
+                        ctx.lineTo(padding + chartWidth, y);
+                        ctx.stroke();
+                    }
+
+                    ctx.strokeStyle = '#A0AEC0';
+                    ctx.beginPath();
+                    ctx.moveTo(padding, padding);
+                    ctx.lineTo(padding, originY);
+                    ctx.lineTo(padding + chartWidth, originY);
+                    ctx.stroke();
+
+                    datasets.forEach(function (dataset) {
+                        ctx.beginPath();
+                        ctx.lineWidth = 2;
+                        ctx.strokeStyle = dataset.color;
+                        var hasStarted = false;
+                        (dataset.values || []).forEach(function (value, index) {
+                            if (typeof value !== 'number' || isNaN(value)) {
+                                hasStarted = false;
+                                return;
+                            }
+                            var x = padding + stepX * index;
+                            var y = originY - (value / maxValue) * chartHeight;
+                            if (!hasStarted) {
+                                ctx.moveTo(x, y);
+                                hasStarted = true;
+                            } else {
+                                ctx.lineTo(x, y);
+                            }
+                        });
+                        ctx.stroke();
+
+                        (dataset.values || []).forEach(function (value, index) {
+                            if (typeof value !== 'number' || isNaN(value)) {
+                                return;
+                            }
+                            var x = padding + stepX * index;
+                            var y = originY - (value / maxValue) * chartHeight;
+                            ctx.beginPath();
+                            ctx.arc(x, y, 3, 0, Math.PI * 2);
+                            ctx.fillStyle = '#fff';
+                            ctx.fill();
+                            ctx.lineWidth = 2;
+                            ctx.strokeStyle = dataset.color;
+                            ctx.stroke();
+                        });
+                    });
+
+                    ctx.fillStyle = '#4A5568';
+                    ctx.font = '12px sans-serif';
+                    ctx.textAlign = 'center';
+                    labels.forEach(function (label, index) {
+                        var x = padding + stepX * index;
+                        ctx.fillText(label, x, originY + 16);
+                    });
+
+                    generateLegend(legendId, datasets);
+                }
+
+                function drawBarChart(containerId, legendId, labels, datasets) {
+                    var ctx = makeCanvas(containerId);
+                    if (!ctx) {
+                        return;
+                    }
+
+                    var width = ctx._voyagerWidth;
+                    var height = ctx._voyagerHeight;
+                    var padding = 32;
+                    var chartWidth = Math.max(10, width - padding * 2);
+                    var chartHeight = Math.max(10, height - padding * 2);
+                    var maxValue = 0;
+
+                    datasets.forEach(function (dataset) {
+                        (dataset.values || []).forEach(function (value) {
+                            if (typeof value === 'number' && value > maxValue) {
+                                maxValue = value;
+                            }
+                        });
+                    });
+
+                    if (maxValue === 0) {
+                        maxValue = 1;
+                    }
+
+                    var groupWidth = chartWidth / labels.length;
+                    var barSpacing = 6;
+                    var barWidth = Math.max(4, (groupWidth - barSpacing) / datasets.length);
+                    var originY = padding + chartHeight;
+
+                    ctx.strokeStyle = '#E2E8F0';
+                    ctx.lineWidth = 1;
+                    for (var i = 0; i <= 4; i++) {
+                        var y = padding + (chartHeight / 4) * i;
+                        ctx.beginPath();
+                        ctx.moveTo(padding, y);
+                        ctx.lineTo(padding + chartWidth, y);
+                        ctx.stroke();
+                    }
+
+                    datasets.forEach(function (dataset, datasetIndex) {
+                        ctx.fillStyle = dataset.color;
+                        (dataset.values || []).forEach(function (value, index) {
+                            if (typeof value !== 'number' || isNaN(value)) {
+                                return;
+                            }
+                            var x = padding + groupWidth * index + datasetIndex * barWidth;
+                            var barHeight = (value / maxValue) * chartHeight;
+                            ctx.fillRect(x, originY - barHeight, barWidth - 2, barHeight);
+                        });
+                    });
+
+                    ctx.fillStyle = '#4A5568';
+                    ctx.font = '12px sans-serif';
+                    ctx.textAlign = 'center';
+                    labels.forEach(function (label, index) {
+                        var x = padding + groupWidth * index + (groupWidth / 2);
+                        ctx.fillText(label, x, originY + 16);
+                    });
+
+                    generateLegend(legendId, datasets);
+                }
+
+                function drawDonutChart(containerId, legendId, items) {
+                    var ctx = makeCanvas(containerId);
+                    if (!ctx) {
+                        return;
+                    }
+
+                    var width = ctx._voyagerWidth;
+                    var height = ctx._voyagerHeight;
+                    var total = items.reduce(function (sum, item) {
+                        return sum + (item.value || 0);
+                    }, 0);
+
+                    if (total === 0) {
+                        showNoData(containerId);
+                        generateLegend(legendId, []);
+                        return;
+                    }
+
+                    var radius = Math.min(width, height) / 2 - 10;
+                    var centerX = width / 2;
+                    var centerY = height / 2;
+                    var startAngle = -Math.PI / 2;
+
+                    items.forEach(function (item) {
+                        var sliceAngle = (item.value / total) * Math.PI * 2;
+                        ctx.beginPath();
+                        ctx.moveTo(centerX, centerY);
+                        ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle);
+                        ctx.closePath();
+                        ctx.fillStyle = item.color;
+                        ctx.fill();
+                        startAngle += sliceAngle;
+                    });
+
+                    ctx.beginPath();
+                    ctx.fillStyle = '#fff';
+                    ctx.arc(centerX, centerY, radius * 0.55, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    generateLegend(legendId, items);
+                }                // Set some global Chart.js defaults.
                 Chart.defaults.global.animationSteps = 60;
                 Chart.defaults.global.animationEasing = 'easeInOutQuart';
                 Chart.defaults.global.responsive = true;
@@ -414,3 +812,5 @@
     @endif
 
 @stop
+
+
