@@ -5,26 +5,10 @@ import '../sass/app.scss';
 
 import 'jquery-ui-dist/jquery-ui';
 import 'bootstrap';
-import select2Source from './vendor/select2.full.js?raw';
-if (typeof window !== 'undefined' && window.jQuery) {
-    const runSelect2 = new Function(
-        'window',
-        'document',
-        '$',
-        'jQuery',
-        'undefined',
-        `${select2Source}\n//# sourceURL=select2.full.js`
-    );
-    runSelect2(window, document, window.jQuery, window.jQuery);
-    if (window.jQuery.fn && window.jQuery.fn.select2) {
-        window.Select2 = window.jQuery.fn.select2;
-    }
-}
+import SimpleTable from './modules/simple-table';
+window.VoyagerSimpleTable = SimpleTable;
 
-import dataTablesSource from './vendor/jquery.dataTables.js?raw';
-import dataTablesBootstrapSource from './vendor/datatables-bootstrap3.js?raw';
-
-const executeLegacyScript = (source, sourceName) => {
+const loadLegacyPlugin = (source, sourceName) => {
     if (typeof window === 'undefined') {
         return;
     }
@@ -34,15 +18,44 @@ const executeLegacyScript = (source, sourceName) => {
         'document',
         '$',
         'jQuery',
+        'define',
+        'exports',
+        'module',
         'undefined',
         `${source}\n//# sourceURL=${sourceName}`
     );
 
-    runner(window, document, window.jQuery, window.jQuery);
+    runner(window, document, window.jQuery, window.jQuery, undefined, undefined, undefined);
 };
 
-executeLegacyScript(dataTablesSource, 'jquery.dataTables.js');
-executeLegacyScript(dataTablesBootstrapSource, 'datatables-bootstrap3.js');
+import select2Source from './vendor/select2.full.js?raw';
+if (typeof window !== 'undefined' && window.jQuery) {
+    loadLegacyPlugin(select2Source, 'select2.full.js');
+    if (window.jQuery.fn && window.jQuery.fn.select2) {
+        window.Select2 = window.jQuery.fn.select2;
+    }
+}
+
+const initSimpleTables = () => {
+    if (typeof document === 'undefined') {
+        return;
+    }
+    document.querySelectorAll('[data-simple-table]').forEach((table) => {
+        if (table.__voyagerSimpleTable) {
+            return;
+        }
+        try {
+            const rawConfig = table.getAttribute('data-simple-table');
+            const options = rawConfig ? JSON.parse(rawConfig) : {};
+            table.__voyagerSimpleTable = new SimpleTable(table, options);
+        } catch (error) {
+            console.error('Voyager simple table init failed', error);
+        }
+    });
+};
+
+window.VoyagerInitSimpleTables = initSimpleTables;
+
 import 'bootstrap-toggle';
 import 'nestable2';
 import 'jquery-match-height';
@@ -156,6 +169,8 @@ $(document).ready(function () {
         fadedOverlay = $('.fadetoblack'),
         hamburger = $('.hamburger');
 
+    initSimpleTables();
+
     const sideMenuEl = document.querySelector('.side-menu');
     if (sideMenuEl) {
         new PerfectScrollbar(sideMenuEl);
@@ -251,9 +266,6 @@ $(document).ready(function () {
 
     $('.match-height').matchHeight();
 
-    $('.datatable').DataTable({
-        "dom": '<"top"fl<"clear">>rt<"bottom"ip<"clear">>'
-    });
 
     $(".side-menu .nav .dropdown").on('show.bs.collapse', function () {
         return $(".side-menu .nav .dropdown .collapse").collapse('hide');

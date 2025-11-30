@@ -74,8 +74,21 @@
                                 @endif
                             </form>
                         @endif
+                        @php
+                            $simpleTableConfig = [
+                                'perPage' => config('voyager.dashboard.data_tables.per_page', 25),
+                                'searchPlaceholder' => __('voyager::generic.search'),
+                                'order' => count($orderColumn) ? $orderColumn[0] : null,
+                            ];
+                        @endphp
                         <div class="table-responsive">
-                            <table id="dataTable" class="table table-hover">
+                            <table
+                                id="dataTable"
+                                class="table table-hover"
+                                @unless($dataType->server_side)
+                                    data-simple-table="{{ e(json_encode($simpleTableConfig)) }}"
+                                @endunless
+                            >
                                 <thead>
                                     <tr>
                                         @if($showCheckboxColumn)
@@ -324,18 +337,7 @@
     @endif
     <script>
         $(document).ready(function () {
-            @if (!$dataType->server_side)
-                var table = $('#dataTable').DataTable({!! json_encode(
-                    array_merge([
-                        "order" => $orderColumn,
-                        "language" => __('voyager::datatable'),
-                        "columnDefs" => [
-                            ['targets' => 'dt-not-orderable', 'searchable' =>  false, 'orderable' => false],
-                        ],
-                    ],
-                    config('voyager.dashboard.data_tables', []))
-                , true) !!});
-            @else
+            @if ($dataType->server_side)
                 $('#search-input select').select2({
                     minimumResultsForSearch: Infinity
                 });
@@ -343,10 +345,6 @@
 
             @if ($isModelTranslatable)
                 $('.side-body').multilingual();
-                //Reinitialise the multilingual features when they change tab
-                $('#dataTable').on('draw.dt', function(){
-                    $('.side-body').data('multilingual').init();
-                })
             @endif
             $('.select_all').on('click', function(e) {
                 $('input[name="row_id"]').prop('checked', $(this).prop('checked')).trigger('change');

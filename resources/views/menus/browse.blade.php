@@ -22,7 +22,18 @@
             <div class="col-md-12">
                 <div class="panel panel-bordered">
                     <div class="panel-body">
-                        <table id="dataTable" class="table table-hover">
+                        @php
+                            $menuTableConfig = [
+                                'perPage' => 15,
+                                'searchPlaceholder' => __('voyager::generic.search'),
+                                'order' => [0, 'asc'],
+                            ];
+                        @endphp
+                        <table
+                            id="dataTable"
+                            class="table table-hover"
+                            data-simple-table="{{ e(json_encode($menuTableConfig)) }}"
+                        >
                             <thead>
                             <tr>
                                 @foreach($dataType->browseRows as $row)
@@ -95,17 +106,7 @@
 @stop
 
 @section('javascript')
-    <!-- DataTables -->
     <script>
-        $(document).ready(function () {
-            $('#dataTable').DataTable({
-                "order": [],
-                "language": {!! json_encode(__('voyager::datatable'), true) !!},
-                "columnDefs": [{"targets": -1, "searchable":  false, "orderable": false}]
-                @if(config('dashboard.data_tables.responsive')), responsive: true @endif
-            });
-        });
-
         $('td').on('click', '.delete', function (e) {
             $('#delete_form')[0].action = '{{ route('voyager.'.$dataType->slug.'.destroy', ['id' => '__menu']) }}'.replace('__menu', $(this).data('id'));
 

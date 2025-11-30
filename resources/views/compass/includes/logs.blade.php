@@ -16,7 +16,18 @@
       {{ __('voyager::compass.logs.file_too_big') }}
     </div>
   @else
-    <table id="table-log" class="table table-striped">
+    @php
+        $logTableConfig = [
+            'perPage' => 30,
+            'searchPlaceholder' => __('voyager::generic.search'),
+            'order' => [2, 'desc'],
+        ];
+    @endphp
+    <table
+        id="table-log"
+        class="table table-striped"
+        data-simple-table="{{ e(json_encode($logTableConfig)) }}"
+    >
       <thead>
       <tr>
         <th>{{ __('voyager::compass.logs.level') }}</th>

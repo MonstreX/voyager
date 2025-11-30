@@ -1,8 +1,6 @@
 @import "_variables";
 @import "bootstrap/stylesheets/bootstrap";
 @import "animate.css/animate";
-@import "vendor/jquery.dataTables";
-@import "vendor/datatables-bootstrap3";
 @import "vendor/select2/select2";
 @import "toastr/build/toastr";
 @import "perfect-scrollbar/css/perfect-scrollbar";
@@ -16,6 +14,52 @@
 @import "cropperjs/dist/cropper";
 @import "eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker";
 @import "fonts";
+
+.simple-table-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+    align-items: center;
+
+    .simple-table-search {
+        flex: 1 1 220px;
+        min-width: 180px;
+    }
+
+    .simple-table-info {
+        font-size: 12px;
+    }
+
+    .simple-table-pagination .btn {
+        min-width: 32px;
+    }
+}
+
+th.simple-table-sortable {
+    cursor: pointer;
+    position: relative;
+    padding-right: 18px;
+
+    &::after {
+        content: '';
+        position: absolute;
+        right: 6px;
+        top: 50%;
+        margin-top: -4px;
+        border: 4px solid transparent;
+    }
+}
+
+th.simple-table-sort-asc::after {
+    border-bottom-color: #555;
+    margin-top: -6px;
+}
+
+th.simple-table-sort-desc::after {
+    border-top-color: #555;
+    margin-top: 2px;
+}
 
 /********** LOGIN STYLES ***********/
 
