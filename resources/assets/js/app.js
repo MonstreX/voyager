@@ -3,7 +3,6 @@ import '../sass/app.scss';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 
-import '../sass/bootstrap/javascripts/bootstrap';
 import SimpleTable from './modules/simple-table';
 window.VoyagerSimpleTable = SimpleTable;
 
@@ -368,6 +367,406 @@ const initDatePickers = () => {
 
 window.VoyagerInitDatePickers = initDatePickers;
 
+const getTargetSelector = (trigger) => {
+    if (!trigger) {
+        return null;
+    }
+    const rawSelector = trigger.getAttribute('data-target') || trigger.getAttribute('href');
+    if (!rawSelector) {
+        return null;
+    }
+    if (rawSelector.startsWith('#') || rawSelector.startsWith('.')) {
+        return rawSelector;
+    }
+    if (rawSelector.indexOf('#') >= 0) {
+        return `#${rawSelector.split('#').pop()}`;
+    }
+    return rawSelector;
+};
+
+const findTargetElement = (trigger) => {
+    const selector = getTargetSelector(trigger);
+    if (!selector) {
+        return null;
+    }
+    try {
+        return document.querySelector(selector);
+    } catch (error) {
+        return null;
+    }
+};
+
+const dispatchCustomEvent = (element, name) => {
+    if (!element) {
+        return;
+    }
+    const event = new CustomEvent(name, { bubbles: true });
+    element.dispatchEvent(event);
+};
+
+const modalStack = [];
+const modalBackdropMap = new Map();
+
+const showModalElement = (modal) => {
+    if (!modal || modal.classList.contains('voyager-modal-visible')) {
+        return;
+    }
+    modal.classList.add('voyager-modal-visible');
+    modal.style.display = 'block';
+    modal.setAttribute('aria-hidden', 'false');
+    modal.classList.add('in', 'show');
+    const backdrop = document.createElement('div');
+    backdrop.className = 'modal-backdrop fade in';
+    backdrop.dataset.voyagerModalId = modal.id || '';
+    document.body.appendChild(backdrop);
+    modalBackdropMap.set(modal, backdrop);
+    modalStack.push(modal);
+    document.body.classList.add('modal-open');
+    dispatchCustomEvent(modal, 'shown.bs.modal');
+};
+
+const hideModalElement = (modal) => {
+    if (!modal || !modal.classList.contains('voyager-modal-visible')) {
+        return;
+    }
+    modal.classList.remove('voyager-modal-visible');
+    modal.classList.remove('in', 'show');
+    modal.style.display = 'none';
+    modal.setAttribute('aria-hidden', 'true');
+    const backdrop = modalBackdropMap.get(modal);
+    if (backdrop && backdrop.parentNode) {
+        backdrop.parentNode.removeChild(backdrop);
+    }
+    modalBackdropMap.delete(modal);
+    const index = modalStack.indexOf(modal);
+    if (index !== -1) {
+        modalStack.splice(index, 1);
+    }
+    if (modalStack.length === 0) {
+        document.body.classList.remove('modal-open');
+    }
+    dispatchCustomEvent(modal, 'hidden.bs.modal');
+};
+
+const currentModal = () => {
+    return modalStack.length ? modalStack[modalStack.length - 1] : null;
+};
+
+const dropdownState = {
+    openDropdown: null
+};
+
+const closeDropdownMenu = (dropdown) => {
+    if (!dropdown) {
+        return;
+    }
+    dropdown.classList.remove('open');
+    if (dropdown === dropdownState.openDropdown) {
+        dropdownState.openDropdown = null;
+    }
+};
+
+const toggleDropdownFromTrigger = (trigger) => {
+    const dropdown = trigger.closest('.dropdown');
+    if (!dropdown) {
+        return;
+    }
+    if (dropdown === dropdownState.openDropdown) {
+        closeDropdownMenu(dropdown);
+        return;
+    }
+    if (dropdownState.openDropdown) {
+        closeDropdownMenu(dropdownState.openDropdown);
+    }
+    dropdown.classList.add('open');
+    dropdownState.openDropdown = dropdown;
+};
+
+const isCollapseOpen = (element) => {
+    return element.classList.contains('in') || element.classList.contains('show');
+};
+
+const showCollapseElement = (element) => {
+    if (!element) {
+        return;
+    }
+    element.classList.add('in', 'show');
+    element.style.height = `${element.scrollHeight}px`;
+    requestAnimationFrame(() => {
+        element.style.height = 'auto';
+    });
+    dispatchCustomEvent(element, 'shown.bs.collapse');
+};
+
+const hideCollapseElement = (element) => {
+    if (!element) {
+        return;
+    }
+    element.classList.remove('in', 'show');
+    element.style.height = '0px';
+    dispatchCustomEvent(element, 'hidden.bs.collapse');
+};
+
+const toggleCollapseElement = (element) => {
+    if (!element) {
+        return;
+    }
+    if (isCollapseOpen(element)) {
+        hideCollapseElement(element);
+    } else {
+        showCollapseElement(element);
+    }
+};
+
+const activateTabTrigger = (trigger) => {
+    if (!trigger) {
+        return;
+    }
+    const target = findTargetElement(trigger);
+    if (!target) {
+        return;
+    }
+    const parentNav = trigger.closest('ul');
+    if (parentNav) {
+        parentNav.querySelectorAll('.active').forEach((active) => active.classList.remove('active'));
+    }
+    const li = trigger.closest('li');
+    if (li) {
+        li.classList.add('active');
+    }
+    const container = target.parentElement;
+    if (container) {
+        container.querySelectorAll('.tab-pane').forEach((pane) => {
+            pane.classList.remove('active', 'in');
+            pane.style.display = 'none';
+        });
+    }
+    target.classList.add('active', 'in');
+    target.style.display = 'block';
+    dispatchCustomEvent(target, 'shown.bs.tab');
+};
+
+let tooltipElement = null;
+const tooltipState = {
+    activeTrigger: null
+};
+
+const ensureTooltipElement = () => {
+    if (!tooltipElement) {
+        tooltipElement = document.createElement('div');
+        tooltipElement.className = 'voyager-tooltip';
+        document.body.appendChild(tooltipElement);
+    }
+    return tooltipElement;
+};
+
+const positionTooltip = (trigger) => {
+    const tooltip = ensureTooltipElement();
+    const text = trigger.getAttribute('title') || trigger.getAttribute('data-original-title');
+    if (!text) {
+        return;
+    }
+    tooltip.textContent = text;
+    const rect = trigger.getBoundingClientRect();
+    const top = window.scrollY + rect.top - 8;
+    const left = window.scrollX + rect.left + rect.width / 2;
+    tooltip.style.top = `${top}px`;
+    tooltip.style.left = `${left}px`;
+    tooltip.classList.add('visible');
+    tooltipState.activeTrigger = trigger;
+};
+
+const hideTooltip = () => {
+    if (tooltipElement) {
+        tooltipElement.classList.remove('visible');
+    }
+    tooltipState.activeTrigger = null;
+};
+
+const initTooltips = (scope) => {
+    const elements = scope
+        ? (Array.isArray(scope) ? scope : [scope])
+        : document.querySelectorAll('[data-toggle="tooltip"]');
+    elements.forEach((element) => {
+        if (element && !element.getAttribute('title') && element.getAttribute('data-original-title')) {
+            element.setAttribute('title', element.getAttribute('data-original-title'));
+        }
+    });
+};
+
+const initBootstrapCompat = () => {
+    document.addEventListener('click', (event) => {
+        const modalTrigger = event.target.closest('[data-toggle="modal"]');
+        if (modalTrigger) {
+            event.preventDefault();
+            const modal = findTargetElement(modalTrigger);
+            if (modal) {
+                showModalElement(modal);
+            }
+            return;
+        }
+
+        const dismissTrigger = event.target.closest('[data-dismiss="modal"]');
+        if (dismissTrigger) {
+            event.preventDefault();
+            const modal = dismissTrigger.closest('.modal');
+            if (modal) {
+                hideModalElement(modal);
+            }
+            return;
+        }
+
+        const dropdownTrigger = event.target.closest('[data-toggle="dropdown"], .dropdown-toggle');
+        if (dropdownTrigger) {
+            event.preventDefault();
+            toggleDropdownFromTrigger(dropdownTrigger);
+            return;
+        }
+
+        const collapseTrigger = event.target.closest('[data-toggle="collapse"]');
+        if (collapseTrigger) {
+            event.preventDefault();
+            const target = findTargetElement(collapseTrigger);
+            if (target) {
+                const parentSelector = collapseTrigger.getAttribute('data-parent');
+                if (parentSelector) {
+                    const parent = document.querySelector(parentSelector);
+                    if (parent) {
+                        parent.querySelectorAll('.collapse.show, .collapse.in').forEach((el) => {
+                            if (el !== target) {
+                                hideCollapseElement(el);
+                            }
+                        });
+                    }
+                }
+                toggleCollapseElement(target);
+                collapseTrigger.setAttribute('aria-expanded', isCollapseOpen(target) ? 'true' : 'false');
+            }
+            return;
+        }
+
+        const tabTrigger = event.target.closest('[data-toggle="tab"]');
+        if (tabTrigger) {
+            event.preventDefault();
+            activateTabTrigger(tabTrigger);
+            return;
+        }
+
+        const buttonToggle = event.target.closest('[data-toggle="buttons"] label');
+        if (buttonToggle) {
+            const input = buttonToggle.querySelector('input');
+            const group = buttonToggle.closest('[data-toggle="buttons"]');
+            if (input && group) {
+                if (input.type === 'radio') {
+                    group.querySelectorAll('label').forEach((label) => label.classList.remove('active'));
+                    buttonToggle.classList.add('active');
+                    input.checked = true;
+                } else {
+                    buttonToggle.classList.toggle('active');
+                    input.checked = buttonToggle.classList.contains('active');
+                }
+            }
+        }
+    });
+
+    document.addEventListener('click', (event) => {
+        const modal = currentModal();
+        if (modal && event.target === modal) {
+            hideModalElement(modal);
+        }
+        if (dropdownState.openDropdown && !event.target.closest('.dropdown')) {
+            closeDropdownMenu(dropdownState.openDropdown);
+        }
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            const modal = currentModal();
+            if (modal) {
+                hideModalElement(modal);
+                return;
+            }
+            if (dropdownState.openDropdown) {
+                closeDropdownMenu(dropdownState.openDropdown);
+            }
+        }
+    });
+
+    document.addEventListener('mouseenter', (event) => {
+        const trigger = event.target.closest('[data-toggle="tooltip"]');
+        if (!trigger) {
+            return;
+        }
+        positionTooltip(trigger);
+    }, true);
+
+    document.addEventListener('mouseleave', (event) => {
+        const trigger = event.target.closest('[data-toggle="tooltip"]');
+        if (trigger) {
+            hideTooltip();
+        }
+    }, true);
+
+    initTooltips();
+    document.querySelectorAll('.tab-pane').forEach((pane) => {
+        if (pane.classList.contains('active')) {
+            pane.style.display = 'block';
+        } else {
+            pane.style.display = 'none';
+        }
+    });
+};
+
+const registerjQueryBridges = () => {
+    if (!window.jQuery) {
+        return;
+    }
+    const $ = window.jQuery;
+    $.fn.modal = function (action) {
+        return this.each(function () {
+            if (action === 'hide') {
+                hideModalElement(this);
+            } else {
+                showModalElement(this);
+            }
+        });
+    };
+    $.fn.collapse = function (action) {
+        return this.each(function () {
+            if (action === 'hide') {
+                hideCollapseElement(this);
+            } else if (action === 'show') {
+                showCollapseElement(this);
+            } else {
+                toggleCollapseElement(this);
+            }
+        });
+    };
+    $.fn.tab = function () {
+        return this.each(function () {
+            activateTabTrigger(this);
+        });
+    };
+    $.fn.dropdown = function () {
+        return this.each(function () {
+            toggleDropdownFromTrigger(this);
+        });
+    };
+    $.fn.tooltip = function () {
+        initTooltips(this.toArray());
+        return this;
+    };
+};
+
+window.VoyagerInitTooltips = initTooltips;
+window.VoyagerBootstrapCompat = {
+    init: initBootstrapCompat,
+    showModal: showModalElement,
+    hideModal: hideModalElement
+};
+
+registerjQueryBridges();
+
 // Only non-jQuery dependencies here
 import PerfectScrollbar from 'perfect-scrollbar';
 import Cropper from 'cropperjs';
@@ -469,6 +868,7 @@ $(document).ready(function () {
     initSimpleTables();
     initToggleSwitches();
     initDatePickers();
+    initBootstrapCompat();
 
     const sideMenuEl = document.querySelector('.side-menu');
     if (sideMenuEl) {
@@ -565,22 +965,24 @@ $(document).ready(function () {
 
     $('.match-height').matchHeight();
 
-
-    $(".side-menu .nav .dropdown").on('show.bs.collapse', function () {
-        return $(".side-menu .nav .dropdown .collapse").collapse('hide');
-    });
-
-    $('.panel-collapse').on('hide.bs.collapse', function (e) {
-        var target = $(e.target);
-        if (!target.is('a')) {
-            target = target.parent();
-        }
-        if (!target.hasClass('collapsed')) {
-            return;
-        }
-        e.stopPropagation();
-        e.preventDefault();
-    });
+    const sideMenuNav = document.querySelector('.side-menu .nav');
+    if (sideMenuNav) {
+        sideMenuNav.addEventListener('click', (event) => {
+            const trigger = event.target.closest('.dropdown [data-toggle="collapse"]');
+            if (!trigger) {
+                return;
+            }
+            const activeDropdown = trigger.closest('.dropdown');
+            if (!activeDropdown) {
+                return;
+            }
+            sideMenuNav.querySelectorAll('.dropdown .collapse').forEach((section) => {
+                if (section.closest('.dropdown') !== activeDropdown) {
+                    hideCollapseElement(section);
+                }
+            });
+        });
+    }
 
     $(document).on('click', '.panel-heading a.panel-action[data-toggle="panel-collapse"]', function (e) {
         e.preventDefault();
