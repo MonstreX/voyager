@@ -618,8 +618,16 @@ class VoyagerSelect {
         closeOpenVoyagerSelect(this);
         const rect = this.selectionEl.getBoundingClientRect();
         this.dropdown.style.position = 'absolute';
+        this.dropdown.style.width = `${rect.width}px`;
         this.dropdown.style.minWidth = `${rect.width}px`;
-        this.dropdown.style.left = `${rect.left + window.scrollX}px`;
+        const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+        const dropdownWidth = rect.width;
+        let left = rect.left + window.scrollX;
+        const maxLeft = window.scrollX + viewportWidth - dropdownWidth;
+        if (left > maxLeft) {
+            left = Math.max(window.scrollX, maxLeft);
+        }
+        this.dropdown.style.left = `${left}px`;
         this.dropdown.style.top = `${rect.bottom + window.scrollY}px`;
         this.dropdown.style.display = 'block';
         this.dropdown.classList.remove('select2-dropdown--above');
