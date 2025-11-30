@@ -161,7 +161,9 @@
         }
 
         $('document').ready(function () {
-            $('.toggleswitch').bootstrapToggle();
+            if (window.VoyagerInitToggles) {
+                window.VoyagerInitToggles();
+            }
 
             // Initialize date/time pickers when Flatpickr is available
             if (window.VoyagerInitDatePickers) {

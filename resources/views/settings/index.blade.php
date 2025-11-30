@@ -478,7 +478,9 @@
             });
             @endcan
 
-            $('.toggleswitch').bootstrapToggle();
+            if (window.VoyagerInitToggles) {
+                window.VoyagerInitToggles();
+            }
 
             $('[data-toggle="tab"]').click(function() {
                 $(".setting_tab").val($(this).html());

@@ -447,7 +447,9 @@
 
             $('[data-toggle="tooltip"]').tooltip();
 
-            $('.toggleswitch').bootstrapToggle();
+            if (window.VoyagerInitToggles) {
+                window.VoyagerInitToggles();
+            }
 
             $('textarea[data-editor]').each(function () {
                 var textarea = $(this),

@@ -94,7 +94,9 @@
 @section('javascript')
     <script>
         $('document').ready(function () {
-            $('.toggleswitch').bootstrapToggle();
+            if (window.VoyagerInitToggles) {
+                window.VoyagerInitToggles();
+            }
 
             $('.permission-group').on('change', function(){
                 $(this).siblings('ul').find("input[type='checkbox']").prop('checked', this.checked);

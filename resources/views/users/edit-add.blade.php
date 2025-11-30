@@ -129,7 +129,9 @@
 @section('javascript')
     <script>
         $('document').ready(function () {
-            $('.toggleswitch').bootstrapToggle();
+            if (window.VoyagerInitToggles) {
+                window.VoyagerInitToggles();
+            }
         });
     </script>
 @stop
