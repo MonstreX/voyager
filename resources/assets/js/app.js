@@ -400,6 +400,12 @@ const findTargetElement = (trigger) => {
         return null;
     }
     try {
+        if (selector.startsWith('#')) {
+            const candidate = document.getElementById(selector.slice(1));
+            if (candidate) {
+                return candidate;
+            }
+        }
         return document.querySelector(selector);
     } catch (error) {
         return null;
