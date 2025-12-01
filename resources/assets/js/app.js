@@ -26,9 +26,6 @@ const loadLegacyPlugin = (source, sourceName) => {
     runner(window, document, window.jQuery, window.jQuery, undefined, undefined, undefined);
 };
 
-import jqueryUiSource from './vendor/jquery-ui.js?raw';
-loadLegacyPlugin(jqueryUiSource, 'jquery-ui.js');
-
 import Sortable from 'sortablejs';
 window.Sortable = Sortable;
 
