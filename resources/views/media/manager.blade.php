@@ -1,6 +1,6 @@
 @section('media-manager')
 <div>
-    <div v-if="hidden_element" :id="'dd_'+this._uid" class="dd">
+    <div v-if="hidden_element" :id="'dd_'+uid" class="dd">
         <ol id="files" class="dd-list">
             <li v-for="file in getSelectedFiles()" class="dd-item" :data-url="getFilePath(file)">
                 <div class="file_link selected" aria-hidden="true" data-toggle="tooltip" data-placement="auto" :title="getFilePath(file)">
@@ -42,7 +42,7 @@
     </div>
     <div id="toolbar" v-if="showToolbar" :style="isExpanded ? 'display:block' : 'display:none'">
         <div class="btn-group offset-right">
-            <button type="button" class="btn btn-primary" v-if="allowCreateFolder" data-toggle="modal" :data-target="'#create_dir_modal_'+this._uid">
+            <button type="button" class="btn btn-primary" v-if="allowCreateFolder" data-toggle="modal" :data-target="'#create_dir_modal_'+uid">
                 <i class="voyager-folder"></i>
                 {{ __('voyager::generic.add_folder') }}
             </button>
@@ -55,15 +55,15 @@
                 <i class="voyager-upload"></i>
                 {{ __('voyager::media.add_all_selected') }}
             </button>
-            <button type="button" v-if="showFolders && allowMove" class="btn btn-default" data-toggle="modal" :data-target="'#move_files_modal_'+this._uid">
+            <button type="button" v-if="showFolders && allowMove" class="btn btn-default" data-toggle="modal" :data-target="'#move_files_modal_'+uid">
                 <i class="voyager-move"></i>
                 {{ __('voyager::generic.move') }}
             </button>
-            <button type="button" v-if="allowDelete" :disabled="selected_files.length == 0" class="btn btn-default" data-toggle="modal" :data-target="'#confirm_delete_modal_'+this._uid">
+            <button type="button" v-if="allowDelete" :disabled="selected_files.length == 0" class="btn btn-default" data-toggle="modal" :data-target="'#confirm_delete_modal_'+uid">
                 <i class="voyager-trash"></i>
                 {{ __('voyager::generic.delete') }}
             </button>
-            <button v-if="allowCrop" :disabled="selected_files.length != 1 || !fileIs(selected_file, 'image')" type="button" class="btn btn-default" data-toggle="modal" :data-target="'#crop_modal_'+this._uid">
+            <button v-if="allowCrop" :disabled="selected_files.length != 1 || !fileIs(selected_file, 'image')" type="button" class="btn btn-default" data-toggle="modal" :data-target="'#crop_modal_'+uid">
                 <i class="voyager-crop"></i>
                 {{ __('voyager::media.crop') }}
             </button>
@@ -217,7 +217,7 @@
     </div>
 
     <!-- Image Modal -->
-    <div class="modal fade" :id="'imagemodal_'+this._uid" v-if="selected_file && fileIs(selected_file, 'image')">
+    <div class="modal fade" :id="'imagemodal_'+uid" v-if="selected_file && fileIs(selected_file, 'image')">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -237,7 +237,7 @@
     <!-- End Image Modal -->
 
     <!-- New Folder Modal -->
-    <div class="modal fade modal-info" :id="'create_dir_modal_'+this._uid">
+    <div class="modal fade modal-info" :id="'create_dir_modal_'+uid">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -260,7 +260,7 @@
     <!-- End New Folder Modal -->
 
     <!-- Delete File Modal -->
-    <div class="modal fade modal-danger" :id="'confirm_delete_modal_'+this._uid" v-if="allowDelete">
+    <div class="modal fade modal-danger" :id="'confirm_delete_modal_'+uid" v-if="allowDelete">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -289,7 +289,7 @@
     <!-- End Delete File Modal -->
 
     <!-- Move Files Modal -->
-    <div class="modal fade modal-warning" :id="'move_files_modal_'+this._uid" v-if="allowMove">
+    <div class="modal fade modal-warning" :id="'move_files_modal_'+uid" v-if="allowMove">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -317,7 +317,7 @@
     <!-- End Move File Modal -->
 
     <!-- Crop Image Modal -->
-    <div class="modal fade modal-warning" :id="'crop_modal_'+this._uid" v-if="allowCrop">
+    <div class="modal fade modal-warning" :id="'crop_modal_'+uid" v-if="allowCrop">
         <div class="modal-dialog">
             <div class="modal-content">
 
@@ -328,10 +328,10 @@
 
                 <div class="modal-body">
                     <div class="crop-container">
-                        <img :id="'cropping-image_'+this._uid" v-if="selected_files.length == 1 && fileIs(selected_file, 'image')" class="img img-responsive" :src="selected_file.path + '?' + selected_file.last_modified" />
+                        <img :id="'cropping-image_'+uid" v-if="selected_files.length == 1 && fileIs(selected_file, 'image')" class="img img-responsive" :src="selected_file.path + '?' + selected_file.last_modified" />
                     </div>
                     <div class="new-image-info">
-                        {{ __('voyager::media.width') }} <span :id="'new-image-width_'+this._uid"></span>, {{ __('voyager::media.height') }}<span :id="'new-image-height_'+this._uid"></span>
+                        {{ __('voyager::media.width') }} <span :id="'new-image-width_'+uid"></span>, {{ __('voyager::media.height') }}<span :id="'new-image-height_'+uid"></span>
                     </div>
                 </div>
 
@@ -447,6 +447,7 @@
         },
         data: function() {
             return {
+                uid: Math.random().toString(36).slice(2),
                 current_folder: this.basePath,
 		  		selected_files: [],
                 files: [],
@@ -569,7 +570,7 @@
                     this.addFileToInput(file);
                 } else {
                     if (this.fileIs(this.selected_file, 'image')) {
-                        $('#imagemodal_' + this._uid).modal('show');
+                        $('#imagemodal_' + this.uid).modal('show');
                     } else {
                         // ...
                     }
@@ -834,7 +835,7 @@
                     console.error('Voyager media: createFolder failed', error);
                     toastr.error('{{ __('voyager::media.error_creating_dir') }}', "{{ __('voyager::generic.whoopsie') }}");
                 }).finally(function() {
-					$('#create_dir_modal_'+vm._uid).modal('hide');
+					$('#create_dir_modal_'+vm.uid).modal('hide');
                 });
             },
             deleteFiles: function() {
@@ -857,7 +858,7 @@
                     console.error('Voyager media: deleteFiles failed', error);
                     toastr.error('{{ __('voyager::media.error_deleting_file') }}', "{{ __('voyager::generic.whoopsie') }}");
                 }).finally(function() {
-					$('#confirm_delete_modal_'+vm._uid).modal('hide');
+					$('#confirm_delete_modal_'+vm.uid).modal('hide');
                 });
             },
             moveFiles: function(e) {
@@ -869,7 +870,7 @@
                 if (destination === '') {
                     return;
                 }
-                $('#move_files_modal_'+vm._uid).modal('hide');
+                $('#move_files_modal_'+vm.uid).modal('hide');
 				this.sendRequest('{{ route('voyager.media.move') }}', {
                     path: vm.current_folder,
                     files: vm.selected_files,
@@ -915,7 +916,7 @@
                     console.error('Voyager media: crop failed', error);
                     toastr.error('{{ __('voyager::media.error_uploading') }}', "{{ __('voyager::generic.whoopsie') }}");
                 }).finally(function() {
-                    $('#crop_modal_'+vm._uid).modal('hide');
+                    $('#crop_modal_'+vm.uid).modal('hide');
                 });
             },
             addSelectedFiles: function () {
@@ -1066,25 +1067,43 @@
 
             //Cropper
             if (this.allowCrop) {
-                var cropper = $(vm.$el).first().find('#crop_modal_'+vm._uid).first();
-                cropper.on('shown.bs.modal', function (e) {
-                    if (typeof cropper !== 'undefined' && cropper instanceof Cropper) {
-    					cropper.destroy();
-    				}
-    				var croppingImage = document.getElementById('cropping-image_'+vm._uid);
-    				cropper = new Cropper(croppingImage, {
-    					crop: function(e) {
-    						document.getElementById('new-image-width_'+vm._uid).innerText = Math.round(e.detail.width) + 'px';
-    						document.getElementById('new-image-height_'+vm._uid).innerText = Math.round(e.detail.height) + 'px';
-    						croppedData = {
-    							x: Math.round(e.detail.x),
-    							y: Math.round(e.detail.y),
-    							height: Math.round(e.detail.height),
-    							width: Math.round(e.detail.width)
-    						};
-    					}
-    				});
-    			});
+                var cropperModal = $(vm.$el).first().find('#crop_modal_'+vm.uid).first();
+                var cropperInstance = null;
+
+                cropperModal.on('shown.bs.modal', function () {
+                    if (cropperInstance && typeof cropperInstance.destroy === 'function') {
+                        cropperInstance.destroy();
+                        cropperInstance = null;
+                    }
+                    var croppingImage = document.getElementById('cropping-image_'+vm.uid);
+                    if (!croppingImage) {
+                        console.warn('Voyager media: cropping image element not found');
+                        return;
+                    }
+                    if (typeof window.Cropper === 'undefined') {
+                        console.error('Voyager media: Cropper library is not available');
+                        return;
+                    }
+                    cropperInstance = new window.Cropper(croppingImage, {
+                        crop: function(e) {
+                            document.getElementById('new-image-width_'+vm.uid).innerText = Math.round(e.detail.width) + 'px';
+                            document.getElementById('new-image-height_'+vm.uid).innerText = Math.round(e.detail.height) + 'px';
+                            croppedData = {
+                                x: Math.round(e.detail.x),
+                                y: Math.round(e.detail.y),
+                                height: Math.round(e.detail.height),
+                                width: Math.round(e.detail.width)
+                            };
+                        }
+                    });
+                });
+
+                cropperModal.on('hidden.bs.modal', function () {
+                    if (cropperInstance && typeof cropperInstance.destroy === 'function') {
+                        cropperInstance.destroy();
+                        cropperInstance = null;
+                    }
+                });
             }
 
             $(document).ready(function () {
@@ -1112,7 +1131,7 @@
                 });
 
                 //Sortable selection list
-                var ddContainer = document.getElementById('dd_'+vm._uid);
+                var ddContainer = document.getElementById('dd_'+vm.uid);
                 if (ddContainer && window.Sortable) {
                     var ddList = ddContainer.querySelector('.dd-list') || ddContainer;
                     Sortable.create(ddList, {
@@ -1134,11 +1153,11 @@
                     });
                 }
 
-                $('#create_dir_modal_' + vm._uid).on('hidden.bs.modal', function () {
+                $('#create_dir_modal_' + vm.uid).on('hidden.bs.modal', function () {
                     vm.modals.new_folder.name = '';
                 });
 
-                $('#move_files_modal_' + vm._uid).on('hidden.bs.modal', function () {
+                $('#move_files_modal_' + vm.uid).on('hidden.bs.modal', function () {
                     vm.modals.move_files.destination = '';
                 });
             });
