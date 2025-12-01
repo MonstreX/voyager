@@ -1867,6 +1867,30 @@ const registerjQueryBridges = () => {
         initTooltips(this.toArray());
         return this;
     };
+
+    if ($.fn.sortable === undefined && typeof window.Sortable !== 'undefined') {
+        $.fn.sortable = function (options = {}) {
+            return this.each(function () {
+                const element = this;
+                if (element.__voyagerSortable) {
+                    element.__voyagerSortable.destroy();
+                }
+                const sortable = window.Sortable.create(element, {
+                    handle: options.handle || null,
+                    animation: typeof options.animation === 'number' ? options.animation : 150,
+                    onSort: function (evt) {
+                        if (typeof options.update === 'function') {
+                            options.update.call(element, evt, evt);
+                        }
+                    }
+                });
+                element.__voyagerSortable = sortable;
+                if (typeof options.create === 'function') {
+                    options.create.call(element, null, {});
+                }
+            });
+        };
+    }
 };
 
 window.VoyagerInitTooltips = initTooltips;
@@ -1972,11 +1996,9 @@ if (document.getElementById('adminmenu')) {
     adminMenuApp.mount('#adminmenu');
 }
 
-$(document).ready(function () {
-    var appContainer = $(".app-container"),
-        fadedOverlay = $('.fadetoblack'),
-        hamburger = $('.hamburger');
-
+document.addEventListener('DOMContentLoaded', () => {
+    const appContainer = document.querySelector('.app-container');
+    const hamburgerButtons = document.querySelectorAll('.hamburger, .navbar-expand-toggle');
     initSimpleTables();
     initToggleSwitches();
     initDatePickers();
@@ -1996,16 +2018,23 @@ $(document).ready(function () {
         new PerfectScrollbar(sideMenuEl);
     }
 
-    $('#voyager-loader').fadeOut();
+    const loader = document.getElementById('voyager-loader');
+    if (loader) {
+        loader.style.display = 'none';
+    }
 
-    $(".hamburger, .navbar-expand-toggle").on('click', function () {
-        appContainer.toggleClass("expanded");
-        $(this).toggleClass('is-active');
-        if ($(this).hasClass('is-active')) {
-            window.localStorage.setItem('voyager.stickySidebar', true);
-        } else {
-            window.localStorage.setItem('voyager.stickySidebar', false);
-        }
+    hamburgerButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+            if (appContainer) {
+                appContainer.classList.toggle('expanded');
+            }
+            const isActive = button.classList.toggle('is-active');
+            if (isActive) {
+                window.localStorage.setItem('voyager.stickySidebar', true);
+            } else {
+                window.localStorage.setItem('voyager.stickySidebar', false);
+            }
+        });
     });
 
     if (window.VoyagerInitMatchHeight) {
@@ -2032,57 +2061,63 @@ $(document).ready(function () {
         });
     }
 
-    $(document).on('click', '.panel-heading a.panel-action[data-toggle="panel-collapse"]', function (e) {
-        e.preventDefault();
-        var $this = $(this);
+    document.addEventListener('click', (event) => {
+        const collapseTrigger = event.target.closest('.panel-heading a.panel-action[data-toggle="panel-collapse"]');
+        if (collapseTrigger) {
+            event.preventDefault();
+            const panel = collapseTrigger.closest('.panel');
+            const body = panel ? panel.querySelector('.panel-body') : null;
+            if (!panel || !body) {
+                return;
+            }
+            const isCollapsed = collapseTrigger.classList.contains('panel-collapsed');
+            if (!isCollapsed) {
+                body.style.display = 'none';
+                collapseTrigger.classList.add('panel-collapsed');
+                collapseTrigger.classList.remove('voyager-angle-up');
+                collapseTrigger.classList.add('voyager-angle-down');
+            } else {
+                body.style.display = '';
+                collapseTrigger.classList.remove('panel-collapsed');
+                collapseTrigger.classList.remove('voyager-angle-down');
+                collapseTrigger.classList.add('voyager-angle-up');
+            }
+            return;
+        }
 
-        // Toggle Collapse
-        if (!$this.hasClass('panel-collapsed')) {
-            $this.parents('.panel').find('.panel-body').slideUp();
-            $this.addClass('panel-collapsed');
-            $this.removeClass('voyager-angle-up').addClass('voyager-angle-down');
-        } else {
-            $this.parents('.panel').find('.panel-body').slideDown();
-            $this.removeClass('panel-collapsed');
-            $this.removeClass('voyager-angle-down').addClass('voyager-angle-up');
+        const fullscreenTrigger = event.target.closest('.panel-heading a.panel-action[data-toggle="panel-fullscreen"]');
+        if (fullscreenTrigger) {
+            event.preventDefault();
+            fullscreenTrigger.classList.toggle('voyager-resize-full');
+            fullscreenTrigger.classList.toggle('voyager-resize-small');
+            const panel = fullscreenTrigger.closest('.panel');
+            if (panel) {
+                panel.classList.toggle('is-fullscreen');
+            }
         }
     });
 
-    //Toggle fullscreen
-    $(document).on('click', '.panel-heading a.panel-action[data-toggle="panel-fullscreen"]', function (e) {
-        e.preventDefault();
-        var $this = $(this);
-        if (!$this.hasClass('voyager-resize-full')) {
-            $this.removeClass('voyager-resize-small').addClass('voyager-resize-full');
-        } else {
-            $this.removeClass('voyager-resize-full').addClass('voyager-resize-small');
-        }
-        $this.closest('.panel').toggleClass('is-fullscreen');
-    });
-
-
-
-    // Save shortcut
-    $(document).keydown(function (e) {
-        if ((e.metaKey || e.ctrlKey) && e.keyCode == 83) { /*ctrl+s or command+s*/
-            $(".btn.save").click();
-            e.preventDefault();
-            return false;
+    document.addEventListener('keydown', (event) => {
+        if ((event.metaKey || event.ctrlKey) && event.keyCode === 83) {
+            const saveButtons = document.querySelectorAll('.btn.save');
+            saveButtons.forEach((button) => button.click());
+            event.preventDefault();
         }
     });
 
     /********** MARKDOWN EDITOR (DISABLED) **********/
 
-    $('.easymde').each(function () {
-        if (this.dataset.voyagerEasymdeNoticeApplied) {
+    document.querySelectorAll('.easymde').forEach((textarea) => {
+        if (textarea.dataset.voyagerEasymdeNoticeApplied === 'true') {
             return;
         }
-        this.dataset.voyagerEasymdeNoticeApplied = 'true';
+        textarea.dataset.voyagerEasymdeNoticeApplied = 'true';
         const notice = document.createElement('div');
         notice.className = 'alert alert-warning mt-2';
-        notice.innerText = 'Markdown editor is temporarily disabled pending rewrite. Please edit the raw markdown text below.';
-        if (this.parentNode) {
-            this.parentNode.insertBefore(notice, this.nextSibling);
+        notice.innerText =
+            'Markdown editor is temporarily disabled pending rewrite. Please edit the raw markdown text below.';
+        if (textarea.parentNode) {
+            textarea.parentNode.insertBefore(notice, textarea.nextSibling);
         }
     });
 
