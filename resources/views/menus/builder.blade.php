@@ -282,6 +282,8 @@
              * Reorder items
              */
             var menuNestable = document.querySelector('.dd');
+            var csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+            var orderUrl = '{{ route('voyager.menus.order_item',['menu' => $menu->id]) }}';
             if (menuNestable && window.VoyagerInitNestable) {
                 console.debug('[VoyagerNestable:MenuBuilder] init', menuNestable);
                 window.VoyagerInitNestable(menuNestable);
@@ -291,12 +293,29 @@
                         ? event.detail.structure
                         : (window.VoyagerSerializeNestable ? window.VoyagerSerializeNestable(menuNestable) : []);
                     console.debug('[VoyagerNestable:MenuBuilder] serialize result', structure);
-                    $.post('{{ route('voyager.menus.order_item',['menu' => $menu->id]) }}', {
-                        order: JSON.stringify(structure),
-                        _token: '{{ csrf_token() }}'
-                    }, function () {
+
+                    var payload = new URLSearchParams();
+                    payload.append('order', JSON.stringify(structure));
+                    payload.append('_token', csrfToken);
+
+                    fetch(orderUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                            'Accept': 'application/json'
+                        },
+                        body: payload.toString()
+                    })
+                    .then(function (response) {
+                        if (!response.ok) {
+                            throw new Error('Menu order update failed with status ' + response.status);
+                        }
                         console.debug('[VoyagerNestable:MenuBuilder] order saved');
                         toastr.success("{{ __('voyager::menu_builder.updated_order') }}");
+                    })
+                    .catch(function (error) {
+                        console.error('[VoyagerNestable:MenuBuilder] order update failed', error);
+                        toastr.error("{{ __('voyager::generic.internal_error') }}");
                     });
                 });
             }
