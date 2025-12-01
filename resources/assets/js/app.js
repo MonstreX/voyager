@@ -4,6 +4,7 @@ import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 
 import SimpleTable from './modules/simple-table';
+import VoyagerToaster from './modules/toaster';
 window.VoyagerSimpleTable = SimpleTable;
 
 const loadLegacyPlugin = (source, sourceName) => {
@@ -1881,8 +1882,9 @@ registerjQueryBridges();
 import PerfectScrollbar from 'perfect-scrollbar';
 import Cropper from 'cropperjs';
 window.Cropper = Cropper;
-import toastrSource from './vendor/toastr.js?raw';
-loadLegacyPlugin(toastrSource, 'toastr.js');
+const voyagerToaster = new VoyagerToaster();
+window.toastr = voyagerToaster;
+
 import './slugify';
 import './multilingual';
 import './voyager_tinymce';
