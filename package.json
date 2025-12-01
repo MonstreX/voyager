@@ -21,6 +21,7 @@
     "flatpickr": "^4.6.13",
     "jquery": "^3.6.1",
     "perfect-scrollbar": "^1.5.5",
+    "sortablejs": "^1.15.0",
     "tinymce": "^6.8.6",
     "vue": "^3.5.25",
     "vue-loader": "^17.4.2"

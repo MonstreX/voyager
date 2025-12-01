@@ -51,21 +51,25 @@
 
 <script>
 $(document).ready(function () {
-    $('.dd').nestable({
-        maxDepth: 1
-    });
-
-    /**
-    * Reorder items
-    */
-    $('.dd').on('change', function (e) {
-        $.post('{{ route('voyager.'.$dataType->slug.'.order') }}', {
-            order: JSON.stringify($('.dd').nestable('serialize')),
-            _token: '{{ csrf_token() }}'
-        }, function (data) {
-            toastr.success("{{ __('voyager::bread.updated_order') }}");
+    var breadNestable = document.querySelector('.dd');
+    if (breadNestable && window.VoyagerInitNestable) {
+        console.debug('[VoyagerNestable:BreadOrder] init', breadNestable);
+        window.VoyagerInitNestable(breadNestable);
+        breadNestable.addEventListener('voyager.sortable.updated', function (event) {
+            console.debug('[VoyagerNestable:BreadOrder] voyager.sortable.updated', event);
+            var structure = event.detail && event.detail.structure
+                ? event.detail.structure
+                : (window.VoyagerSerializeNestable ? window.VoyagerSerializeNestable(breadNestable) : []);
+            console.debug('[VoyagerNestable:BreadOrder] serialize result', structure);
+            $.post('{{ route('voyager.'.$dataType->slug.'.order') }}', {
+                order: JSON.stringify(structure),
+                _token: '{{ csrf_token() }}'
+            }, function () {
+                console.debug('[VoyagerNestable:BreadOrder] order saved');
+                toastr.success("{{ __('voyager::bread.updated_order') }}");
+            });
         });
-    });
+    }
 });
 </script>
 @stop

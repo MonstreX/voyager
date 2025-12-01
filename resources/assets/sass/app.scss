@@ -8462,6 +8462,24 @@ limitations under the License.
             box-shadow: 2px 4px 6px 0 rgba(0,0,0,.1);
 }
 
+.dd .dd-ghost {
+    opacity: 0.4;
+}
+
+.dd-list[data-voyager-placeholder="true"] {
+    display: none;
+}
+
+.dd > .dd-list[data-voyager-placeholder="true"],
+.dd.dd-sorting .dd-list[data-voyager-placeholder="true"] {
+    display: block;
+    margin: 5px 0;
+    padding: 0;
+    min-height: 30px;
+    border: 1px dashed #b6bcbf;
+    background: #f2fbff;
+}
+
 .nestable-lists { display: block; clear: both; padding: 30px 0; width: 100%; border: 0; border-top: 2px solid #ddd; border-bottom: 2px solid #ddd; }
 #nestable-menu { padding: 0; margin: 20px 0; }
 #nestable-output,

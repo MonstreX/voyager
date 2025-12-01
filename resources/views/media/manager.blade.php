@@ -1063,23 +1063,28 @@
                     }
                 });
 
-                //Nestable
-                $('#dd_'+vm._uid).nestable({
-                    maxDepth: 1,
-                    handleClass: 'file_link',
-                    collapseBtnHTML: '',
-                    expandBtnHTML: '',
-                    callback: function(l, e) {
-                        if (vm.allowMultiSelect) {
-                            var new_content = [];
-                            var object = $('#dd_'+vm._uid).nestable('serialize');
-                            for (var key in object) {
-                                new_content.push(object[key].url);
+                //Sortable selection list
+                var ddContainer = document.getElementById('dd_'+vm._uid);
+                if (ddContainer && window.Sortable) {
+                    var ddList = ddContainer.querySelector('.dd-list') || ddContainer;
+                    Sortable.create(ddList, {
+                        handle: '.file_link',
+                        draggable: '.dd-item',
+                        animation: 150,
+                        onEnd: function () {
+                            if (!vm.allowMultiSelect) {
+                                return;
                             }
-                            vm.hidden_element.value = JSON.stringify(new_content);
+                            var newContent = [];
+                            ddList.querySelectorAll('.dd-item').forEach(function (item) {
+                                if (item.dataset && item.dataset.url) {
+                                    newContent.push(item.dataset.url);
+                                }
+                            });
+                            vm.hidden_element.value = JSON.stringify(newContent);
                         }
-                    }
-                });
+                    });
+                }
 
                 $('#create_dir_modal_' + vm._uid).on('hidden.bs.modal', function () {
                     vm.modals.new_folder.name = '';

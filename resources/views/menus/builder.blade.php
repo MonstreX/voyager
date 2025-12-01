@@ -147,12 +147,6 @@
             @endif
 
 
-            $('.dd').nestable({
-                expandBtnHTML: '',
-                collapseBtnHTML: ''
-            });
-
-
             /**
              * Set Variables
              */
@@ -287,14 +281,25 @@
             /**
              * Reorder items
              */
-            $('.dd').on('change', function (e) {
-                $.post('{{ route('voyager.menus.order_item',['menu' => $menu->id]) }}', {
-                    order: JSON.stringify($('.dd').nestable('serialize')),
-                    _token: '{{ csrf_token() }}'
-                }, function (data) {
-                    toastr.success("{{ __('voyager::menu_builder.updated_order') }}");
+            var menuNestable = document.querySelector('.dd');
+            if (menuNestable && window.VoyagerInitNestable) {
+                console.debug('[VoyagerNestable:MenuBuilder] init', menuNestable);
+                window.VoyagerInitNestable(menuNestable);
+                menuNestable.addEventListener('voyager.sortable.updated', function (event) {
+                    console.debug('[VoyagerNestable:MenuBuilder] voyager.sortable.updated', event);
+                    var structure = event.detail && event.detail.structure
+                        ? event.detail.structure
+                        : (window.VoyagerSerializeNestable ? window.VoyagerSerializeNestable(menuNestable) : []);
+                    console.debug('[VoyagerNestable:MenuBuilder] serialize result', structure);
+                    $.post('{{ route('voyager.menus.order_item',['menu' => $menu->id]) }}', {
+                        order: JSON.stringify(structure),
+                        _token: '{{ csrf_token() }}'
+                    }, function () {
+                        console.debug('[VoyagerNestable:MenuBuilder] order saved');
+                        toastr.success("{{ __('voyager::menu_builder.updated_order') }}");
+                    });
                 });
-            });
+            }
         });
     </script>
 @stop
