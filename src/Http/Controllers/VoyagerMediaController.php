@@ -198,7 +198,10 @@ class VoyagerMediaController extends Controller
         $success = false;
         $error = false;
 
-        if (pathinfo($filename)['extension'] !== pathinfo($newFilename)['extension']) {
+        $currentExtension = pathinfo($filename, PATHINFO_EXTENSION);
+        $newExtension = pathinfo($newFilename, PATHINFO_EXTENSION);
+
+        if ($currentExtension !== $newExtension) {
             $error = __('voyager::media.error_renaming_ext');
         } else {
             if (is_array($folderLocation)) {

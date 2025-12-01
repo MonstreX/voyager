@@ -348,6 +348,23 @@
 @endsection
 
 <script>
+    const voyagerMediaCsrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+    const voyagerMediaRequest = (url, payload = {}) => {
+        return fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': voyagerMediaCsrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify(payload)
+        });
+    };
+
+    let croppedData = {};
+
     window.VueRegisterComponent('media-manager', {
         template: `@yield('media-manager')`,
         props: {
@@ -463,10 +480,21 @@
             }
         },
         methods: {
+            sendRequest: function(url, payload = {}) {
+                return voyagerMediaRequest(url, payload).then(function(response) {
+                    if (!response.ok) {
+                        throw new Error('Voyager media request failed with status ' + response.status);
+                    }
+                    return response.json();
+                });
+            },
             getFiles: function() {
                 var vm = this;
                 vm.is_loading = true;
-                $.post('{{ route('voyager.media.files') }}', { folder: vm.current_folder, _token: '{{ csrf_token() }}', details: vm.details }, function(data) {
+                this.sendRequest('{{ route('voyager.media.files') }}', {
+                    folder: vm.current_folder,
+                    details: vm.details
+                }).then(function(data) {
                     vm.files = [];
                     for (var i = 0, file; file = data[i]; i++) {
                         if (vm.filter(file)) {
@@ -477,8 +505,14 @@
                     if (vm.preSelect && data.length > 0) {
                         vm.selected_files.push(data[0]);
                     }
-					vm.is_loading = false;
-				});
+                }).catch(function(error) {
+                    console.error('Voyager media: getFiles failed', error);
+                    if (window.toastr) {
+                        window.toastr.error('{{ __('voyager::media.error_uploading') }}', "{{ __('voyager::generic.whoopsie') }}");
+                    }
+                }).finally(function() {
+                    vm.is_loading = false;
+                });
             },
             selectFile: function(file, e) {
                 if ((!e.ctrlKey && !e.metaKey && !e.shiftKey) || !this.allowMultiSelect) {
@@ -766,19 +800,21 @@
                 if (!this.allowRename || vm.selected_file.name == object.target.value) {
                     return;
                 }
-                $.post('{{ route('voyager.media.rename') }}', {
+                this.sendRequest('{{ route('voyager.media.rename') }}', {
                     folder_location: vm.current_folder,
                     filename: vm.selected_file.name,
-                    new_filename: object.target.value,
-                    _token: '{{ csrf_token() }}'
-                }, function(data){
+                    new_filename: object.target.value
+                }).then(function(data){
 					if (data.success == true) {
 						toastr.success('{{ __('voyager::media.success_renamed') }}', "{{ __('voyager::generic.sweet_success') }}");
 						vm.getFiles();
 					} else {
 						toastr.error(data.error, "{{ __('voyager::generic.whoopsie') }}");
 					}
-				});
+				}).catch(function(error) {
+                    console.error('Voyager media: inline rename failed', error);
+                    toastr.error('{{ __('voyager::media.error_renaming_ext') }}', "{{ __('voyager::generic.whoopsie') }}");
+                });
             },
             createFolder: function(e) {
                 if (!this.allowCreateFolder) {
@@ -786,7 +822,7 @@
                 }
                 var vm = this;
                 var name = this.modals.new_folder.name;
-                $.post('{{ route('voyager.media.new_folder') }}', { new_folder: vm.current_folder+'/'+name, _token: '{{ csrf_token() }}' }, function(data) {
+                this.sendRequest('{{ route('voyager.media.new_folder') }}', { new_folder: vm.current_folder+'/'+name }).then(function(data) {
 					if(data.success == true){
 						toastr.success('{{ __('voyager::generic.successfully_created') }} ' + name, "{{ __('voyager::generic.sweet_success') }}");
 						vm.getFiles();
@@ -794,29 +830,35 @@
 						toastr.error(data.error, "{{ __('voyager::generic.whoopsie') }}");
 					}
                     vm.modals.new_folder.name = '';
+				}).catch(function(error) {
+                    console.error('Voyager media: createFolder failed', error);
+                    toastr.error('{{ __('voyager::media.error_creating_dir') }}', "{{ __('voyager::generic.whoopsie') }}");
+                }).finally(function() {
 					$('#create_dir_modal_'+vm._uid).modal('hide');
-				});
+                });
             },
             deleteFiles: function() {
                 if (!this.allowDelete) {
                     return;
                 }
                 var vm = this;
-                $.post('{{ route('voyager.media.delete') }}', {
+                this.sendRequest('{{ route('voyager.media.delete') }}', {
                     path: vm.current_folder,
-                    files: vm.selected_files,
-                    _token: '{{ csrf_token() }}'
-                }, function(data){
+                    files: vm.selected_files
+                }).then(function(data){
 					if(data.success == true){
 						toastr.success('', "{{ __('voyager::generic.sweet_success') }}");
 						vm.getFiles();
-						$('#confirm_delete_modal_'+vm._uid).modal('hide');
 					} else {
 						toastr.error(data.error, "{{ __('voyager::generic.whoopsie') }}");
                         vm.getFiles();
-						$('#confirm_delete_modal_'+vm._uid).modal('hide');
 					}
-				});
+				}).catch(function(error) {
+                    console.error('Voyager media: deleteFiles failed', error);
+                    toastr.error('{{ __('voyager::media.error_deleting_file') }}', "{{ __('voyager::generic.whoopsie') }}");
+                }).finally(function() {
+					$('#confirm_delete_modal_'+vm._uid).modal('hide');
+                });
             },
             moveFiles: function(e) {
                 if (!this.allowMove) {
@@ -828,12 +870,11 @@
                     return;
                 }
                 $('#move_files_modal_'+vm._uid).modal('hide');
-				$.post('{{ route('voyager.media.move') }}', {
+				this.sendRequest('{{ route('voyager.media.move') }}', {
                     path: vm.current_folder,
                     files: vm.selected_files,
-                    destination: destination,
-                    _token: '{{ csrf_token() }}'
-                }, function(data){
+                    destination: destination
+                }).then(function(data){
 					if(data.success == true){
 						toastr.success('{{ __('voyager::media.success_moved') }}', "{{ __('voyager::generic.sweet_success') }}");
 						vm.getFiles();
@@ -842,7 +883,10 @@
 					}
 
                     vm.modals.move_files.destination = '';
-				});
+				}).catch(function(error) {
+                    console.error('Voyager media: moveFiles failed', error);
+                    toastr.error('{{ __('voyager::media.error_moving') }}', "{{ __('voyager::generic.whoopsie') }}");
+                });
             },
             crop: function(mode) {
                 if (!this.allowCrop) {
@@ -859,16 +903,20 @@
 				croppedData.createMode = mode;
 
                 var vm = this;
-                var postData = Object.assign(croppedData, { _token: '{{ csrf_token() }}' });
-				$.post('{{ route('voyager.media.crop') }}', postData, function(data) {
+                var postData = Object.assign({}, croppedData);
+				this.sendRequest('{{ route('voyager.media.crop') }}', postData).then(function(data) {
 					if (data.success) {
 						toastr.success(data.message);
 						vm.getFiles();
-						$('#crop_modal_'+vm._uid).modal('hide');
 					} else {
 						toastr.error(data.error, "{{ __('voyager::generic.whoopsie') }}");
 					}
-				});
+				}).catch(function(error) {
+                    console.error('Voyager media: crop failed', error);
+                    toastr.error('{{ __('voyager::media.error_uploading') }}', "{{ __('voyager::generic.whoopsie') }}");
+                }).finally(function() {
+                    $('#crop_modal_'+vm._uid).modal('hide');
+                });
             },
             addSelectedFiles: function () {
                 var vm = this;
