@@ -336,7 +336,7 @@
         <script src="{{ voyager_asset('lib/js/dataTables.responsive.min.js') }}"></script>
     @endif
     <script>
-        $(document).ready(function () {
+        document.addEventListener('DOMContentLoaded', function () {
             @if ($dataType->server_side)
                 document.querySelectorAll('#search-input select').forEach(function (select) {
                     select.dataset.voyagerDisableSearch = 'true';
@@ -347,50 +347,84 @@
             @endif
 
             @if ($isModelTranslatable)
-                $('.side-body').multilingual();
-            @endif
-            $('.select_all').on('click', function(e) {
-                $('input[name="row_id"]').prop('checked', $(this).prop('checked')).trigger('change');
-            });
-        });
-
-
-        var deleteFormAction;
-        $('td').on('click', '.delete', function (e) {
-            $('#delete_form')[0].action = '{{ route('voyager.'.$dataType->slug.'.destroy', '__id') }}'.replace('__id', $(this).data('id'));
-            $('#delete_modal').modal('show');
-        });
-
-        @if($usesSoftDeletes)
-            @php
-                $params = [
-                    's' => $search->value,
-                    'filter' => $search->filter,
-                    'key' => $search->key,
-                    'order_by' => $orderBy,
-                    'sort_order' => $sortOrder,
-                ];
-            @endphp
-            $(function() {
-                $('#show_soft_deletes').change(function() {
-                    if ($(this).prop('checked')) {
-                        $('#dataTable').before('<a id="redir" href="{{ (route('voyager.'.$dataType->slug.'.index', array_merge($params, ['showSoftDeleted' => 1]), true)) }}"></a>');
-                    }else{
-                        $('#dataTable').before('<a id="redir" href="{{ (route('voyager.'.$dataType->slug.'.index', array_merge($params, ['showSoftDeleted' => 0]), true)) }}"></a>');
-                    }
-
-                    $('#redir')[0].click();
-                })
-            })
-        @endif
-        $('input[name="row_id"]').on('change', function () {
-            var ids = [];
-            $('input[name="row_id"]').each(function() {
-                if ($(this).is(':checked')) {
-                    ids.push($(this).val());
+                if (window.VoyagerInitMultilingual) {
+                    window.VoyagerInitMultilingual('.side-body');
                 }
+            @endif
+
+            var selectAllToggle = document.querySelector('.select_all');
+            if (selectAllToggle) {
+                selectAllToggle.addEventListener('click', function (event) {
+                    var checked = event.currentTarget.checked;
+                    document.querySelectorAll('input[name="row_id"]').forEach(function (checkbox) {
+                        checkbox.checked = checked;
+                        checkbox.dispatchEvent(new Event('change'));
+                    });
+                });
+            }
+
+            var deleteModal = document.getElementById('delete_modal');
+            var deleteForm = document.getElementById('delete_form');
+            var deleteActionTemplate = deleteForm ? deleteForm.getAttribute('action') : '';
+
+            function openDeleteModal(button) {
+                if (!deleteModal || !deleteForm || !deleteActionTemplate) {
+                    return;
+                }
+                var id = button.dataset.id;
+                if (id) {
+                    deleteForm.setAttribute('action', deleteActionTemplate.replace('__id', id));
+                }
+                showModal(deleteModal);
+            }
+
+            function showModal(modal) {
+                if (window.jQuery) {
+                    window.jQuery(modal).modal('show');
+                    return;
+                }
+                modal.classList.add('in');
+                modal.style.display = 'block';
+                modal.setAttribute('aria-hidden', 'false');
+                var backdrop = document.createElement('div');
+                backdrop.className = 'modal-backdrop fade in';
+                backdrop.dataset.modalTarget = modal.id;
+                document.body.appendChild(backdrop);
+                document.body.classList.add('modal-open');
+            }
+
+            document.querySelectorAll('td .delete').forEach(function (button) {
+                button.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    openDeleteModal(event.currentTarget);
+                });
             });
-            $('.selected_ids').val(ids);
+
+            @if($usesSoftDeletes)
+                var softDeleteToggle = document.getElementById('show_soft_deletes');
+                if (softDeleteToggle) {
+                    softDeleteToggle.addEventListener('change', function (event) {
+                        var checked = event.currentTarget.checked;
+                        var targetUrl = checked
+                            ? "{{ route('voyager.'.$dataType->slug.'.index', array_merge($params, ['showSoftDeleted' => 1]), true) }}"
+                            : "{{ route('voyager.'.$dataType->slug.'.index', array_merge($params, ['showSoftDeleted' => 0]), true) }}";
+                        window.location.href = targetUrl;
+                    });
+                }
+            @endif
+
+            var selectedInput = document.querySelector('.selected_ids');
+            if (selectedInput) {
+                document.querySelectorAll('input[name="row_id"]').forEach(function (checkbox) {
+                    checkbox.addEventListener('change', function () {
+                        var ids = [];
+                        document.querySelectorAll('input[name="row_id"]:checked').forEach(function (checkedBox) {
+                            ids.push(checkedBox.value);
+                        });
+                        selectedInput.value = ids.join(',');
+                    });
+                });
+            }
         });
     </script>
 @stop
