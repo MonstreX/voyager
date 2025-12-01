@@ -52,6 +52,9 @@
 <script>
 $(document).ready(function () {
     var breadNestable = document.querySelector('.dd');
+    var csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+    var orderUrl = '{{ route('voyager.'.$dataType->slug.'.order') }}';
+
     if (breadNestable && window.VoyagerInitNestable) {
         console.debug('[VoyagerNestable:BreadOrder] init', breadNestable);
         window.VoyagerInitNestable(breadNestable);
@@ -61,12 +64,29 @@ $(document).ready(function () {
                 ? event.detail.structure
                 : (window.VoyagerSerializeNestable ? window.VoyagerSerializeNestable(breadNestable) : []);
             console.debug('[VoyagerNestable:BreadOrder] serialize result', structure);
-            $.post('{{ route('voyager.'.$dataType->slug.'.order') }}', {
-                order: JSON.stringify(structure),
-                _token: '{{ csrf_token() }}'
-            }, function () {
+
+            var payload = new URLSearchParams();
+            payload.append('order', JSON.stringify(structure));
+            payload.append('_token', csrfToken);
+
+            fetch(orderUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                    'Accept': 'application/json'
+                },
+                body: payload.toString()
+            })
+            .then(function (response) {
+                if (!response.ok) {
+                    throw new Error('Order update failed with status ' + response.status);
+                }
                 console.debug('[VoyagerNestable:BreadOrder] order saved');
                 toastr.success("{{ __('voyager::bread.updated_order') }}");
+            })
+            .catch(function (error) {
+                console.error('[VoyagerNestable:BreadOrder] order update failed', error);
+                toastr.error("{{ __('voyager::generic.internal_error') }}");
             });
         });
     }
