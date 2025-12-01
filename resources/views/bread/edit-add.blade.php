@@ -173,9 +173,9 @@
                 $('.side-body').multilingual({"editing": true});
             @endif
 
-            $('.side-body input[data-slug-origin]').each(function(i, el) {
-                $(el).slugify();
-            });
+            if (window.VoyagerInitSlugify) {
+                window.VoyagerInitSlugify(document.querySelectorAll('.side-body input[data-slug-origin]'));
+            }
 
             $('.form-group').on('click', '.remove-multi-image', deleteHandler('img', true));
             $('.form-group').on('click', '.remove-single-image', deleteHandler('img', false));

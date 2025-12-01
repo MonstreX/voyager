@@ -1885,7 +1885,7 @@ window.Cropper = Cropper;
 const voyagerToaster = new VoyagerToaster();
 window.toastr = voyagerToaster;
 
-import './slugify';
+import { initSlugifyFields } from './modules/slugify';
 import './multilingual';
 import './voyager_tinymce';
 import voyagerTinyMCE from './voyager_tinymce_config';
@@ -1895,6 +1895,7 @@ window.loadVoyagerTinyMCE = loadVoyagerTinyMCE;
 import './voyager_ace_editor';
 import * as helpers from './helpers.js';
 window.helpers = helpers;
+window.VoyagerInitSlugify = initSlugifyFields;
 import AdminMenu from './components/admin_menu.vue';
 import { createApp } from 'vue';
 
@@ -1982,6 +1983,9 @@ $(document).ready(function () {
     initBootstrapCompat();
     if (window.VoyagerInitSelects) {
         window.VoyagerInitSelects();
+    }
+    if (window.VoyagerInitSlugify) {
+        window.VoyagerInitSlugify('.side-body input[data-slug-origin]');
     }
     if (window.VoyagerInitNestable) {
         window.VoyagerInitNestable();
