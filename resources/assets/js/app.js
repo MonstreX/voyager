@@ -1,4 +1,5 @@
 import './jquery-first';
+import './modules/csrf';
 import '../sass/app.scss';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.css';
@@ -1923,7 +1924,6 @@ window.toastr = voyagerToaster;
 
 import { initSlugifyFields } from './modules/slugify';
 import './multilingual';
-import './voyager_tinymce';
 import voyagerTinyMCE from './voyager_tinymce_config';
 import { loadVoyagerTinyMCE } from './tinymce-loader';
 window.voyagerTinyMCE = voyagerTinyMCE;

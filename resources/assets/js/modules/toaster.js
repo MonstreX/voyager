@@ -12,6 +12,16 @@ export default class VoyagerToaster {
         this.options = { ...DEFAULT_OPTIONS, ...options };
         this.container = null;
         this.toasts = new Set();
+        this.setOptions = this.setOptions.bind(this);
+        this.ensureContainer = this.ensureContainer.bind(this);
+        this.buildToast = this.buildToast.bind(this);
+        this.removeToast = this.removeToast.bind(this);
+        this.show = this.show.bind(this);
+        this.clear = this.clear.bind(this);
+        this.success = this.success.bind(this);
+        this.info = this.info.bind(this);
+        this.warning = this.warning.bind(this);
+        this.error = this.error.bind(this);
     }
 
     setOptions(options = {}) {
