@@ -93,46 +93,90 @@
 @stop
 @section('javascript')
     <script>
-        $('document').ready(function(){
-            $('.collapse-head').click(function(){
-                var collapseContainer = $(this).parent();
-                if(collapseContainer.find('.collapse-content').hasClass('in')){
-                    collapseContainer.find('.voyager-angle-up').fadeOut('fast');
-                    collapseContainer.find('.voyager-angle-down').fadeIn('slow');
-                } else {
-                    collapseContainer.find('.voyager-angle-down').fadeOut('fast');
-                    collapseContainer.find('.voyager-angle-up').fadeIn('slow');
-                }
+        function toggleCollapse(event) {
+            var head = event.currentTarget;
+            var container = head.parentElement;
+            var content = container.querySelector('.collapse-content');
+            if (!content) {
+                return;
+            }
+            var expanded = content.classList.contains('in');
+            if (expanded) {
+                content.classList.remove('in');
+                content.style.display = 'none';
+                container.querySelectorAll('.voyager-angle-up').forEach(function (icon) {
+                    icon.style.display = 'none';
+                });
+                container.querySelectorAll('.voyager-angle-down').forEach(function (icon) {
+                    icon.style.display = '';
+                });
+            } else {
+                content.classList.add('in');
+                content.style.display = '';
+                container.querySelectorAll('.voyager-angle-down').forEach(function (icon) {
+                    icon.style.display = 'none';
+                });
+                container.querySelectorAll('.voyager-angle-up').forEach(function (icon) {
+                    icon.style.display = '';
+                });
+            }
+        }
+
+        function bindCollapseHandlers() {
+            document.querySelectorAll('.collapse-head').forEach(function (head) {
+                head.addEventListener('click', toggleCollapse);
             });
-        });
-    </script>
-    <!-- JS for commands -->
-    <script>
+        }
 
-        $(document).ready(function(){
-            $('.command').click(function(){
-                $(this).find('.cmd_form').slideDown();
-                $(this).addClass('more_args');
-                $(this).find('input[type="text"]').focus();
+        function bindCommandHandlers() {
+            document.querySelectorAll('.command').forEach(function (command) {
+                command.addEventListener('click', function () {
+                    var form = command.querySelector('.cmd_form');
+                    if (form) {
+                        form.style.display = 'block';
+                    }
+                    command.classList.add('more_args');
+                    var firstInput = command.querySelector('input[type="text"]');
+                    if (firstInput) {
+                        firstInput.focus();
+                    }
+                });
             });
-
-            $('.close-output').click(function(){
-                $('#commands pre').slideUp();
+            document.querySelectorAll('.close-output').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    document.querySelectorAll('#commands pre').forEach(function (pre) {
+                        pre.style.display = 'none';
+                    });
+                });
             });
-        });
+        }
 
-    </script>
+        function bindLogHandlers() {
+            document.querySelectorAll('.table-container tr').forEach(function (row) {
+                row.addEventListener('click', function () {
+                    var displayId = row.dataset.display;
+                    if (!displayId) {
+                        return;
+                    }
+                    var log = document.getElementById(displayId);
+                    if (log) {
+                        log.style.display = log.style.display === 'none' ? '' : 'none';
+                    }
+                });
+            });
+            document.querySelectorAll('#delete-log, #delete-all-log').forEach(function (button) {
+                button.addEventListener('click', function (event) {
+                    if (!confirm('{{ __('voyager::generic.are_you_sure') }}')) {
+                        event.preventDefault();
+                    }
+                });
+            });
+        }
 
-    <!-- JS for logs -->
-    <script>
-      $(document).ready(function () {
-        $('.table-container tr').on('click', function () {
-          $('#' + $(this).data('display')).toggle();
+        document.addEventListener('DOMContentLoaded', function () {
+            bindCollapseHandlers();
+            bindCommandHandlers();
+            bindLogHandlers();
         });
-
-        $('#delete-log, #delete-all-log').click(function () {
-          return confirm('{{ __('voyager::generic.are_you_sure') }}');
-        });
-      });
     </script>
 @stop
