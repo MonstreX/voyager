@@ -124,166 +124,305 @@
 @stop
 
 @section('javascript')
-
     <script>
-        $(document).ready(function () {
-            @if ($isModelTranslatable)
-                /**
-                 * Multilingual setup for main page
-                 */
-                $('.side-body').multilingual({
-                    "transInputs": '.dd-list input[data-i18n=true]'
-                });
+        document.addEventListener('DOMContentLoaded', function () {
+            var csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+            var addLabel = @json(__('voyager::generic.add'));
+            var updateLabel = @json(__('voyager::generic.update'));
+            var menuModal = document.getElementById('menu_item_modal');
+            var deleteModal = document.getElementById('delete_modal');
+            var menuForm = document.getElementById('m_form');
+            var formMethodInput = document.getElementById('m_form_method');
+            var idInput = document.getElementById('m_id');
+            var titleInput = document.getElementById('m_title');
+            var titleTranslationsInput = document.getElementById('title_i18n');
+            var urlInput = document.getElementById('m_url');
+            var routeInput = document.getElementById('m_route');
+            var paramsInput = document.getElementById('m_parameters');
+            var iconInput = document.getElementById('m_icon_class');
+            var colorInput = document.getElementById('m_color');
+            var targetSelect = document.getElementById('m_target');
+            var linkTypeSelect = document.getElementById('m_link_type');
+            var urlTypeContainer = document.getElementById('m_url_type');
+            var routeTypeContainer = document.getElementById('m_route_type');
+            var addHeading = document.getElementById('m_hd_add');
+            var editHeading = document.getElementById('m_hd_edit');
+            var submitButton = menuForm ? menuForm.querySelector('input[type="submit"]') : null;
+            var deleteForm = document.getElementById('delete_form');
+            var deleteActionTemplate = deleteForm ? deleteForm.getAttribute('action') : '';
+            var menuOrderUrl = '{{ route('voyager.menus.order_item',['menu' => $menu->id]) }}';
+            var modalMultilingualInstance = null;
 
-                /**
-                 * Multilingual for Add/Edit Menu
-                 */
-                $('#menu_item_modal').multilingual({
-                    "form":          'form',
-                    "transInputs":   '#menu_item_modal input[data-i18n=true]',
-                    "langSelectors": '.language-selector input',
-                    "editing":       true
+            function initMultilingualSections() {
+                if (!window.VoyagerInitMultilingual) {
+                    return;
+                }
+                window.VoyagerInitMultilingual('.side-body', {
+                    transInputs: '.dd-list input[data-i18n=true]'
                 });
+                var modalInstance = window.VoyagerInitMultilingual('#menu_item_modal', {
+                    form: 'form',
+                    transInputs: '#menu_item_modal input[data-i18n=true]',
+                    langSelectors: '#menu_item_modal .language-selector input',
+                    editing: true
+                });
+                modalMultilingualInstance = Array.isArray(modalInstance) ? modalInstance[0] : modalInstance;
+            }
+
+            @if ($isModelTranslatable)
+                initMultilingualSections();
             @endif
 
+            function prepareHeading(element) {
+                if (!element) {
+                    return;
+                }
+                element.classList.remove('hidden');
+                element.style.display = 'none';
+            }
 
-            /**
-             * Set Variables
-             */
-            var $m_modal       = $('#menu_item_modal'),
-                $m_hd_add      = $('#m_hd_add').hide().removeClass('hidden'),
-                $m_hd_edit     = $('#m_hd_edit').hide().removeClass('hidden'),
-                $m_form        = $('#m_form'),
-                $m_form_method = $('#m_form_method'),
-                $m_title       = $('#m_title'),
-                $m_title_i18n  = $('#title_i18n'),
-                $m_url_type    = $('#m_url_type'),
-                $m_url         = $('#m_url'),
-                $m_link_type   = $('#m_link_type'),
-                $m_route_type  = $('#m_route_type'),
-                $m_route       = $('#m_route'),
-                $m_parameters  = $('#m_parameters'),
-                $m_icon_class  = $('#m_icon_class'),
-                $m_color       = $('#m_color'),
-                $m_target      = $('#m_target'),
-                $m_id          = $('#m_id');
+            prepareHeading(addHeading);
+            prepareHeading(editHeading);
 
-            /**
-             * Add Menu
-             */
-            $('.add_item').click(function() {
-                $m_form.trigger('reset');
-                $m_form.find("input[type=submit]").val('{{ __('voyager::generic.add') }}');
-                $m_modal.modal('show', {data: null});
-            });
+            function toggleModalHeading(isAdd) {
+                if (addHeading) {
+                    addHeading.style.display = isAdd ? '' : 'none';
+                }
+                if (editHeading) {
+                    editHeading.style.display = isAdd ? 'none' : '';
+                }
+            }
 
-            /**
-             * Edit Menu
-             */
-            $('.item_actions').on('click', '.edit', function (e) {
-                $m_form.find("input[type=submit]").val('{{ __('voyager::generic.update') }}');
-                $m_modal.modal('show', {data: $(e.currentTarget)});
-            });
+            function createBackdrop(modal) {
+                var backdrop = document.createElement('div');
+                backdrop.className = 'modal-backdrop fade in';
+                backdrop.dataset.modalTarget = modal.id;
+                return backdrop;
+            }
 
-            /**
-             * Menu Modal is Open
-             */
-            $m_modal.on('show.bs.modal', function(e, data) {
-                var _adding      = e.relatedTarget.data ? false : true,
-                    translatable = $m_modal.data('multilingual'),
-                    $_str_i18n   = '';
+            function openModal(modal) {
+                if (!modal) {
+                    return;
+                }
+                modal.classList.add('in');
+                modal.style.display = 'block';
+                modal.setAttribute('aria-hidden', 'false');
+                document.body.classList.add('modal-open');
+                document.body.appendChild(createBackdrop(modal));
+            }
 
-                if (_adding) {
-                    $m_form.attr('action', $m_form.data('action-add'));
-                    $m_form_method.val('POST');
-                    $m_hd_add.show();
-                    $m_hd_edit.hide();
-                    $m_target.val('_self').change();
-                    $m_link_type.val('url').change();
-                    $m_url.val('');
-                    $m_icon_class.val('');
+            function closeModal(modal) {
+                if (!modal) {
+                    return;
+                }
+                modal.classList.remove('in');
+                modal.style.display = 'none';
+                modal.setAttribute('aria-hidden', 'true');
+                var backdrop = document.querySelector('.modal-backdrop[data-modal-target="' + modal.id + '"]');
+                if (backdrop) {
+                    backdrop.remove();
+                }
+                if (!document.querySelector('.modal.in')) {
+                    document.body.classList.remove('modal-open');
+                }
+            }
 
+            function bindModalDismiss(modal) {
+                if (!modal) {
+                    return;
+                }
+                modal.querySelectorAll('[data-dismiss="modal"]').forEach(function (button) {
+                    button.addEventListener('click', function () {
+                        closeModal(modal);
+                    });
+                });
+                modal.addEventListener('click', function (event) {
+                    if (event.target === modal) {
+                        closeModal(modal);
+                    }
+                });
+            }
+
+            bindModalDismiss(menuModal);
+            bindModalDismiss(deleteModal);
+
+            function setLinkType(type) {
+                if (!linkTypeSelect) {
+                    return;
+                }
+                linkTypeSelect.value = type;
+                if (linkTypeSelect.value === 'route') {
+                    if (urlTypeContainer) {
+                        urlTypeContainer.style.display = 'none';
+                    }
+                    if (routeTypeContainer) {
+                        routeTypeContainer.style.display = '';
+                    }
                 } else {
-                    $m_form.attr('action', $m_form.data('action-update'));
-                    $m_form_method.val('PUT');
-                    $m_hd_add.hide();
-                    $m_hd_edit.show();
-
-                    var _src = e.relatedTarget.data, // the source
-                        id   = _src.data('id');
-
-                    $m_title.val(_src.data('title'));
-                    $m_url.val(_src.data('url'));
-                    $m_route.val(_src.data('route'));
-                    $m_parameters.val(JSON.stringify(_src.data('parameters')));
-                    $m_icon_class.val(_src.data('icon_class'));
-                    $m_color.val(_src.data('color'));
-                    $m_id.val(id);
-
-                    if(translatable){
-                        $_str_i18n = $("#title" + id + "_i18n").val();
+                    if (urlTypeContainer) {
+                        urlTypeContainer.style.display = '';
                     }
-
-                    if (_src.data('target') == '_self') {
-                        $m_target.val('_self').change();
-                    } else if (_src.data('target') == '_blank') {
-                        $m_target.find("option[value='_self']").removeAttr('selected');
-                        $m_target.find("option[value='_blank']").attr('selected', 'selected');
-                        $m_target.val('_blank');
-                    }
-                    if (_src.data('route') != "") {
-                        $m_link_type.val('route').change();
-                        $m_url_type.hide();
-                    } else {
-                        $m_link_type.val('url').change();
-                        $m_route_type.hide();
-                    }
-                    if ($m_link_type.val() == 'route') {
-                        $m_url_type.hide();
-                        $m_route_type.show();
-                    } else {
-                        $m_route_type.hide();
-                        $m_url_type.show();
+                    if (routeTypeContainer) {
+                        routeTypeContainer.style.display = 'none';
                     }
                 }
+            }
 
-                if (translatable) {
-                    $m_title_i18n.val($_str_i18n);
-                    translatable.refresh();
+            if (linkTypeSelect) {
+                linkTypeSelect.addEventListener('change', function () {
+                    setLinkType(linkTypeSelect.value);
+                });
+            }
+
+            function formatParameters(value) {
+                if (!value || value === 'null') {
+                    return '';
+                }
+                try {
+                    var parsed = JSON.parse(value);
+                    return JSON.stringify(parsed, null, 2);
+                } catch (error) {
+                    return value;
+                }
+            }
+
+            function resetFormValues() {
+                if (!menuForm) {
+                    return;
+                }
+                menuForm.reset();
+                if (paramsInput) {
+                    paramsInput.value = '';
+                }
+                if (titleTranslationsInput) {
+                    titleTranslationsInput.value = '';
+                }
+                if (modalMultilingualInstance && typeof modalMultilingualInstance.refresh === 'function') {
+                    modalMultilingualInstance.refresh();
+                }
+            }
+
+            function openAddModal() {
+                if (!menuForm) {
+                    return;
+                }
+                resetFormValues();
+                menuForm.setAttribute('action', menuForm.dataset.actionAdd);
+                if (formMethodInput) {
+                    formMethodInput.value = 'POST';
+                }
+                if (submitButton) {
+                    submitButton.value = addLabel;
+                }
+                toggleModalHeading(true);
+                setLinkType('url');
+                if (targetSelect) {
+                    targetSelect.value = '_self';
+                }
+                openModal(menuModal);
+            }
+
+            function openEditModal(button) {
+                if (!menuForm || !button) {
+                    return;
+                }
+                resetFormValues();
+                menuForm.setAttribute('action', menuForm.dataset.actionUpdate);
+                if (formMethodInput) {
+                    formMethodInput.value = 'PUT';
+                }
+                if (submitButton) {
+                    submitButton.value = updateLabel;
+                }
+                toggleModalHeading(false);
+
+                var id = button.dataset.id || '';
+                if (idInput) {
+                    idInput.value = id;
+                }
+                if (titleInput) {
+                    titleInput.value = button.dataset.title || '';
+                }
+                if (titleTranslationsInput) {
+                    var translationSource = document.getElementById('title' + id + '_i18n');
+                    titleTranslationsInput.value = translationSource ? translationSource.value : '';
+                }
+                if (modalMultilingualInstance && typeof modalMultilingualInstance.refresh === 'function') {
+                    modalMultilingualInstance.refresh();
+                }
+
+                var targetValue = button.dataset.target || '_self';
+                if (targetSelect) {
+                    targetSelect.value = targetValue;
+                }
+
+                var routeValue = button.dataset.route || '';
+                var urlValue = button.dataset.url || '';
+                setLinkType(routeValue ? 'route' : 'url');
+                if (urlInput) {
+                    urlInput.value = urlValue;
+                }
+                if (routeInput) {
+                    routeInput.value = routeValue;
+                }
+                if (paramsInput) {
+                    paramsInput.value = formatParameters(button.dataset.parameters);
+                }
+                if (iconInput) {
+                    iconInput.value = button.dataset.icon_class || '';
+                }
+                if (colorInput) {
+                    colorInput.value = button.dataset.color || '';
+                }
+
+                openModal(menuModal);
+            }
+
+            function openDeleteModal(button) {
+                if (!deleteModal || !deleteForm || !deleteActionTemplate) {
+                    return;
+                }
+                var id = button.dataset.id;
+                if (id) {
+                    deleteForm.setAttribute('action', deleteActionTemplate.replace('__id', id));
+                }
+                openModal(deleteModal);
+            }
+
+            document.querySelectorAll('.add_item').forEach(function (button) {
+                button.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    openAddModal();
+                });
+            });
+
+            document.addEventListener('click', function (event) {
+                var editButton = event.target.closest('.item_actions .edit');
+                if (editButton) {
+                    event.preventDefault();
+                    openEditModal(editButton);
+                    return;
+                }
+                var deleteButton = event.target.closest('.item_actions .delete');
+                if (deleteButton) {
+                    event.preventDefault();
+                    openDeleteModal(deleteButton);
                 }
             });
 
-
-            /**
-             * Toggle Form Menu Type
-             */
-            $m_link_type.on('change', function (e) {
-                if ($m_link_type.val() == 'route') {
-                    $m_url_type.hide();
-                    $m_route_type.show();
-                } else {
-                    $m_url_type.show();
-                    $m_route_type.hide();
+            document.addEventListener('keydown', function (event) {
+                if (event.key !== 'Escape') {
+                    return;
+                }
+                if (menuModal && menuModal.classList.contains('in')) {
+                    closeModal(menuModal);
+                }
+                if (deleteModal && deleteModal.classList.contains('in')) {
+                    closeModal(deleteModal);
                 }
             });
 
-
-            /**
-             * Delete menu item
-             */
-            $('.item_actions').on('click', '.delete', function (e) {
-                id = $(e.currentTarget).data('id');
-                $('#delete_form')[0].action = '{{ route('voyager.menus.item.destroy', ['menu' => $menu->id, 'id' => '__id']) }}'.replace('__id', id);
-                $('#delete_modal').modal('show');
-            });
-
-
-            /**
-             * Reorder items
-             */
             var menuNestable = document.querySelector('.dd');
-            var csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-            var orderUrl = '{{ route('voyager.menus.order_item',['menu' => $menu->id]) }}';
             if (menuNestable && window.VoyagerInitNestable) {
                 console.debug('[VoyagerNestable:MenuBuilder] init', menuNestable);
                 window.VoyagerInitNestable(menuNestable);
@@ -298,7 +437,7 @@
                     payload.append('order', JSON.stringify(structure));
                     payload.append('_token', csrfToken);
 
-                    fetch(orderUrl, {
+                    fetch(menuOrderUrl, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
