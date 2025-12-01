@@ -32,10 +32,17 @@ const getAssetsBase = () => {
     if (typeof window === 'undefined') {
         return '';
     }
+
     if (window.voyagerTinyMCEBase) {
         return window.voyagerTinyMCEBase.replace(/\/?$/, '/');
     }
-    const fromMeta = $('meta[name="assets-path"]').attr('content') || '';
+
+    if (typeof document === 'undefined') {
+        return '';
+    }
+
+    const meta = document.querySelector('meta[name="assets-path"]');
+    const fromMeta = meta ? meta.getAttribute('content') || '' : '';
     return fromMeta.replace(/\/?$/, '/') + 'js/';
 };
 

@@ -1,254 +1,376 @@
-/**
- *  Multilingual System
- *
- *  Last Update: 28 Mar 2017
- *  First version: 05 Mar 2017
- *  Author: Bruno Torrinha <http://www.torrinha.com>
- *
- *  MIT License
- *
- *  Provides a mechanism for easily manage multi languages on a single page.
- *  It was created for the BREAD system of Voyager, but can be implemented
- *  with any html structure.
- *  For each translatable field, the page requires an hidden input containing
- *  all translations in JSON format.
- *
- *  Some considerations:
- *  Every time a translatable model is opened, all languages are being loaded.
- *  This may work well with few languages, but in case of 20+, it may require
- *  another approach, like using AJAX.
- *
- *  TO-DO
- *  * Google Translator, triggered by a subtle link placed somewhere near the input.
- *  * Option for showing a fall-back version of the field, under the input.
- *    This would apply to text input only.
- *
- */
-;( function( $, window, document, undefined ) {
+const pluginName = 'multilingual';
 
-    "use strict";
+const defaults = {
+    editing: false,
+    form: '.form-edit-add',
+    transInputs: 'input[data-i18n="true"]',
+    langSelectors: '.language-selector input',
+};
 
-    var pluginName = "multilingual",
-        defaults = {
-            editing:       false,                       // Editing or View
-            form:          '.form-edit-add',
-            transInputs:   'input[data-i18n = true]', // Hidden inputs holding translations
-            langSelectors: '.language-selector:first input' // Language selector inputs
-        };
+const instanceRegistry = new WeakMap();
 
-    function Plugin ( element, options ) {
-        this.element   = $(element);
-        this.settings  = $.extend( {}, defaults, options );
-        this._defaults = defaults;
-        this._name     = pluginName;
-        this.init();
+const hasDocument = typeof document !== 'undefined';
+const ELEMENT_NODE = typeof Node !== 'undefined' ? Node.ELEMENT_NODE : 1;
+
+const toArray = (collection = []) => Array.prototype.slice.call(collection);
+
+const isElement = (value) => typeof Element !== 'undefined' && value instanceof Element;
+const isNodeList = (value) => typeof NodeList !== 'undefined' && value instanceof NodeList;
+const isHTMLCollection = (value) => typeof HTMLCollection !== 'undefined' && value instanceof HTMLCollection;
+
+const normalizeTargets = (target) => {
+    if (!hasDocument || !target) {
+        return [];
     }
 
-    $.extend( Plugin.prototype, {
-        init: function() {
-            this.form          = this.element.find(this.settings.form);
-            this.transInputs   = $(this.settings.transInputs);
-            this.langSelectors = this.element.find(this.settings.langSelectors);
+    if (typeof target === 'string') {
+        return toArray(document.querySelectorAll(target));
+    }
 
-            if (this.transInputs.length === 0 || this.langSelectors === 0) {
-                return false;
-            }
+    if (isElement(target)) {
+        return [target];
+    }
 
-            this.setup();
-            this.refresh();
-        },
+    if (isNodeList(target) || isHTMLCollection(target)) {
+        return toArray(target);
+    }
 
+    if (Array.isArray(target)) {
+        return target.filter((node) => isElement(node));
+    }
 
-        setup: function() {
-            var _this = this;
+    return [];
+};
 
-            this.locale = this.returnLocale();
+const queryAll = (root, selector) => {
+    if (!selector || !hasDocument) {
+        return [];
+    }
 
-            $('.js-language-label').text(this.locale);
+    if (root && isElement(root)) {
+        const scoped = root.querySelectorAll(selector);
+        if (scoped.length) {
+            return toArray(scoped);
+        }
+    }
 
-            /**
-             * Setup language selector
-             */
-            this.langSelectors.each(function(i, btn) {
-                $(btn).change($.proxy(_this.selectLanguage, _this));
-            });
+    return toArray(document.querySelectorAll(selector));
+};
 
-            /**
-             * Save data before submit
-             */
-            if (this.settings.editing) {
-                $(this.form).on('submit', function(e) {
-                    _this.prepareData();
-                });
-            }
-        },
+const findNextElement = (node, selector) => {
+    if (!isElement(node)) {
+        return null;
+    }
 
-        /**
-         * Refresh plugin data, required for dynamic calls (ex menu)
-         */
-        refresh: function() {
-            var _this = this;
-
-            /**
-             * Setup translatable inputs
-             */
-            this.transInputs.each(function(i, inp) {
-                var _inp   = $(inp),
-                    inpUsr = _inp.nextAll(_this.settings.editing ? '.form-control' : '');
-
-                inpUsr.data("inp", _inp);
-                _inp.data("inpUsr", inpUsr);
-
-                // Load and Save data in hidden input
-                var $_data = _this.loadJsonField(_inp.val());
-                if (_this.settings.editing) {
-                    _inp.val(JSON.stringify($_data));
-                }
-
-                _this.langSelectors.each(function(i, btn) {
-                    _inp.data(btn.id, $_data[btn.id]);  // Save translation in mem
-                    if (btn.id == _this.locale) {
-                        _this.loadLang(_inp, btn.id)    // Load active locale
-                    }
-                });
-            });
-        },
-
-        loadJsonField: function(str) {
-            var $_data = {};
-
-            if (this.isJsonValid(str)) {
-                $_data = JSON.parse(str);
-
-                /**
-                 * Convert nulls to ''.
-                 */
-                this.langSelectors.each(function(i, btn) {  // loop languages
-                    $_data[btn.id] = $_data[btn.id] || '';
-                });
-
-                return $_data;
-            }
-
-            /**
-             * For the sake of validation, this looks ugly, but it will work
-             */
-            this.langSelectors.each(function(i, btn) {
-                $_data[btn.id] = '';
-            });
-
-            return $_data;
-        },
-
-
-        isJsonValid: function(str) {
-            try {
-                JSON.parse(str);
-            } catch (ex) {
-                return false;
-            }
-            return true;
-        },
-
-        /**
-         * Return Locale for a given Button Group Selector
-         *
-         * @return string The locale.
-         */
-        returnLocale: function() {
-            return this.langSelectors.filter(function() {
-                return $(this).parent().hasClass('active');
-            }).prop('id');
-        },
-
-        selectLanguage: function(e) {
-            var _this = this,
-                lang  = e.target.id;
-
-            this.transInputs.each(function(i, inp) {
-                if (_this.settings.editing) {
-                    _this.updateInputCache($(inp));
-                }
-                _this.loadLang($(inp), lang);
-            });
-
-            this.locale = lang;
-
-            $('.js-language-label').text(lang);
-        },
-
-        /**
-         * Update cache for all inputs, and prepare form data for submit
-         */
-        prepareData: function() {
-            var _this = this;
-            this.transInputs.each(function(i, inp) {
-                _this.updateInputCache($(inp));
-            });
-        },
-
-        /**
-         * Update cache for a single input
-         */
-        updateInputCache: function(inp) {
-            var _this  = this,
-                inpUsr = inp.data('inpUsr'),
-                $_val  = $(inpUsr).val(),
-                $_data = {};  // Create new data
-
-            if (inpUsr.hasClass('richTextBox')) {
-                var tinymceInstance = window.tinymce && window.tinymce.get('richtext'+inpUsr.prop('name'));
-                if (tinymceInstance && tinymceInstance.getContent) {
-                    $_val = tinymceInstance.getContent();
-                }
-            }
-
-            if (inpUsr.hasClass('easymde')) {
-                var $codemirror = inpUsr.nextAll('.CodeMirror')[0].CodeMirror;
-                $_val = $codemirror.getDoc().getValue();
-                $codemirror.save();
-            }
-
-            this.langSelectors.each(function(i, btn) {
-                var lang = btn.id;
-                $_data[lang] = (_this.locale == lang) ? $_val : inp.data(lang);
-            });
-
-            inp.val(JSON.stringify($_data));
-            inp.data(this.locale, $_val);     // Update single key Mem
-        },
-
-        /**
-         * Load input translation
-         */
-        loadLang: function(inp, lang) {
-            var inpUsr = inp.data("inpUsr"),
-                _val   = inp.data(lang);
-
-            if (!this.settings.editing) {
-                inpUsr.text(_val);
-
-            } else {
-                var _mce = window.tinymce && window.tinymce.get('richtext'+inpUsr.prop('name'));
-                if (inpUsr.hasClass('richTextBox') && _mce && _mce.initialized) {
-                    _mce.setContent(_val);
-                } else {
-                    inpUsr.val(_val);
-                    if (inpUsr.hasClass('easymde')) {
-                        var $codemirror = inpUsr.nextAll('.CodeMirror')[0].CodeMirror;
-                        $codemirror.getDoc().setValue(inpUsr.val());
-                    }
-                }
+    let sibling = node.nextSibling;
+    while (sibling) {
+        if (sibling.nodeType === ELEMENT_NODE) {
+            if (!selector || sibling.matches(selector)) {
+                return sibling;
             }
         }
-    });
+        sibling = sibling.nextSibling;
+    }
 
-    $.fn[ pluginName ] = function( options ) {
-        return this.each( function() {
-            if ( !$.data( this, pluginName ) ) {
-                $.data( this, pluginName, new Plugin(this, options) );
+    return null;
+};
+
+const findCodeMirrorInstance = (element) => {
+    if (!element || typeof element !== 'object') {
+        return null;
+    }
+
+    let sibling = element.nextSibling;
+    while (sibling) {
+        if (sibling.nodeType === ELEMENT_NODE && sibling.classList.contains('CodeMirror') && sibling.CodeMirror) {
+            return sibling.CodeMirror;
+        }
+        sibling = sibling.nextSibling;
+    }
+
+    return null;
+};
+
+class VoyagerMultilingual {
+    constructor(element, options = {}) {
+        if (!element) {
+            throw new Error('VoyagerMultilingual requires a target element');
+        }
+
+        this.element = element;
+        this.settings = Object.assign({}, defaults, options);
+        this.translationCache = new WeakMap();
+        this.userInputMap = new WeakMap();
+        this.hiddenInputMap = new WeakMap();
+
+        if (!hasDocument) {
+            this.transInputs = [];
+            this.langSelectors = [];
+            return;
+        }
+
+        this.form = this.element.querySelector(this.settings.form) || null;
+        this.transInputs = toArray(document.querySelectorAll(this.settings.transInputs));
+        this.langSelectors = queryAll(this.element, this.settings.langSelectors);
+
+        if (this.transInputs.length === 0 || this.langSelectors.length === 0) {
+            return;
+        }
+
+        this.setup();
+        this.refresh();
+    }
+
+    setup() {
+        this.locale = this.returnLocale();
+        this.updateLanguageLabels();
+
+        this.langSelectors.forEach((selector) => {
+            selector.addEventListener('change', (event) => this.selectLanguage(event));
+        });
+
+        if (this.settings.editing && this.form) {
+            this.form.addEventListener('submit', () => {
+                this.prepareData();
+            });
+        }
+    }
+
+    refresh() {
+        this.transInputs.forEach((hiddenInput) => {
+            const targetInput = this.resolveUserInput(hiddenInput);
+            if (!targetInput) {
+                return;
             }
-        } );
-    };
 
-} )( jQuery, window, document );
+            this.userInputMap.set(hiddenInput, targetInput);
+            this.hiddenInputMap.set(targetInput, hiddenInput);
+
+            const data = this.loadJsonField(hiddenInput.value);
+            if (this.settings.editing) {
+                hiddenInput.value = JSON.stringify(data);
+            }
+
+            this.translationCache.set(hiddenInput, data);
+
+            this.langSelectors.forEach((selector) => {
+                const lang = selector.id;
+                if (lang && typeof data[lang] === 'undefined') {
+                    data[lang] = '';
+                }
+                if (lang === this.locale) {
+                    this.loadLang(hiddenInput, lang);
+                }
+            });
+        });
+    }
+
+    resolveUserInput(hiddenInput) {
+        if (!hiddenInput || !(hiddenInput instanceof Element)) {
+            return null;
+        }
+
+        if (this.userInputMap.has(hiddenInput)) {
+            return this.userInputMap.get(hiddenInput);
+        }
+
+        if (this.settings.editing) {
+            return findNextElement(hiddenInput, '.form-control');
+        }
+
+        return findNextElement(hiddenInput);
+    }
+
+    loadJsonField(value) {
+        let parsed = {};
+        if (value && this.isJsonValid(value)) {
+            parsed = JSON.parse(value);
+        }
+
+        this.langSelectors.forEach((selector) => {
+            const lang = selector.id;
+            if (!lang) {
+                return;
+            }
+            parsed[lang] = parsed[lang] || '';
+        });
+
+        return parsed;
+    }
+
+    isJsonValid(value) {
+        try {
+            JSON.parse(value);
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    returnLocale() {
+        const activeSelector = this.langSelectors.find((selector) => {
+            return selector.checked || (selector.parentElement && selector.parentElement.classList.contains('active'));
+        });
+
+        if (activeSelector && activeSelector.id) {
+            return activeSelector.id;
+        }
+
+        return this.langSelectors[0] ? this.langSelectors[0].id : '';
+    }
+
+    selectLanguage(event) {
+        const lang = event && event.target ? event.target.id : null;
+        if (!lang) {
+            return;
+        }
+
+        if (this.settings.editing) {
+            this.transInputs.forEach((hiddenInput) => this.updateInputCache(hiddenInput));
+        }
+
+        this.transInputs.forEach((hiddenInput) => this.loadLang(hiddenInput, lang));
+        this.locale = lang;
+        this.updateLanguageLabels();
+    }
+
+    updateLanguageLabels() {
+        if (typeof document === 'undefined') {
+            return;
+        }
+
+        toArray(document.querySelectorAll('.js-language-label')).forEach((label) => {
+            label.textContent = this.locale;
+        });
+    }
+
+    prepareData() {
+        this.transInputs.forEach((hiddenInput) => this.updateInputCache(hiddenInput));
+    }
+
+    updateInputCache(hiddenInput) {
+        const userInput = this.userInputMap.get(hiddenInput);
+        if (!hiddenInput || !userInput) {
+            return;
+        }
+
+        let value = this.getUserInputValue(userInput);
+
+        const data = this.translationCache.get(hiddenInput) || {};
+        this.langSelectors.forEach((selector) => {
+            const lang = selector.id;
+            if (!lang) {
+                return;
+            }
+            data[lang] = this.locale === lang ? value : (data[lang] || '');
+        });
+
+        hiddenInput.value = JSON.stringify(data);
+        this.translationCache.set(hiddenInput, data);
+    }
+
+    getUserInputValue(userInput) {
+        let value = '';
+
+        if (!this.settings.editing) {
+            return userInput.textContent || '';
+        }
+
+        if (userInput.classList.contains('richTextBox') && typeof window !== 'undefined' && window.tinymce) {
+            const instance = window.tinymce.get(`richtext${userInput.name}`);
+            if (instance && typeof instance.getContent === 'function') {
+                value = instance.getContent();
+                return value;
+            }
+        }
+
+        if (userInput.classList.contains('easymde')) {
+            const codeMirror = findCodeMirrorInstance(userInput);
+            if (codeMirror) {
+                value = codeMirror.getDoc().getValue();
+                codeMirror.save();
+                return value;
+            }
+        }
+
+        if ('value' in userInput) {
+            return userInput.value;
+        }
+
+        return userInput.textContent || '';
+    }
+
+    loadLang(hiddenInput, lang) {
+        const userInput = this.userInputMap.get(hiddenInput);
+        if (!userInput) {
+            return;
+        }
+
+        const data = this.translationCache.get(hiddenInput) || {};
+        const value = data[lang] || '';
+
+        if (!this.settings.editing) {
+            userInput.textContent = value;
+            return;
+        }
+
+        if (userInput.classList.contains('richTextBox') && typeof window !== 'undefined' && window.tinymce) {
+            const instance = window.tinymce.get(`richtext${userInput.name}`);
+            if (instance && instance.initialized) {
+                instance.setContent(value || '');
+                return;
+            }
+        }
+
+        if ('value' in userInput) {
+            userInput.value = value || '';
+        } else {
+            userInput.textContent = value || '';
+        }
+
+        if (userInput.classList.contains('easymde')) {
+            const codeMirror = findCodeMirrorInstance(userInput);
+            if (codeMirror) {
+                codeMirror.getDoc().setValue(userInput.value || '');
+            }
+        }
+    }
+}
+
+const initMultilingualInstance = (element, options) => {
+    if (instanceRegistry.has(element)) {
+        return instanceRegistry.get(element);
+    }
+
+    const instance = new VoyagerMultilingual(element, options);
+    instanceRegistry.set(element, instance);
+    return instance;
+};
+
+export const initMultilingual = (target, options = {}) => {
+    const elements = normalizeTargets(target);
+    if (!elements.length) {
+        return null;
+    }
+
+    const instances = elements.map((element) => initMultilingualInstance(element, options));
+    return instances.length === 1 ? instances[0] : instances;
+};
+
+if (typeof window !== 'undefined') {
+    window.VoyagerInitMultilingual = initMultilingual;
+}
+
+if (typeof window !== 'undefined' && window.jQuery) {
+    const $ = window.jQuery;
+    $.fn[pluginName] = function(options = {}) {
+        return this.each(function initPlugin() {
+            if (!$.data(this, pluginName)) {
+                const instance = initMultilingualInstance(this, options);
+                $.data(this, pluginName, instance);
+            }
+        });
+    };
+}
+
+export { VoyagerMultilingual };

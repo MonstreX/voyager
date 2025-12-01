@@ -4,12 +4,88 @@
 |
 --------------------*/
 
-var getConfig = function(options) {
+const getMetaContent = (name) => {
+    if (typeof document === 'undefined') {
+        return '';
+    }
+    const meta = document.querySelector(`meta[name="${name}"]`);
+    return meta ? meta.getAttribute('content') || '' : '';
+};
 
-    var baseTinymceConfig = {
+const getInputValue = (id) => {
+    if (typeof document === 'undefined') {
+        return '';
+    }
+    const el = document.getElementById(id);
+    return el ? el.value : '';
+};
+
+const setLoaderVisibility = (visible) => {
+    if (typeof document === 'undefined') {
+        return;
+    }
+
+    const loader = document.getElementById('voyager-loader');
+    if (!loader) {
+        return;
+    }
+
+    loader.style.zIndex = visible ? '10000' : '99';
+    loader.style.display = visible ? 'block' : 'none';
+};
+
+const uploadTinyMceImage = async (file) => {
+    const uploadUrl = getInputValue('upload_url');
+
+    if (!uploadUrl) {
+        throw new Error('TinyMCE upload_url field is missing');
+    }
+
+    const formdata = new FormData();
+    formdata.append('image', file);
+
+    const typeSlug = getInputValue('upload_type_slug');
+    if (typeSlug) {
+        formdata.append('type_slug', typeSlug);
+    }
+
+    setLoaderVisibility(true);
+
+    try {
+        const response = await fetch(uploadUrl, {
+            method: 'POST',
+            body: formdata,
+            credentials: 'same-origin',
+            headers: {
+                'X-CSRF-TOKEN': getMetaContent('csrf-token') || '',
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`TinyMCE image upload failed (${response.status})`);
+        }
+
+        return await response.text();
+    } finally {
+        setLoaderVisibility(false);
+    }
+};
+
+const getDefaultBaseUrl = () => {
+    if (typeof window !== 'undefined' && window.voyagerTinyMCEBase) {
+        return window.voyagerTinyMCEBase;
+    }
+
+    const assetsPath = getMetaContent('assets-path') || '';
+    return assetsPath.replace(/\/?$/, '/js');
+};
+
+const getConfig = function(options = {}) {
+
+    const baseTinymceConfig = {
         menubar: false,
         selector: 'textarea.richTextBox',
-        base_url: (window.voyagerTinyMCEBase || ($('meta[name="assets-path"]').attr('content') || '').replace(/\/?$/, '/js')),
+        base_url: getDefaultBaseUrl(),
         skin: 'oxide',
         min_height: 600,
         resize: true,
@@ -20,34 +96,25 @@ var getConfig = function(options) {
         file_picker_types: 'image',
         file_picker_callback: (callback, value, meta) => {
             if (meta.filetype == 'image') {
-                var input = document.createElement('input');
+                const input = document.createElement('input');
                 input.setAttribute('type', 'file');
                 input.setAttribute('accept', 'image/*');
 
-                input.onchange = function () {
-                    var formdata = new FormData();
-                    formdata.append('image', this.files[0]);
-                    formdata.append('type_slug', $('#upload_type_slug').val());
-                    // Show loader
-                    $('#voyager-loader').css('z-index', 10000);
-                    $('#voyager-loader').fadeIn();
-                    $.ajax({
-                        type: 'post',
-                        url: $('#upload_url').val(),
-                        data: formdata,
-                        enctype: 'multipart/form-data',
-                        processData: false,
-                        contentType: false,
-                        cache: false,
-                    })
-                    .done((result) => {
-                        callback(result);
-                    })
-                    .always(() => {
-                        $('#voyager-loader').fadeOut();
-                        $('#voyager-loader').css('z-index', 99);
-                    });
-                }
+                input.addEventListener('change', async function handleImageUpload() {
+                    if (!this.files || !this.files[0]) {
+                        return;
+                    }
+
+                    try {
+                        const url = await uploadTinyMceImage(this.files[0]);
+                        callback(url);
+                    } catch (error) {
+                        console.error('TinyMCE image upload failed', error);
+                        if (typeof window !== 'undefined' && window.toastr && typeof window.toastr.error === 'function') {
+                            window.toastr.error('Image upload failed.');
+                        }
+                    }
+                }, { once: true });
 
                 input.click();
             }
@@ -67,7 +134,7 @@ var getConfig = function(options) {
         }
     };
 
-    return $.extend({}, baseTinymceConfig, options);
+    return Object.assign({}, baseTinymceConfig, options);
 }
 
 export default { getConfig };
