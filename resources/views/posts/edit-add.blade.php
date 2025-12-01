@@ -370,22 +370,53 @@
             $('.form-group').on('click', '.remove-multi-file', deleteHandler('a', true));
             $('.form-group').on('click', '.remove-single-file', deleteHandler('a', false));
 
-            $('#confirm_delete').on('click', function(){
-                $.post('{{ route('voyager.'.$dataType->slug.'.media.remove') }}', params, function (response) {
-                    if ( response
-                        && response.data
-                        && response.data.status
-                        && response.data.status == 200 ) {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+            const confirmDeleteButton = document.getElementById('confirm_delete');
+            const mediaRemoveUrl = '{{ route('voyager.'.$dataType->slug.'.media.remove') }}';
+            if (confirmDeleteButton) {
+                confirmDeleteButton.addEventListener('click', function () {
+                    const formData = new URLSearchParams();
+                    Object.keys(params).forEach(function (key) {
+                        const value = params[key];
+                        formData.append(key, typeof value === 'boolean' ? Number(value).toString() : value);
+                    });
 
-                        toastr.success(response.data.message);
-                        $file.parent().fadeOut(300, function() { $(this).remove(); })
-                    } else {
+                    fetch(mediaRemoveUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json'
+                        },
+                        body: formData.toString()
+                    })
+                    .then(function (response) {
+                        if (!response.ok) {
+                            throw new Error('Media remove request failed with status ' + response.status);
+                        }
+                        return response.json();
+                    })
+                    .then(function (response) {
+                        if ( response
+                            && response.data
+                            && response.data.status
+                            && response.data.status == 200 ) {
+
+                            toastr.success(response.data.message);
+                            $file.parent().fadeOut(300, function() { $(this).remove(); })
+                        } else {
+                            toastr.error("Error removing file.");
+                        }
+                    })
+                    .catch(function (error) {
+                        console.error('Voyager media remove failed', error);
                         toastr.error("Error removing file.");
-                    }
+                    })
+                    .finally(function () {
+                        $('#confirm_delete_modal').modal('hide');
+                    });
                 });
-
-                $('#confirm_delete_modal').modal('hide');
-            });
+            }
             $('[data-toggle="tooltip"]').tooltip();
         });
     </script>
