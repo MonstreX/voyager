@@ -1868,6 +1868,18 @@ const registerjQueryBridges = () => {
         return this;
     };
 
+    if ($.fn.disableSelection === undefined) {
+        $.fn.disableSelection = function () {
+            return this.each(function () {
+                this.style.userSelect = 'none';
+                this.style.webkitUserSelect = 'none';
+                this.style.msUserSelect = 'none';
+                this.style.MozUserSelect = 'none';
+                this.setAttribute('unselectable', 'on');
+            });
+        };
+    }
+
     if ($.fn.sortable === undefined && typeof window.Sortable !== 'undefined') {
         $.fn.sortable = function (options = {}) {
             return this.each(function () {
