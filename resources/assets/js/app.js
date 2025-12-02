@@ -875,6 +875,7 @@ class VoyagerSelect {
         this.dropdown = document.createElement('span');
         this.dropdown.className = 'select2-dropdown select2-dropdown--below';
         this.dropdown.style.display = 'none';
+        this.dropdown.style.zIndex = '10000000'; // Ensure it's above modals
         this.dropdown.innerHTML = `
             <span class="select2-search select2-search--dropdown">
                 <input class="select2-search__field" type="search" placeholder="${this.searchPlaceholder}" autocomplete="off" autocapitalize="none" spellcheck="false">

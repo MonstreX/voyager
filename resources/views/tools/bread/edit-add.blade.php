@@ -656,7 +656,7 @@
         }
 
         function handleRelationshipTypeChange(select) {
-            const fieldWrapper = select.parentElement ? select.parentElement.parentElement : null;
+            const fieldWrapper = select.closest('.voyager-relationship-details') || select.closest('.modal-body');
             if (!fieldWrapper) {
                 return;
             }
@@ -715,7 +715,7 @@
                 return;
             }
             const tbl = dropdown.value;
-            const container = dropdown.parentElement ? dropdown.parentElement.parentElement : null;
+            const container = dropdown.closest('.voyager-relationship-details') || dropdown.closest('.modal-body');
             if (!container) {
                 return;
             }
@@ -757,15 +757,15 @@
         }
 
         function updateRelationshipDisplayName(input) {
-            const wrapper = input.parentElement && input.parentElement.parentElement ? input.parentElement.parentElement.parentElement : null;
-            const label = wrapper ? wrapper.querySelector('.label_relationship p') : null;
+            const wrapper = input.closest('.row-dd-relationship');
+            const label = wrapper ? wrapper.querySelector('h4 strong') : null;
             if (label) {
                 label.textContent = input.value || '';
             }
         }
 
         function updateRelationshipTableLabel(dropdown) {
-            const wrapper = dropdown.parentElement ? dropdown.parentElement.parentElement : null;
+            const wrapper = dropdown.closest('.voyager-relationship-details') || dropdown.closest('.modal-body');
             const label = wrapper ? wrapper.querySelector('.label_table_name') : null;
             if (label) {
                 const selectedOption = dropdown.options[dropdown.selectedIndex];
