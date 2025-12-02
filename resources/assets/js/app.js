@@ -1011,29 +1011,48 @@ class VoyagerSelect {
 
     updateSelectElement(triggerChange = true) {
         const values = Array.from(this.selectedValues);
+        
+        // Helper to ensure option exists
+        const ensureOption = (value) => {
+            const strValue = String(value);
+            let option = Array.from(this.select.options).find((opt) => opt.value === strValue);
+            if (!option && strValue !== '') {
+                const optionData = this.getOptionByValue(strValue);
+                option = new Option(optionData ? optionData.text : strValue, strValue);
+                this.select.add(option);
+            }
+            return option;
+        };
+
         if (this.multiple) {
+            // Ensure all selected values have options
+            values.forEach(ensureOption);
+            
+            // Update selected state for all options
             Array.from(this.select.options).forEach((option) => {
-                option.selected = values.includes(option.value);
-            });
-            values.forEach((value) => {
-                if (!Array.from(this.select.options).some((option) => option.value === value)) {
-                    const optionData = this.getOptionByValue(value);
-                    const optionEl = new Option(optionData ? optionData.text : value, value, true, true);
-                    this.select.add(optionEl);
+                const shouldBeSelected = values.includes(option.value);
+                option.selected = shouldBeSelected;
+                if (shouldBeSelected) {
+                    option.setAttribute('selected', 'selected');
+                } else {
+                    option.removeAttribute('selected');
                 }
             });
         } else {
-            const value = values.length ? values[0] : '';
-            if (this.select.value !== value) {
-                const exists = Array.from(this.select.options).some((option) => option.value === value);
-                if (!exists && value !== '') {
-                    const optionData = this.getOptionByValue(value);
-                    const optionEl = new Option(optionData ? optionData.text : value, value, true, true);
-                    this.select.add(optionEl);
+            const value = values.length ? String(values[0]) : '';
+            ensureOption(value);
+            this.select.value = value;
+            
+            // Update attributes for single select
+            Array.from(this.select.options).forEach((option) => {
+                if (option.value === value) {
+                    option.setAttribute('selected', 'selected');
+                } else {
+                    option.removeAttribute('selected');
                 }
-                this.select.value = value;
-            }
+            });
         }
+
         if (triggerChange) {
             this.select.dispatchEvent(new Event('change', { bubbles: true }));
         }
