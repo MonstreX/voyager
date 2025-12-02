@@ -18,6 +18,7 @@
     "@vue/compiler-sfc": "^3.5.25",
     "ace-builds": "^1.12.3",
     "cropperjs": "^1.5.12",
+    "easymde": "^2.20.0",
     "flatpickr": "^4.6.13",
     "perfect-scrollbar": "^1.5.5",
     "sortablejs": "^1.15.0",

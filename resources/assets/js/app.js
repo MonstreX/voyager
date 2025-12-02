@@ -2,6 +2,8 @@ import './modules/csrf';
 import '../sass/app.scss';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.css';
+import EasyMDE from 'easymde';
+import 'easymde/dist/easymde.min.css';
 
 import SimpleTable from './modules/simple-table';
 import VoyagerToaster from './modules/toaster';
@@ -2044,20 +2046,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    /********** MARKDOWN EDITOR (DISABLED) **********/
+    /********** MARKDOWN EDITOR **********/
 
-    document.querySelectorAll('.easymde').forEach((textarea) => {
-        if (textarea.dataset.voyagerEasymdeNoticeApplied === 'true') {
+    document.querySelectorAll('textarea.easymde').forEach((textarea) => {
+        if (textarea.dataset.voyagerEasymdeInit === 'true') {
             return;
         }
-        textarea.dataset.voyagerEasymdeNoticeApplied = 'true';
-        const notice = document.createElement('div');
-        notice.className = 'alert alert-warning mt-2';
-        notice.innerText =
-            'Markdown editor is temporarily disabled pending rewrite. Please edit the raw markdown text below.';
-        if (textarea.parentNode) {
-            textarea.parentNode.insertBefore(notice, textarea.nextSibling);
-        }
+        textarea.dataset.voyagerEasymdeInit = 'true';
+        new EasyMDE({
+            element: textarea,
+            forceSync: true, // Update the underlying textarea on change
+            spellChecker: false
+        });
     });
 
     /********** END MARKDOWN EDITOR **********/
