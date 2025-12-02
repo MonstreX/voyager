@@ -728,9 +728,15 @@
                     return response.json();
                 })
                 .then(function (data) {
-                    const options = Object.keys(data || {}).map(function (key) {
-                        return { id: key, text: key };
-                    });
+                    const options = [];
+                    for (const key in data) {
+                        if (Object.prototype.hasOwnProperty.call(data, key)) {
+                            const col = data[key];
+                            // If row has 'field', use it. Otherwise use the key (e.g. for additional attributes or if key-based)
+                            const value = (col && col.field) ? col.field : key;
+                            options.push({ id: value, text: value });
+                        }
+                    }
                     container.querySelectorAll('.rowDrop').forEach(function (select) {
                         const selectedValue = select.dataset.selected || '';
                         if (window.VoyagerSelectSetOptions) {
