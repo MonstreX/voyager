@@ -80,6 +80,89 @@ const getDefaultBaseUrl = () => {
     return assetsPath.replace(/\/?$/, '/js');
 };
 
+const ensureAceModal = () => {
+    if (document.getElementById('voyager-ace-code-modal')) {
+        return;
+    }
+    const modalHtml = `
+        <div class="modal fade" id="voyager-ace-code-modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document" style="width: 90%;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Source Code</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div id="voyager-ace-code-editor" style="height: 70vh; width: 100%;"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="voyager-ace-code-save">Update</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+};
+
+let aceEditor = null;
+let currentTinyMce = null;
+
+const openAceModal = (editor) => {
+    ensureAceModal();
+    currentTinyMce = editor;
+    const modal = document.getElementById('voyager-ace-code-modal');
+    
+    if (!aceEditor) {
+        // Config Ace
+        const assetsMeta = document.querySelector('meta[name="assets-path"]');
+        const assetsBase = assetsMeta ? assetsMeta.getAttribute('content') : '';
+        const aceBaseMeta = document.querySelector('meta[name="voyager-ace-base"]');
+        const explicitAceBase = window.voyagerAceBase || (aceBaseMeta ? aceBaseMeta.getAttribute('content') : '') || '';
+        const fallbackBase = assetsBase.replace(/\/?$/, '/') + 'js/ace/libs';
+        const aceBasePath = (explicitAceBase || fallbackBase).replace(/\/?$/, '/');
+        
+        if (window.ace) {
+            window.ace.config.set("basePath", aceBasePath);
+            window.ace.config.set("themePath", aceBasePath);
+            window.ace.config.set("modePath", aceBasePath);
+            
+            aceEditor = window.ace.edit('voyager-ace-code-editor');
+            aceEditor.setTheme('ace/theme/monokai');
+            aceEditor.session.setMode('ace/mode/html');
+            aceEditor.setShowPrintMargin(false);
+        }
+    }
+    
+    if (aceEditor) {
+        aceEditor.setValue(editor.getContent(), -1);
+        
+        const saveBtn = document.getElementById('voyager-ace-code-save');
+        saveBtn.onclick = () => {
+            currentTinyMce.setContent(aceEditor.getValue());
+            if (window.VoyagerBootstrapCompat) {
+                window.VoyagerBootstrapCompat.hideModal(modal);
+            } else {
+                // Fallback if compat not loaded
+                modal.classList.remove('in');
+                modal.style.display = 'none';
+                document.body.classList.remove('modal-open');
+                const backdrop = document.querySelector('.modal-backdrop');
+                if (backdrop) backdrop.remove();
+            }
+        };
+
+        if (window.VoyagerBootstrapCompat) {
+            window.VoyagerBootstrapCompat.showModal(modal);
+        }
+        
+        setTimeout(() => {
+            aceEditor.resize();
+        }, 200);
+    }
+};
+
 const getConfig = function(options = {}) {
 
     const baseTinymceConfig = {
@@ -89,7 +172,7 @@ const getConfig = function(options = {}) {
         skin: 'oxide',
         min_height: 600,
         resize: true,
-        plugins: 'link image code table lists',
+        plugins: 'link image table lists', // Removed 'code' to avoid conflicts if any, but we override button
         extended_valid_elements : 'input[id|name|value|type|class|style|required|placeholder|autocomplete|onclick]',
         relative_urls: false,
         remove_script_host: true,
@@ -132,6 +215,14 @@ const getConfig = function(options = {}) {
             if (typeof tinymce_setup_callback !== "undefined") {
                 tinymce_setup_callback(editor);
             }
+            
+            editor.ui.registry.addButton('code', {
+                icon: 'sourcecode',
+                tooltip: 'Source code',
+                onAction: function () {
+                    openAceModal(editor);
+                }
+            });
         }
     };
 
