@@ -57,7 +57,7 @@ var Tag = function () {
     this.end = { row: 0, column: 0 };
 };
 function is(token, type) {
-    return token.type.lastIndexOf(type + ".xml") > -1;
+    return token && token.type && token.type.lastIndexOf(type + ".xml") > -1;
 }
 (function () {
     this.getFoldWidget = function (session, foldStyle, row) {
@@ -3682,7 +3682,7 @@ var VueHighlightRules = function (options) {
     var self = this;
     VueRules.tag_stuff.unshift({
         token: "string",
-        regex: /(?:\b(v-)|(:|@))(\[?[a-zA-Z\-.]+\]?)(?:(\:\[?[a-zA-Z\-]+\]?))?(?:(\.[a-zA-Z\-]+))*(\s*)(=)(\s*)(["'])/,
+        regex: /(?:\b(v-)|(:|@))(\[?[a-zA-Z\-.]+\]?)(?:(\:\[?[a-zA-Z\-]+\]?))?((?:\.[a-zA-Z\-]+)*)(\s*)(=)(\s*)(["'])/,
         onMatch: function (value, currentState, stack) {
             var quote = value[value.length - 1];
             stack.unshift(quote, currentState);
