@@ -91,8 +91,9 @@ const getConfig = function(options = {}) {
         resize: true,
         plugins: 'link image code table lists',
         extended_valid_elements : 'input[id|name|value|type|class|style|required|placeholder|autocomplete|onclick]',
-        relative_urls: false, // Necessary so uploaded images don't get a relative path but an URL instead.
-        remove_script_host: false,
+        relative_urls: false,
+        remove_script_host: true,
+        convert_urls: true,
         file_picker_types: 'image',
         file_picker_callback: (callback, value, meta) => {
             if (meta.filetype == 'image') {
