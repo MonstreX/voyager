@@ -42,6 +42,10 @@
     </div>
     <div id="toolbar" v-if="showToolbar" :style="isExpanded ? 'display:block' : 'display:none'">
         <div class="btn-group offset-right">
+            <button type="button" class="btn btn-primary" id="upload" v-if="allowUpload" v-on:click="triggerUpload">
+                <i class="voyager-upload"></i>
+                {{ __('voyager::generic.upload') }}
+            </button>
             <button type="button" class="btn btn-primary" v-if="allowCreateFolder" data-toggle="modal" :data-target="'#create_dir_modal_'+uid">
                 <i class="voyager-folder"></i>
                 {{ __('voyager::generic.add_folder') }}
@@ -69,6 +73,10 @@
             </button>
         </div>
     </div>
+    <div id="uploadProgress" class="progress active progress-striped" v-if="allowUpload" style="display:none;">
+        <div class="progress-bar progress-bar-success" style="width: 0"></div>
+    </div>
+    <input type="file" id="file_upload_input" name="files[]" multiple style="display:none;" v-on:change="handleFileUpload">
     <div id="content" :style="isExpanded ? 'display:block' : 'display:none'">
         <div class="breadcrumb-container">
             <ol class="breadcrumb filemanager">
@@ -1027,11 +1035,129 @@
                 return suffixes.some(function (suffix) {
                     return string.endsWith(suffix);
                 });
+            },
+            triggerUpload: function() {
+                var input = document.getElementById('file_upload_input');
+                if (input) {
+                    input.click();
+                }
+            },
+            handleFileUpload: function(e) {
+                var files = e.target.files || e.dataTransfer.files;
+                if (!files.length) {
+                    return;
+                }
+                this.uploadFiles(files);
+            },
+            uploadFiles: function(files) {
+                var vm = this;
+                var totalFiles = files.length;
+                var uploadedFiles = 0;
+                var progressBar = document.querySelector('#uploadProgress .progress-bar');
+                var progressContainer = document.getElementById('uploadProgress');
+
+                if (progressContainer) {
+                    progressContainer.style.display = 'block';
+                    progressContainer.style.opacity = '1';
+                }
+
+                Array.from(files).forEach(function(file) {
+                    var formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('upload_path', vm.current_folder);
+                    formData.append('filename', vm.filename || '');
+                    formData.append('details', JSON.stringify(vm.details));
+                    formData.append('_token', voyagerMediaCsrfToken);
+
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('POST', '{{ route('voyager.media.upload') }}', true);
+                    xhr.setRequestHeader('X-CSRF-TOKEN', voyagerMediaCsrfToken);
+                    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+                    xhr.upload.onprogress = function(e) {
+                        if (e.lengthComputable && totalFiles === 1) {
+                            var percentComplete = (e.loaded / e.total) * 100;
+                            if (progressBar) {
+                                progressBar.style.width = percentComplete + '%';
+                            }
+                        }
+                    };
+
+                    xhr.onload = function() {
+                        uploadedFiles++;
+                        if (xhr.status === 200) {
+                            try {
+                                var res = JSON.parse(xhr.responseText);
+                                if (res.success) {
+                                    toastr.success(res.message);
+                                } else {
+                                    toastr.error(res.message);
+                                }
+                            } catch (e) {
+                                toastr.error("{{ __('voyager::generic.whoopsie') }}");
+                            }
+                        } else {
+                            toastr.error("{{ __('voyager::media.error_uploading') }}");
+                        }
+
+                        if (uploadedFiles === totalFiles) {
+                            if (progressBar) {
+                                progressBar.style.width = '100%';
+                            }
+                            setTimeout(function() {
+                                if (progressContainer) {
+                                    progressContainer.style.opacity = '0';
+                                    setTimeout(function() {
+                                        progressContainer.style.display = 'none';
+                                        if (progressBar) {
+                                            progressBar.style.width = '0%';
+                                        }
+                                    }, 500);
+                                }
+                                vm.getFiles();
+                            }, 1000);
+                        }
+                    };
+
+                    xhr.onerror = function() {
+                        uploadedFiles++;
+                        toastr.error("{{ __('voyager::media.error_uploading') }}");
+                    };
+
+                    xhr.send(formData);
+                });
             }
         },
         mounted: function() {
             this.getFiles();
             var vm = this;
+
+            if (this.allowUpload) {
+                var dropZone = this.$el;
+                
+                dropZone.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropZone.classList.add('drag-over');
+                });
+
+                dropZone.addEventListener('dragleave', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropZone.classList.remove('drag-over');
+                });
+
+                dropZone.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropZone.classList.remove('drag-over');
+                    
+                    var files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        vm.uploadFiles(files);
+                    }
+                });
+            }
 
             if (this.element != '') {
                 this.hidden_element = document.querySelector(this.element);
@@ -1193,5 +1319,10 @@
     width: 100%;
     min-width: 200px;
     max-width: 250px;
+}
+.drag-over {
+    outline: 2px dashed #22a7f0;
+    outline-offset: -10px;
+    background-color: rgba(34, 167, 240, 0.1);
 }
 </style>
