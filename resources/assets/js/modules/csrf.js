@@ -8,22 +8,3 @@ const getMetaContent = (name) => {
 };
 
 export const getCsrfToken = () => getMetaContent('csrf-token');
-
-export const applyjQueryCsrfHeader = () => {
-    if (typeof window === 'undefined' || !window.jQuery) {
-        return;
-    }
-
-    const token = getCsrfToken();
-    if (!token) {
-        return;
-    }
-
-    window.jQuery.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': token,
-        },
-    });
-};
-
-applyjQueryCsrfHeader();

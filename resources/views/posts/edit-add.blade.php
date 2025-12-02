@@ -324,60 +324,117 @@
 
 @section('javascript')
     <script>
-        var params = {};
-        var $file;
+        document.addEventListener('DOMContentLoaded', function () {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+            const confirmDeleteModal = document.getElementById('confirm_delete_modal');
+            const confirmDeleteButton = document.getElementById('confirm_delete');
+            const confirmDeleteName = confirmDeleteModal ? confirmDeleteModal.querySelector('.confirm_delete_name') : null;
+            const mediaRemoveUrl = '{{ route('voyager.'.$dataType->slug.'.media.remove') }}';
+            const bootstrapCompat = window.VoyagerBootstrapCompat;
+            const deleteState = { params: {}, wrapper: null };
 
-        function deleteHandler(tag, isMulti) {
-          return function() {
-            $file = $(this).siblings(tag);
+            const showModal = (modal) => {
+                if (!modal) {
+                    return;
+                }
+                if (bootstrapCompat && typeof bootstrapCompat.showModal === 'function') {
+                    bootstrapCompat.showModal(modal);
+                    return;
+                }
+                modal.classList.add('in');
+                modal.style.display = 'block';
+                modal.setAttribute('aria-hidden', 'false');
+                const backdrop = document.createElement('div');
+                backdrop.className = 'modal-backdrop fade in';
+                backdrop.dataset.modalTarget = modal.id;
+                document.body.appendChild(backdrop);
+                document.body.classList.add('modal-open');
+            };
 
-            params = {
-                slug:   '{{ $dataType->slug }}',
-                filename:  $file.data('file-name'),
-                id:     $file.data('id'),
-                field:  $file.parent().data('field-name'),
-                multi: isMulti,
-                _token: '{{ csrf_token() }}'
-            }
+            const hideModal = (modal) => {
+                if (!modal) {
+                    return;
+                }
+                if (bootstrapCompat && typeof bootstrapCompat.hideModal === 'function') {
+                    bootstrapCompat.hideModal(modal);
+                    return;
+                }
+                modal.classList.remove('in');
+                modal.style.display = 'none';
+                modal.setAttribute('aria-hidden', 'true');
+                const backdrop = document.querySelector(`.modal-backdrop[data-modal-target="${modal.id}"]`);
+                if (backdrop) {
+                    backdrop.remove();
+                }
+                document.body.classList.remove('modal-open');
+            };
 
-            $('.confirm_delete_name').text(params.filename);
-            $('#confirm_delete_modal').modal('show');
-          };
-        }
+            const startDeleteFlow = (trigger, selector, isMulti) => {
+                const container = trigger.parentElement;
+                if (!container) {
+                    return;
+                }
+                const target = Array.from(container.children).find((child) => child.matches(selector));
+                if (!target) {
+                    return;
+                }
 
-        $('document').ready(function () {
-            $('#slug').slugify();
+                deleteState.params = {
+                    slug: '{{ $dataType->slug }}',
+                    filename: target.dataset.fileName || '',
+                    id: target.dataset.id || '',
+                    field: container.dataset.fieldName || '',
+                    multi: isMulti,
+                    _token: '{{ csrf_token() }}',
+                };
+                deleteState.wrapper = container;
+                if (confirmDeleteName) {
+                    confirmDeleteName.textContent = deleteState.params.filename || '';
+                }
+                showModal(confirmDeleteModal);
+            };
 
-            if (window.VoyagerInitToggles) {
+            const registerRemovalHandler = (selector, tag, isMulti) => {
+                document.addEventListener('click', (event) => {
+                    const trigger = event.target.closest(selector);
+                    if (!trigger) {
+                        return;
+                    }
+                    event.preventDefault();
+                    startDeleteFlow(trigger, tag, isMulti);
+                });
+            };
+
+            [
+                { selector: '.remove-multi-image', tag: 'img', multi: true },
+                { selector: '.remove-single-image', tag: 'img', multi: false },
+                { selector: '.remove-multi-file', tag: 'a', multi: true },
+                { selector: '.remove-single-file', tag: 'a', multi: false },
+            ].forEach(({ selector, tag, multi }) => registerRemovalHandler(selector, tag, multi));
+
+            if (typeof window.VoyagerInitToggles === 'function') {
                 window.VoyagerInitToggles();
             }
-
-            // Initialize date/time pickers when Flatpickr is available
-            if (window.VoyagerInitDatePickers) {
+            if (typeof window.VoyagerInitDatePickers === 'function') {
                 window.VoyagerInitDatePickers();
             }
-
             @if ($isModelTranslatable)
-                $('.side-body').multilingual({"editing": true});
+                if (typeof window.VoyagerInitMultilingual === 'function') {
+                    window.VoyagerInitMultilingual(document.querySelectorAll('.side-body'), { editing: true });
+                }
             @endif
+            if (typeof window.VoyagerInitSlugify === 'function') {
+                window.VoyagerInitSlugify(document.querySelectorAll('#slug, .side-body input[data-slug-origin]'));
+            }
+            if (typeof window.VoyagerInitTooltips === 'function') {
+                window.VoyagerInitTooltips(document.querySelectorAll('[data-toggle="tooltip"]'));
+            }
 
-            $('.side-body input[data-slug-origin]').each(function(i, el) {
-                $(el).slugify();
-            });
-
-            $('.form-group').on('click', '.remove-multi-image', deleteHandler('img', true));
-            $('.form-group').on('click', '.remove-single-image', deleteHandler('img', false));
-            $('.form-group').on('click', '.remove-multi-file', deleteHandler('a', true));
-            $('.form-group').on('click', '.remove-single-file', deleteHandler('a', false));
-
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-            const confirmDeleteButton = document.getElementById('confirm_delete');
-            const mediaRemoveUrl = '{{ route('voyager.'.$dataType->slug.'.media.remove') }}';
             if (confirmDeleteButton) {
                 confirmDeleteButton.addEventListener('click', function () {
                     const formData = new URLSearchParams();
-                    Object.keys(params).forEach(function (key) {
-                        const value = params[key];
+                    Object.keys(deleteState.params).forEach(function (key) {
+                        const value = deleteState.params[key];
                         formData.append(key, typeof value === 'boolean' ? Number(value).toString() : value);
                     });
 
@@ -386,38 +443,40 @@
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
                             'X-CSRF-TOKEN': csrfToken,
-                            'Accept': 'application/json'
+                            'Accept': 'application/json',
                         },
-                        body: formData.toString()
+                        body: formData.toString(),
                     })
-                    .then(function (response) {
-                        if (!response.ok) {
-                            throw new Error('Media remove request failed with status ' + response.status);
-                        }
-                        return response.json();
-                    })
-                    .then(function (response) {
-                        if ( response
-                            && response.data
-                            && response.data.status
-                            && response.data.status == 200 ) {
-
-                            toastr.success(response.data.message);
-                            $file.parent().fadeOut(300, function() { $(this).remove(); })
-                        } else {
+                        .then(function (response) {
+                            if (!response.ok) {
+                                throw new Error('Media remove request failed with status ' + response.status);
+                            }
+                            return response.json();
+                        })
+                        .then(function (response) {
+                            if (response && response.data && response.data.status && response.data.status == 200) {
+                                toastr.success(response.data.message);
+                                const wrapper = deleteState.wrapper;
+                                if (wrapper) {
+                                    wrapper.style.transition = 'opacity 0.3s ease';
+                                    wrapper.style.opacity = '0';
+                                    setTimeout(function () {
+                                        wrapper.remove();
+                                    }, 300);
+                                }
+                            } else {
+                                toastr.error("Error removing file.");
+                            }
+                        })
+                        .catch(function (error) {
+                            console.error('Voyager media remove failed', error);
                             toastr.error("Error removing file.");
-                        }
-                    })
-                    .catch(function (error) {
-                        console.error('Voyager media remove failed', error);
-                        toastr.error("Error removing file.");
-                    })
-                    .finally(function () {
-                        $('#confirm_delete_modal').modal('hide');
-                    });
+                        })
+                        .finally(function () {
+                            hideModal(confirmDeleteModal);
+                        });
                 });
             }
-            $('[data-toggle="tooltip"]').tooltip();
         });
     </script>
 @stop

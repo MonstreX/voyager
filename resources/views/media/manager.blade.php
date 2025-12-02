@@ -348,7 +348,8 @@
 @endsection
 
 <script>
-    const voyagerMediaCsrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+    const voyagerMediaCsrfMeta = document.querySelector('meta[name="csrf-token"]');
+    const voyagerMediaCsrfToken = voyagerMediaCsrfMeta ? voyagerMediaCsrfMeta.getAttribute('content') : '';
     const voyagerMediaRequest = (url, payload = {}) => {
         return fetch(url, {
             method: 'POST',
@@ -481,6 +482,20 @@
             }
         },
         methods: {
+            toggleModalVisibility: function(modalId, shouldShow) {
+                if (typeof document === 'undefined') {
+                    return;
+                }
+                var modal = document.getElementById(modalId);
+                if (!modal || !window.VoyagerBootstrapCompat) {
+                    return;
+                }
+                if (shouldShow) {
+                    window.VoyagerBootstrapCompat.showModal(modal);
+                } else {
+                    window.VoyagerBootstrapCompat.hideModal(modal);
+                }
+            },
             sendRequest: function(url, payload = {}) {
                 return voyagerMediaRequest(url, payload).then(function(response) {
                     if (!response.ok) {
@@ -570,7 +585,7 @@
                     this.addFileToInput(file);
                 } else {
                     if (this.fileIs(this.selected_file, 'image')) {
-                        $('#imagemodal_' + this.uid).modal('show');
+                        this.toggleModalVisibility('imagemodal_' + this.uid, true);
                     } else {
                         // ...
                     }
@@ -835,7 +850,7 @@
                     console.error('Voyager media: createFolder failed', error);
                     toastr.error('{{ __('voyager::media.error_creating_dir') }}', "{{ __('voyager::generic.whoopsie') }}");
                 }).finally(function() {
-					$('#create_dir_modal_'+vm.uid).modal('hide');
+                    vm.toggleModalVisibility('create_dir_modal_' + vm.uid, false);
                 });
             },
             deleteFiles: function() {
@@ -858,7 +873,7 @@
                     console.error('Voyager media: deleteFiles failed', error);
                     toastr.error('{{ __('voyager::media.error_deleting_file') }}', "{{ __('voyager::generic.whoopsie') }}");
                 }).finally(function() {
-					$('#confirm_delete_modal_'+vm.uid).modal('hide');
+                    vm.toggleModalVisibility('confirm_delete_modal_' + vm.uid, false);
                 });
             },
             moveFiles: function(e) {
@@ -870,7 +885,7 @@
                 if (destination === '') {
                     return;
                 }
-                $('#move_files_modal_'+vm.uid).modal('hide');
+                vm.toggleModalVisibility('move_files_modal_' + vm.uid, false);
 				this.sendRequest('{{ route('voyager.media.move') }}', {
                     path: vm.current_folder,
                     files: vm.selected_files,
@@ -916,7 +931,7 @@
                     console.error('Voyager media: crop failed', error);
                     toastr.error('{{ __('voyager::media.error_uploading') }}', "{{ __('voyager::generic.whoopsie') }}");
                 }).finally(function() {
-                    $('#crop_modal_'+vm.uid).modal('hide');
+                    vm.toggleModalVisibility('crop_modal_' + vm.uid, false);
                 });
             },
             addSelectedFiles: function () {
@@ -1067,14 +1082,15 @@
 
             //Cropper
             if (this.allowCrop) {
-                var cropperModal = $(vm.$el).first().find('#crop_modal_'+vm.uid).first();
+                var cropperModal = document.getElementById('crop_modal_' + vm.uid);
                 var cropperInstance = null;
 
-                cropperModal.on('shown.bs.modal', function () {
-                    if (cropperInstance && typeof cropperInstance.destroy === 'function') {
-                        cropperInstance.destroy();
-                        cropperInstance = null;
-                    }
+                if (cropperModal) {
+                    cropperModal.addEventListener('shown.bs.modal', function () {
+                        if (cropperInstance && typeof cropperInstance.destroy === 'function') {
+                            cropperInstance.destroy();
+                            cropperInstance = null;
+                        }
                     var croppingImage = document.getElementById('cropping-image_'+vm.uid);
                     if (!croppingImage) {
                         console.warn('Voyager media: cropping image element not found');
@@ -1096,45 +1112,45 @@
                             };
                         }
                     });
-                });
 
-                cropperModal.on('hidden.bs.modal', function () {
-                    if (cropperInstance && typeof cropperInstance.destroy === 'function') {
-                        cropperInstance.destroy();
-                        cropperInstance = null;
-                    }
-                });
+                    cropperModal.addEventListener('hidden.bs.modal', function () {
+                        if (cropperInstance && typeof cropperInstance.destroy === 'function') {
+                            cropperInstance.destroy();
+                            cropperInstance = null;
+                        }
+                    });
+                }
             }
 
-            $(document).ready(function () {
-                $(".form-edit-add").submit(function (e) {
-                    if (vm.hidden_element) {
+            document.addEventListener('DOMContentLoaded', function () {
+                document.querySelectorAll('.form-edit-add').forEach(function (form) {
+                    form.addEventListener('submit', function (e) {
+                        if (!vm.hidden_element) {
+                            return;
+                        }
                         if (vm.maxSelectedFiles > 1) {
-                            var content = JSON.parse(vm.hidden_element.value);
+                            var content = JSON.parse(vm.hidden_element.value || '[]');
                             if (content.length < vm.minSelectedFiles) {
                                 e.preventDefault();
-                                var msg_sing = "{{ trans_choice('voyager::media.min_files_select', 1) }}";
-                                var msg_plur = "{{ trans_choice('voyager::media.min_files_select', 2) }}";
+                                var msgSing = "{{ trans_choice('voyager::media.min_files_select', 1) }}";
+                                var msgPlur = "{{ trans_choice('voyager::media.min_files_select', 2) }}";
                                 if (vm.minSelectedFiles == 1) {
-                                    toastr.error(msg_sing);
+                                    toastr.error(msgSing);
                                 } else {
-                                    toastr.error(msg_plur.replace('2', vm.minSelectedFiles));
+                                    toastr.error(msgPlur.replace('2', vm.minSelectedFiles));
                                 }
                             }
-                        } else {
-                            if (vm.minSelectedFiles > 0 && vm.hidden_element.value == '') {
-                                e.preventDefault();
-                                toastr.error("{{ trans_choice('voyager::media.min_files_select', 1) }}");
-                            }
+                        } else if (vm.minSelectedFiles > 0 && vm.hidden_element.value === '') {
+                            e.preventDefault();
+                            toastr.error("{{ trans_choice('voyager::media.min_files_select', 1) }}");
                         }
-                    }
+                    });
                 });
 
-                //Sortable selection list
-                var ddContainer = document.getElementById('dd_'+vm.uid);
+                var ddContainer = document.getElementById('dd_' + vm.uid);
                 if (ddContainer && window.Sortable) {
                     var ddList = ddContainer.querySelector('.dd-list') || ddContainer;
-                    Sortable.create(ddList, {
+                    window.Sortable.create(ddList, {
                         handle: '.file_link',
                         draggable: '.dd-item',
                         animation: 150,
@@ -1153,13 +1169,19 @@
                     });
                 }
 
-                $('#create_dir_modal_' + vm.uid).on('hidden.bs.modal', function () {
-                    vm.modals.new_folder.name = '';
-                });
+                var createDirModal = document.getElementById('create_dir_modal_' + vm.uid);
+                if (createDirModal) {
+                    createDirModal.addEventListener('hidden.bs.modal', function () {
+                        vm.modals.new_folder.name = '';
+                    });
+                }
 
-                $('#move_files_modal_' + vm.uid).on('hidden.bs.modal', function () {
-                    vm.modals.move_files.destination = '';
-                });
+                var moveFilesModal = document.getElementById('move_files_modal_' + vm.uid);
+                if (moveFilesModal) {
+                    moveFilesModal.addEventListener('hidden.bs.modal', function () {
+                        vm.modals.move_files.destination = '';
+                    });
+                }
             });
         },
     });

@@ -50,7 +50,7 @@
 @section('javascript')
 
 <script>
-$(document).ready(function () {
+document.addEventListener('DOMContentLoaded', function () {
     var breadNestable = document.querySelector('.dd');
     var csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
     var orderUrl = '{{ route('voyager.'.$dataType->slug.'.order') }}';

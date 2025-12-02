@@ -9,8 +9,10 @@ for(var i = 0; i < ace_editor_element.length; i++)
     var aceGlobal = window.ace;
 
     //Define path for libs
-    const assetsBase = $('meta[name="assets-path"]').attr('content') || '';
-    const explicitAceBase = window.voyagerAceBase || $('meta[name="voyager-ace-base"]').attr('content') || '';
+    const assetsMeta = document.querySelector('meta[name="assets-path"]');
+    const assetsBase = assetsMeta ? assetsMeta.getAttribute('content') : '';
+    const aceBaseMeta = document.querySelector('meta[name="voyager-ace-base"]');
+    const explicitAceBase = window.voyagerAceBase || (aceBaseMeta ? aceBaseMeta.getAttribute('content') : '') || '';
     const fallbackBase = assetsBase.replace(/\/?$/, '/') + 'js/ace/libs';
     const aceBasePath = (explicitAceBase || fallbackBase).replace(/\/?$/, '/');
     aceGlobal.config.set("basePath", aceBasePath);

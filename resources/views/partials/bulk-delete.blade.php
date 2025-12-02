@@ -30,41 +30,65 @@
 </div><!-- /.modal -->
 
 <script>
-window.onload = function () {
-    // Bulk delete selectors
-    var $bulkDeleteBtn = $('#bulk_delete_btn');
-    var $bulkDeleteModal = $('#bulk_delete_modal');
-    var $bulkDeleteCount = $('#bulk_delete_count');
-    var $bulkDeleteDisplayName = $('#bulk_delete_display_name');
-    var $bulkDeleteInput = $('#bulk_delete_input');
-    // Reposition modal to prevent z-index issues
-    $bulkDeleteModal.appendTo('body');
-    // Bulk delete listener
-    $bulkDeleteBtn.click(function () {
-        var ids = [];
-        var $checkedBoxes = $('#dataTable input[type=checkbox]:checked').not('.select_all');
-        var count = $checkedBoxes.length;
-        if (count) {
-            // Reset input value
-            $bulkDeleteInput.val('');
-            // Deletion info
-            var displayName = count > 1 ? '{{ $dataType->getTranslatedAttribute('display_name_plural') }}' : '{{ $dataType->getTranslatedAttribute('display_name_singular') }}';
-            displayName = displayName.toLowerCase();
-            $bulkDeleteCount.html(count);
-            $bulkDeleteDisplayName.html(displayName);
-            // Gather IDs
-            $.each($checkedBoxes, function () {
-                var value = $(this).val();
-                ids.push(value);
-            })
-            // Set input value
-            $bulkDeleteInput.val(ids);
-            // Show modal
-            $bulkDeleteModal.modal('show');
-        } else {
-            // No row selected
-            toastr.warning('{{ __('voyager::generic.bulk_delete_nothing') }}');
+window.addEventListener('load', function () {
+    const bulkDeleteBtn = document.getElementById('bulk_delete_btn');
+    const bulkDeleteModal = document.getElementById('bulk_delete_modal');
+    const bulkDeleteCount = document.getElementById('bulk_delete_count');
+    const bulkDeleteDisplayName = document.getElementById('bulk_delete_display_name');
+    const bulkDeleteInput = document.getElementById('bulk_delete_input');
+    const bootstrapCompat = window.VoyagerBootstrapCompat;
+
+    const showModal = (modal) => {
+        if (!modal) {
+            return;
         }
-    });
-}
+        if (bootstrapCompat && typeof bootstrapCompat.showModal === 'function') {
+            bootstrapCompat.showModal(modal);
+            return;
+        }
+        modal.classList.add('in');
+        modal.style.display = 'block';
+        modal.setAttribute('aria-hidden', 'false');
+        const backdrop = document.createElement('div');
+        backdrop.className = 'modal-backdrop fade in';
+        backdrop.dataset.modalTarget = modal.id;
+        document.body.appendChild(backdrop);
+        document.body.classList.add('modal-open');
+    };
+
+    if (bulkDeleteModal && bulkDeleteModal.parentElement !== document.body) {
+        document.body.appendChild(bulkDeleteModal);
+    }
+
+    if (bulkDeleteBtn) {
+        bulkDeleteBtn.addEventListener('click', function () {
+            const ids = [];
+            const checkedBoxes = Array.from(document.querySelectorAll('#dataTable input[type="checkbox"]:checked'))
+                .filter((checkbox) => !checkbox.classList.contains('select_all'));
+            const count = checkedBoxes.length;
+            if (!count) {
+                toastr.warning('{{ __('voyager::generic.bulk_delete_nothing') }}');
+                return;
+            }
+
+            checkedBoxes.forEach((checkbox) => {
+                ids.push(checkbox.value);
+            });
+
+            if (bulkDeleteCount) {
+                bulkDeleteCount.textContent = count;
+            }
+            if (bulkDeleteDisplayName) {
+                const displayName = count > 1
+                    ? '{{ $dataType->getTranslatedAttribute('display_name_plural') }}'
+                    : '{{ $dataType->getTranslatedAttribute('display_name_singular') }}';
+                bulkDeleteDisplayName.textContent = displayName.toLowerCase();
+            }
+            if (bulkDeleteInput) {
+                bulkDeleteInput.value = ids.join(',');
+            }
+            showModal(bulkDeleteModal);
+        });
+    }
+});
 </script>

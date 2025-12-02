@@ -361,16 +361,4 @@ if (typeof window !== 'undefined') {
     window.VoyagerInitMultilingual = initMultilingual;
 }
 
-if (typeof window !== 'undefined' && window.jQuery) {
-    const $ = window.jQuery;
-    $.fn[pluginName] = function(options = {}) {
-        return this.each(function initPlugin() {
-            if (!$.data(this, pluginName)) {
-                const instance = initMultilingualInstance(this, options);
-                $.data(this, pluginName, instance);
-            }
-        });
-    };
-}
-
 export { VoyagerMultilingual };

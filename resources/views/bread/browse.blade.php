@@ -366,6 +366,7 @@
             var deleteModal = document.getElementById('delete_modal');
             var deleteForm = document.getElementById('delete_form');
             var deleteActionTemplate = deleteForm ? deleteForm.getAttribute('action') : '';
+            var bootstrapCompat = window.VoyagerBootstrapCompat;
 
             function openDeleteModal(button) {
                 if (!deleteModal || !deleteForm || !deleteActionTemplate) {
@@ -379,8 +380,8 @@
             }
 
             function showModal(modal) {
-                if (window.jQuery) {
-                    window.jQuery(modal).modal('show');
+                if (bootstrapCompat && typeof bootstrapCompat.showModal === 'function') {
+                    bootstrapCompat.showModal(modal);
                     return;
                 }
                 modal.classList.add('in');

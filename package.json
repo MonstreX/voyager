@@ -19,7 +19,6 @@
     "ace-builds": "^1.12.3",
     "cropperjs": "^1.5.12",
     "flatpickr": "^4.6.13",
-    "jquery": "^3.6.1",
     "perfect-scrollbar": "^1.5.5",
     "sortablejs": "^1.15.0",
     "tinymce": "^6.8.6",

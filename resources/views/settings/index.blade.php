@@ -457,42 +457,90 @@
 
 @section('javascript')
     <script>
-        $('document').ready(function () {
-            $('#toggle_options').click(function () {
-                $('.new-settings-options').toggle();
-                if ($('#toggle_options .voyager-double-down').length) {
-                    $('#toggle_options .voyager-double-down').removeClass('voyager-double-down').addClass('voyager-double-up');
-                } else {
-                    $('#toggle_options .voyager-double-up').removeClass('voyager-double-up').addClass('voyager-double-down');
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggleOptions = document.getElementById('toggle_options');
+            const optionsSections = document.querySelectorAll('.new-settings-options');
+            const bootstrapCompat = window.VoyagerBootstrapCompat;
+
+            const showModal = (modal) => {
+                if (!modal) {
+                    return;
                 }
-            });
+                if (bootstrapCompat && typeof bootstrapCompat.showModal === 'function') {
+                    bootstrapCompat.showModal(modal);
+                    return;
+                }
+                modal.classList.add('in');
+                modal.style.display = 'block';
+                modal.setAttribute('aria-hidden', 'false');
+                const backdrop = document.createElement('div');
+                backdrop.className = 'modal-backdrop fade in';
+                backdrop.dataset.modalTarget = modal.id;
+                document.body.appendChild(backdrop);
+                document.body.classList.add('modal-open');
+            };
+
+            if (toggleOptions) {
+                toggleOptions.addEventListener('click', function () {
+                    optionsSections.forEach((section) => {
+                        const isHidden = window.getComputedStyle(section).display === 'none';
+                        section.style.display = isHidden ? '' : 'none';
+                    });
+                    const icon = toggleOptions.querySelector('.voyager-double-down, .voyager-double-up');
+                    if (icon) {
+                        icon.classList.toggle('voyager-double-down');
+                        icon.classList.toggle('voyager-double-up');
+                    }
+                });
+            }
 
             @can('delete', Voyager::model('Setting'))
-            $('.panel-actions .voyager-trash').click(function () {
-                var display = $(this).data('display-name') + '/' + $(this).data('display-key');
+            (function registerDeleteHandlers() {
+                const deleteModal = document.getElementById('delete_modal');
+                const deleteForm = document.getElementById('delete_form');
+                const deleteTitle = document.getElementById('delete_setting_title');
+                const deleteActionTemplate = '{{ route('voyager.settings.delete', [ 'id' => '__id' ]) }}';
 
-                $('#delete_setting_title').text(display);
-
-                $('#delete_form')[0].action = '{{ route('voyager.settings.delete', [ 'id' => '__id' ]) }}'.replace('__id', $(this).data('id'));
-                $('#delete_modal').modal('show');
-            });
+                document.querySelectorAll('.panel-actions .voyager-trash').forEach((button) => {
+                    button.addEventListener('click', () => {
+                        const display = `${button.dataset.displayName || ''}/${button.dataset.displayKey || ''}`;
+                        if (deleteTitle) {
+                            deleteTitle.textContent = display;
+                        }
+                        if (deleteForm) {
+                            deleteForm.action = deleteActionTemplate.replace('__id', button.dataset.id || '');
+                        }
+                        showModal(deleteModal);
+                    });
+                });
+            })();
             @endcan
 
-            if (window.VoyagerInitToggles) {
+            if (typeof window.VoyagerInitToggles === 'function') {
                 window.VoyagerInitToggles();
             }
 
-            $('[data-toggle="tab"]').click(function() {
-                $(".setting_tab").val($(this).html());
+            document.querySelectorAll('[data-toggle="tab"]').forEach((tabButton) => {
+                tabButton.addEventListener('click', function () {
+                    const label = tabButton.textContent || '';
+                    document.querySelectorAll('.setting_tab').forEach((input) => {
+                        input.value = label.trim();
+                    });
+                });
             });
 
-            $('.delete_value').click(function(e) {
-                e.preventDefault();
-                $(this).closest('form').attr('action', $(this).attr('href'));
-                $(this).closest('form').submit();
+            document.querySelectorAll('.delete_value').forEach((link) => {
+                link.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    const form = link.closest('form');
+                    if (!form) {
+                        return;
+                    }
+                    form.setAttribute('action', link.getAttribute('href'));
+                    form.submit();
+                });
             });
 
-            // Initiliaze rich text editor
             if (window.loadVoyagerTinyMCE) {
                 window.loadVoyagerTinyMCE()
                     .then(function () {

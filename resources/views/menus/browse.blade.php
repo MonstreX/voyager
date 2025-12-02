@@ -107,10 +107,40 @@
 
 @section('javascript')
     <script>
-        $('td').on('click', '.delete', function (e) {
-            $('#delete_form')[0].action = '{{ route('voyager.'.$dataType->slug.'.destroy', ['id' => '__menu']) }}'.replace('__menu', $(this).data('id'));
+        document.addEventListener('DOMContentLoaded', function () {
+            const deleteModal = document.getElementById('delete_modal');
+            const deleteForm = document.getElementById('delete_form');
+            const deleteActionTemplate = '{{ route('voyager.'.$dataType->slug.'.destroy', ['id' => '__menu']) }}';
+            const bootstrapCompat = window.VoyagerBootstrapCompat;
 
-            $('#delete_modal').modal('show');
+            const showModal = (modal) => {
+                if (!modal) {
+                    return;
+                }
+                if (bootstrapCompat && typeof bootstrapCompat.showModal === 'function') {
+                    bootstrapCompat.showModal(modal);
+                    return;
+                }
+                modal.classList.add('in');
+                modal.style.display = 'block';
+                modal.setAttribute('aria-hidden', 'false');
+                const backdrop = document.createElement('div');
+                backdrop.className = 'modal-backdrop fade in';
+                backdrop.dataset.modalTarget = modal.id;
+                document.body.appendChild(backdrop);
+                document.body.classList.add('modal-open');
+            };
+
+            document.querySelectorAll('td .delete').forEach((button) => {
+                button.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    if (!deleteForm) {
+                        return;
+                    }
+                    deleteForm.action = deleteActionTemplate.replace('__menu', button.dataset.id || '');
+                    showModal(deleteModal);
+                });
+            });
         });
     </script>
 @stop

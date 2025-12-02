@@ -178,6 +178,16 @@
                     this.deleteIndex(this.getColumnsIndex(column.name));
                 }
             },
+            columnsMatch(first, second) {
+                const normalizedFirst = Array.isArray(first) ? [...first] : [];
+                const normalizedSecond = Array.isArray(second) ? [...second] : [];
+                if (normalizedFirst.length !== normalizedSecond.length) {
+                    return false;
+                }
+                const sortedFirst = normalizedFirst.slice().sort();
+                const sortedSecond = normalizedSecond.slice().sort();
+                return sortedFirst.every((value, index) => value === sortedSecond[index]);
+            },
             getColumnsIndex(columns) {
                 // todo: detect if a column has a composite index
                 //  if so, maybe disable its Index input, and tell the user to go to special Index form (advanced view)?
@@ -189,7 +199,7 @@
 
                 for (i in this.table.indexes) {
                     // if there is no difference between columns
-                    if (!($(this.table.indexes[i].columns).not(columns).get().length)) {
+                    if (this.columnsMatch(this.table.indexes[i].columns, columns)) {
                         index = this.table.indexes[i];
                         break;
                     }

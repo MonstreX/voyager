@@ -4,12 +4,13 @@
 
 @push('javascript')
     <script>
-        $(document).ready(function() {
+        document.addEventListener('DOMContentLoaded', function () {
             var additionalConfig = {
                 selector: 'textarea.richTextBox[name="{{ $row->field }}"]',
-            }
+            };
 
-            $.extend(additionalConfig, {!! json_encode($options->tinymceOptions ?? (object)[]) !!})
+            var tinymceOverrides = {!! json_encode($options->tinymceOptions ?? (object)[]) !!} || {};
+            additionalConfig = Object.assign(additionalConfig, tinymceOverrides);
 
             if (window.loadVoyagerTinyMCE) {
                 window.loadVoyagerTinyMCE()

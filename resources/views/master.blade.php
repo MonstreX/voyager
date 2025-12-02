@@ -124,7 +124,6 @@ if (\Illuminate\Support\Str::startsWith(Auth::user()->avatar, 'http://') || \Ill
 
 
 <script src="{{ voyager_asset('js/ace/libs/ace.js') }}"></script>
-<!-- jQuery must be loaded BEFORE app.js -->
 <script src="{{ voyager_asset('js/app.js') }}"></script>
 
 <script>

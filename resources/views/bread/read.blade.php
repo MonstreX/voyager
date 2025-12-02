@@ -166,27 +166,57 @@
 @section('javascript')
     @if ($isModelTranslatable)
         <script>
-            $(document).ready(function () {
-                $('.side-body').multilingual();
+            document.addEventListener('DOMContentLoaded', function () {
+                if (window.VoyagerInitMultilingual) {
+                    window.VoyagerInitMultilingual(document.querySelectorAll('.side-body'));
+                }
             });
         </script>
     @endif
     <script>
-        var deleteFormAction;
-        $('.delete').on('click', function (e) {
-            var form = $('#delete_form')[0];
+        document.addEventListener('DOMContentLoaded', function () {
+            const deleteButtons = document.querySelectorAll('.delete');
+            const deleteForm = document.getElementById('delete_form');
+            const deleteModal = document.getElementById('delete_modal');
+            const bootstrapCompat = window.VoyagerBootstrapCompat;
+            let deleteFormAction = deleteForm ? deleteForm.getAttribute('action') : null;
 
-            if (!deleteFormAction) {
-                // Save form action initial value
-                deleteFormAction = form.action;
-            }
+            const showModal = (modal) => {
+                if (!modal) {
+                    return;
+                }
+                if (bootstrapCompat && typeof bootstrapCompat.showModal === 'function') {
+                    bootstrapCompat.showModal(modal);
+                    return;
+                }
+                modal.classList.add('in');
+                modal.style.display = 'block';
+                modal.setAttribute('aria-hidden', 'false');
+                const backdrop = document.createElement('div');
+                backdrop.className = 'modal-backdrop fade in';
+                backdrop.dataset.modalTarget = modal.id;
+                document.body.appendChild(backdrop);
+                document.body.classList.add('modal-open');
+            };
 
-            form.action = deleteFormAction.match(/\/[0-9]+$/)
-                ? deleteFormAction.replace(/([0-9]+$)/, $(this).data('id'))
-                : deleteFormAction + '/' + $(this).data('id');
-
-            $('#delete_modal').modal('show');
+            deleteButtons.forEach((button) => {
+                button.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    if (!deleteForm) {
+                        return;
+                    }
+                    if (!deleteFormAction) {
+                        deleteFormAction = deleteForm.getAttribute('action');
+                    }
+                    const id = button.dataset.id || '';
+                    if (/\/[0-9]+$/.test(deleteFormAction)) {
+                        deleteForm.setAttribute('action', deleteFormAction.replace(/([0-9]+$)/, id));
+                    } else {
+                        deleteForm.setAttribute('action', `${deleteFormAction}/${id}`);
+                    }
+                    showModal(deleteModal);
+                });
+            });
         });
-
     </script>
 @stop

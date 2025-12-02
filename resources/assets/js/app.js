@@ -1,4 +1,3 @@
-import './jquery-first';
 import './modules/csrf';
 import '../sass/app.scss';
 import flatpickr from 'flatpickr';
@@ -7,26 +6,6 @@ import 'flatpickr/dist/flatpickr.css';
 import SimpleTable from './modules/simple-table';
 import VoyagerToaster from './modules/toaster';
 window.VoyagerSimpleTable = SimpleTable;
-
-const loadLegacyPlugin = (source, sourceName) => {
-    if (typeof window === 'undefined') {
-        return;
-    }
-
-    const runner = new Function(
-        'window',
-        'document',
-        '$',
-        'jQuery',
-        'define',
-        'exports',
-        'module',
-        'undefined',
-        `${source}\n//# sourceURL=${sourceName}`
-    );
-
-    runner(window, document, window.jQuery, window.jQuery, undefined, undefined, undefined);
-};
 
 import Sortable from 'sortablejs';
 window.Sortable = Sortable;
@@ -1829,91 +1808,12 @@ const initBootstrapCompat = () => {
     });
 };
 
-const registerjQueryBridges = () => {
-    if (!window.jQuery) {
-        return;
-    }
-    const $ = window.jQuery;
-    $.fn.modal = function (action) {
-        return this.each(function () {
-            if (action === 'hide') {
-                hideModalElement(this);
-            } else {
-                showModalElement(this);
-            }
-        });
-    };
-    $.fn.collapse = function (action) {
-        return this.each(function () {
-            if (action === 'hide') {
-                hideCollapseElement(this);
-            } else if (action === 'show') {
-                showCollapseElement(this);
-            } else {
-                toggleCollapseElement(this);
-            }
-        });
-    };
-    $.fn.tab = function () {
-        return this.each(function () {
-            activateTabTrigger(this);
-        });
-    };
-    $.fn.dropdown = function () {
-        return this.each(function () {
-            toggleDropdownFromTrigger(this);
-        });
-    };
-    $.fn.tooltip = function () {
-        initTooltips(this.toArray());
-        return this;
-    };
-
-    if ($.fn.disableSelection === undefined) {
-        $.fn.disableSelection = function () {
-            return this.each(function () {
-                this.style.userSelect = 'none';
-                this.style.webkitUserSelect = 'none';
-                this.style.msUserSelect = 'none';
-                this.style.MozUserSelect = 'none';
-                this.setAttribute('unselectable', 'on');
-            });
-        };
-    }
-
-    if ($.fn.sortable === undefined && typeof window.Sortable !== 'undefined') {
-        $.fn.sortable = function (options = {}) {
-            return this.each(function () {
-                const element = this;
-                if (element.__voyagerSortable) {
-                    element.__voyagerSortable.destroy();
-                }
-                const sortable = window.Sortable.create(element, {
-                    handle: options.handle || null,
-                    animation: typeof options.animation === 'number' ? options.animation : 150,
-                    onSort: function (evt) {
-                        if (typeof options.update === 'function') {
-                            options.update.call(element, evt, evt);
-                        }
-                    }
-                });
-                element.__voyagerSortable = sortable;
-                if (typeof options.create === 'function') {
-                    options.create.call(element, null, {});
-                }
-            });
-        };
-    }
-};
-
 window.VoyagerInitTooltips = initTooltips;
 window.VoyagerBootstrapCompat = {
     init: initBootstrapCompat,
     showModal: showModalElement,
     hideModal: hideModalElement
 };
-
-registerjQueryBridges();
 
 // Only non-jQuery dependencies here
 import PerfectScrollbar from 'perfect-scrollbar';

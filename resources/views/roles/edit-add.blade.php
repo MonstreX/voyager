@@ -93,40 +93,64 @@
 
 @section('javascript')
     <script>
-        $('document').ready(function () {
-            if (window.VoyagerInitToggles) {
-                window.VoyagerInitToggles();
+        document.addEventListener('DOMContentLoaded', function () {
+            const voyagerInitToggles = window.VoyagerInitToggles;
+            if (typeof voyagerInitToggles === 'function') {
+                voyagerInitToggles();
             }
 
-            $('.permission-group').on('change', function(){
-                $(this).siblings('ul').find("input[type='checkbox']").prop('checked', this.checked);
-            });
+            const permissionGroups = Array.from(document.querySelectorAll('.permission-group'));
 
-            $('.permission-select-all').on('click', function(){
-                $('ul.permissions').find("input[type='checkbox']").prop('checked', true);
-                return false;
-            });
+            const getGroupListInputs = (groupCheckbox) => {
+                const container = groupCheckbox ? groupCheckbox.parentElement : null;
+                const list = container ? container.querySelector('ul') : null;
+                return list ? Array.from(list.querySelectorAll("input[type='checkbox']")) : [];
+            };
 
-            $('.permission-deselect-all').on('click', function(){
-                $('ul.permissions').find("input[type='checkbox']").prop('checked', false);
-                return false;
-            });
-
-            function parentChecked(){
-                $('.permission-group').each(function(){
-                    var allChecked = true;
-                    $(this).siblings('ul').find("input[type='checkbox']").each(function(){
-                        if(!this.checked) allChecked = false;
-                    });
-                    $(this).prop('checked', allChecked);
+            const syncGroupState = () => {
+                permissionGroups.forEach((group) => {
+                    const inputs = getGroupListInputs(group);
+                    if (!inputs.length) {
+                        return;
+                    }
+                    group.checked = inputs.every((input) => input.checked);
                 });
-            }
+            };
 
-            parentChecked();
-
-            $('.the-permission').on('change', function(){
-                parentChecked();
+            permissionGroups.forEach((group) => {
+                group.addEventListener('change', () => {
+                    getGroupListInputs(group).forEach((input) => {
+                        input.checked = group.checked;
+                    });
+                });
             });
+
+            const setAllPermissions = (checked) => {
+                document.querySelectorAll('ul.permissions input[type="checkbox"]').forEach((input) => {
+                    input.checked = checked;
+                });
+                syncGroupState();
+            };
+
+            document.querySelectorAll('.permission-select-all').forEach((button) => {
+                button.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    setAllPermissions(true);
+                });
+            });
+
+            document.querySelectorAll('.permission-deselect-all').forEach((button) => {
+                button.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    setAllPermissions(false);
+                });
+            });
+
+            document.querySelectorAll('.the-permission').forEach((input) => {
+                input.addEventListener('change', syncGroupState);
+            });
+
+            syncGroupState();
         });
     </script>
 @stop

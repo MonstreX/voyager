@@ -14,7 +14,7 @@
                 this.$emit('columnAdded', column);
             },
             makeColumn(options) {
-                return $.extend({
+                return Object.assign({
                     name: '',
                     oldName: '',
                     type: getDbType('integer'),

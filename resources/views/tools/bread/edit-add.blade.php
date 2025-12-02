@@ -426,236 +426,352 @@
 @section('javascript')
     <script>
         window.invalidEditors = [];
-        var validationAlerts = $('.validation-error');
-        validationAlerts.hide();
-        $(function () {
+        let validationAlerts = [];
+
+        document.addEventListener('DOMContentLoaded', function () {
+            validationAlerts = Array.from(document.querySelectorAll('.validation-error'));
+            hideValidationAlerts();
+
             @if ($isModelTranslatable)
-                /**
-                 * Multilingual setup
-                 */
-                $('.side-body').multilingual({
-                    "form":    'form',
-                    "editing": true
-                });
+                if (typeof window.VoyagerInitMultilingual === 'function') {
+                    window.VoyagerInitMultilingual(document.querySelectorAll('.side-body'), {
+                        form: 'form',
+                        editing: true
+                    });
+                }
             @endif
-            /**
-             * Reorder items
-             */
-            reOrderItems();
 
-            $('#bread-items').disableSelection();
+            initBreadItemsSortable();
+            initAceEditors();
+            initRelationshipControls();
 
-            $('[data-toggle="tooltip"]').tooltip();
-
-            if (window.VoyagerInitToggles) {
+            if (typeof window.VoyagerInitToggles === 'function') {
                 window.VoyagerInitToggles();
             }
+            if (typeof window.VoyagerInitTooltips === 'function') {
+                window.VoyagerInitTooltips(document.querySelectorAll('[data-toggle="tooltip"]'));
+            }
+        });
 
-            $('textarea[data-editor]').each(function () {
-                var textarea = $(this),
-                mode = textarea.data('editor'),
-                editDiv = $('<div>').insertBefore(textarea),
-                editor = ace.edit(editDiv[0]),
-                _session = editor.getSession(),
-                valid = false;
-                textarea.hide();
+        function hideValidationAlerts() {
+            validationAlerts.forEach(function (alert) {
+                alert.style.display = 'none';
+            });
+        }
 
-                // Validate JSON
-                _session.on("changeAnnotation", function(){
-                    valid = _session.getAnnotations().length ? false : true;
-                    if (!valid) {
-                        if (window.invalidEditors.indexOf(textarea.attr('id')) < 0) {
-                            window.invalidEditors.push(textarea.attr('id'));
-                        }
-                    } else {
-                        for(var i = window.invalidEditors.length - 1; i >= 0; i--) {
-                            if(window.invalidEditors[i] == textarea.attr('id')) {
-                               window.invalidEditors.splice(i, 1);
-                            }
-                        }
+        function showValidationForTextarea(textarea, visible) {
+            if (!textarea) {
+                return;
+            }
+            const container = textarea.parentElement;
+            const validationError = container ? container.querySelector('.validation-error') : null;
+            if (validationError) {
+                validationError.style.display = visible ? 'block' : 'none';
+            }
+        }
+
+        function initAceEditors() {
+            document.querySelectorAll('textarea[data-editor]').forEach(function (textarea) {
+                const mode = textarea.dataset.editor || 'json';
+                const editDiv = document.createElement('div');
+                textarea.parentNode.insertBefore(editDiv, textarea);
+                const editor = ace.edit(editDiv);
+                const session = editor.getSession();
+                let isValid = false;
+                textarea.style.display = 'none';
+
+                session.on('changeAnnotation', function () {
+                    isValid = session.getAnnotations().length === 0;
+                    const textareaId = textarea.id;
+                    if (!textareaId) {
+                        return;
+                    }
+                    if (!isValid && window.invalidEditors.indexOf(textareaId) === -1) {
+                        window.invalidEditors.push(textareaId);
+                    } else if (isValid) {
+                        window.invalidEditors = window.invalidEditors.filter(function (id) {
+                            return id !== textareaId;
+                        });
                     }
                 });
 
-                // Use workers only when needed
                 editor.on('focus', function () {
-                    _session.setUseWorker(true);
+                    session.setUseWorker(true);
                 });
                 editor.on('blur', function () {
-                    if (valid) {
-                        textarea.siblings('.validation-error').hide();
-                        _session.setUseWorker(false);
+                    if (isValid) {
+                        showValidationForTextarea(textarea, false);
+                        session.setUseWorker(false);
                     } else {
-                        textarea.siblings('.validation-error').show();
+                        showValidationForTextarea(textarea, true);
                     }
                 });
 
-                _session.setUseWorker(false);
-
+                session.setUseWorker(false);
                 editor.setAutoScrollEditorIntoView(true);
                 editor.$blockScrolling = Infinity;
-                editor.setOption("maxLines", 30);
-                editor.setOption("minLines", 4);
-                editor.setOption("showLineNumbers", false);
-                editor.setTheme("ace/theme/github");
-                _session.setMode("ace/mode/json");
-                if (textarea.val()) {
-                    _session.setValue(JSON.stringify(JSON.parse(textarea.val()), null, 4));
+                editor.setOption('maxLines', 30);
+                editor.setOption('minLines', 4);
+                editor.setOption('showLineNumbers', false);
+                editor.setTheme('ace/theme/github');
+                session.setMode('ace/mode/json');
+                if (textarea.value) {
+                    try {
+                        session.setValue(JSON.stringify(JSON.parse(textarea.value), null, 4));
+                    } catch (error) {
+                        console.warn('Voyager BREAD editor: failed to parse textarea JSON', error);
+                        session.setValue(textarea.value);
+                    }
                 }
+                session.setMode('ace/mode/' + mode);
 
-                _session.setMode("ace/mode/" + mode);
-
-                // copy back to textarea on form submit...
-                textarea.closest('form').on('submit', function (ev) {
+                const form = textarea.closest('form');
+                if (!form) {
+                    return;
+                }
+                form.addEventListener('submit', function (event) {
                     if (window.invalidEditors.length) {
-                        ev.preventDefault();
-                        ev.stopPropagation();
-                        validationAlerts.hide();
-                        for (var i = window.invalidEditors.length - 1; i >= 0; i--) {
-                            $('#'+window.invalidEditors[i]).siblings('.validation-error').show();
-                        }
-                        toastr.error('{{ __('voyager::json.invalid_message') }}', '{{ __('voyager::json.validation_errors') }}', {"preventDuplicates": true, "preventOpenDuplicates": true});
-                    } else {
-                        if (_session.getValue()) {
-                            // uglify JSON object and update textarea for submit purposes
-                            textarea.val(JSON.stringify(JSON.parse(_session.getValue())));
-                        }else{
-                            textarea.val('');
-                        }
-                    }
-                });
-            });
-
-        });
-
-        function reOrderItems(){
-            $('#bread-items').sortable({
-                handle: '.handler',
-                update: function (e, ui) {
-                    var _rows = $('#bread-items').find('.row_order'),
-                        _size = _rows.length;
-
-                    for (var i = 0; i < _size; i++) {
-                        $(_rows[i]).val(i+1);
-                    }
-                },
-                create: function (event, ui) {
-                    sort();
-                }
-            });
-        }
-
-        function sort() {
-            var sortableList = $('#bread-items');
-            var listitems = $('div.row.row-dd', sortableList);
-
-            listitems.sort(function (a, b) {
-                return (parseInt($(a).find('.row_order').val()) > parseInt($(b).find('.row_order').val()))  ? 1 : -1;
-            });
-            sortableList.append(listitems);
-
-        }
-
-        /********** Relationship functionality **********/
-
-        $(function () {
-            $('.relationship_type').change(function(){
-                $(this).parent().parent().find('.belongsToManyShow, .belongsToShow, .hasOneShow, .hasManyShow').hide();
-                $(this).parent().parent().find('.' + $(this).val() + 'Show').show();
-                // hasOneShow has a prepopulated select, only one between the following should be enabled
-                $(this).parent().parent().find('.hasOneShow select').attr('disabled', true);
-                $(this).parent().parent().find('.belongsToShow select').attr('disabled', false);
-
-                if($(this).val() == 'belongsTo'){
-                    $(this).parent().parent().find('.relationshipField').show();
-                    $(this).parent().parent().find('.relationshipPivot').hide();
-                    $(this).parent().parent().find('.relationship_taggable').hide();
-                    $(this).parent().parent().find('.hasOneMany').removeClass('flexed');
-                    $(this).parent().parent().find('.belongsTo').addClass('flexed');
-                } else if($(this).val() == 'hasOne' || $(this).val() == 'hasMany'){
-                    $(this).parent().parent().find('.relationshipField').show();
-                    $(this).parent().parent().find('.relationshipPivot').hide();
-                    $(this).parent().parent().find('.relationship_taggable').hide();
-                    $(this).parent().parent().find('.hasOneMany').addClass('flexed');
-                    $(this).parent().parent().find('.belongsTo').removeClass('flexed');
-                    $(this).parent().parent().find('.hasOneShow select').attr('disabled', false);
-                    $(this).parent().parent().find('.belongsToShow select').attr('disabled', true);
-                } else {
-                    $(this).parent().parent().find('.relationshipField').hide();
-                    $(this).parent().parent().find('.relationshipPivot').css('display', 'flex');
-                    $(this).parent().parent().find('.relationship_taggable').show();
-                }
-            }).trigger('change');
-
-            $('.btn-new-relationship').click(function(){
-                // Update table data
-                $('#new_relationship_modal .relationship_table').trigger('change');
-
-                $('#new_relationship_modal').modal('show');
-            });
-
-            relationshipTextDataBinding();
-
-            $('.relationship_table').on('change', function(){
-                populateRowsFromTable($(this));
-            });
-
-            $('.voyager-relationship-details-btn').click(function(){
-                $(this).toggleClass('open');
-                if($(this).hasClass('open')){
-                    $(this).parent().parent().find('.voyager-relationship-details').slideDown();
-                    populateRowsFromTable($(this).parent().parent().find('select.relationship_table'));
-                } else {
-                    $(this).parent().parent().find('.voyager-relationship-details').slideUp();
-                }
-            });
-
-        });
-
-        function populateRowsFromTable(dropdown){
-            var tbl = dropdown.val();
-
-            $.get('{{ route('voyager.database.index') }}/' + tbl, function(data){
-                $(dropdown).parent().parent().find('.rowDrop').each(function(){
-                    var selected_value = $(this).data('selected');
-                    var options = $.map(data, function (obj, key) {
-                        return {id: key, text: key};
-                    });
-
-                    if (window.VoyagerSelectSetOptions) {
-                        window.VoyagerSelectSetOptions(this, options, selected_value);
-                        if (selected_value) {
-                            this.dispatchEvent(new Event('change', { bubbles: true }));
-                        }
-                    } else {
-                        var select = this;
-                        select.innerHTML = '';
-                        options.forEach(function(option) {
-                            var optionEl = document.createElement('option');
-                            optionEl.value = option.id;
-                            optionEl.text = option.text;
-                            select.appendChild(optionEl);
+                        event.preventDefault();
+                        event.stopPropagation();
+                        hideValidationAlerts();
+                        window.invalidEditors.forEach(function (id) {
+                            const invalidTextarea = document.getElementById(id);
+                            showValidationForTextarea(invalidTextarea, true);
                         });
-                        select.value = selected_value || (select.options[0] ? select.options[0].value : '');
-                        select.dispatchEvent(new Event('change', { bubbles: true }));
+                        toastr.error('{{ __('voyager::json.invalid_message') }}', '{{ __('voyager::json.validation_errors') }}', {
+                            preventDuplicates: true,
+                            preventOpenDuplicates: true
+                        });
+                        return;
+                    }
+                    const value = session.getValue();
+                    if (value) {
+                        try {
+                            textarea.value = JSON.stringify(JSON.parse(value));
+                        } catch (error) {
+                            textarea.value = value;
+                        }
+                    } else {
+                        textarea.value = '';
                     }
                 });
             });
         }
 
-        function relationshipTextDataBinding(){
-            $('.relationship_display_name').bind('input', function() {
-                $(this).parent().parent().parent().find('.label_relationship p').text($(this).val());
+        function initBreadItemsSortable() {
+            const container = document.getElementById('bread-items');
+            if (!container || typeof window.Sortable === 'undefined') {
+                return;
+            }
+            container.style.userSelect = 'none';
+            container.setAttribute('unselectable', 'on');
+
+            window.Sortable.create(container, {
+                handle: '.handler',
+                animation: 150,
+                onEnd: function () {
+                    updateRowOrders();
+                },
+                onStart: sortBreadItems
             });
-            $('.relationship_table').on('change', function(){
-                var tbl_selected_text = $(this).find('option:selected').text();
-                $(this).parent().parent().find('.label_table_name').text(tbl_selected_text);
-            });
-            $('.relationship_table').each(function(){
-                var tbl_selected_text = $(this).find('option:selected').text();
-                $(this).parent().parent().find('.label_table_name').text(tbl_selected_text);
+
+            sortBreadItems();
+            updateRowOrders();
+        }
+
+        function updateRowOrders() {
+            document.querySelectorAll('#bread-items .row_order').forEach(function (input, index) {
+                input.value = index + 1;
             });
         }
 
+        function sortBreadItems() {
+            const container = document.getElementById('bread-items');
+            if (!container) {
+                return;
+            }
+            const items = Array.from(container.querySelectorAll('div.row.row-dd'));
+            items.sort(function (a, b) {
+                const aInput = a.querySelector('.row_order');
+                const bInput = b.querySelector('.row_order');
+                const aValue = parseInt(aInput ? aInput.value : '0', 10);
+                const bValue = parseInt(bInput ? bInput.value : '0', 10);
+                return aValue > bValue ? 1 : -1;
+            });
+            items.forEach(function (item) {
+                container.appendChild(item);
+            });
+        }
+
+        function initRelationshipControls() {
+            document.querySelectorAll('.relationship_type').forEach(function (select) {
+                select.addEventListener('change', function () {
+                    handleRelationshipTypeChange(select);
+                });
+                handleRelationshipTypeChange(select);
+            });
+
+            document.querySelectorAll('.btn-new-relationship').forEach(function (button) {
+                button.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    document.querySelectorAll('#new_relationship_modal .relationship_table').forEach(function (dropdown) {
+                        dropdown.dispatchEvent(new Event('change', { bubbles: true }));
+                    });
+                    showModalById('new_relationship_modal');
+                });
+            });
+
+            document.querySelectorAll('.relationship_table').forEach(function (dropdown) {
+                dropdown.addEventListener('change', function () {
+                    populateRowsFromTable(dropdown);
+                    updateRelationshipTableLabel(dropdown);
+                });
+                updateRelationshipTableLabel(dropdown);
+            });
+
+            document.querySelectorAll('.relationship_display_name').forEach(function (input) {
+                input.addEventListener('input', function () {
+                    updateRelationshipDisplayName(input);
+                });
+                updateRelationshipDisplayName(input);
+            });
+
+            document.querySelectorAll('.voyager-relationship-details-btn').forEach(function (button) {
+                button.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    button.classList.toggle('open');
+                    const wrapper = button.parentElement ? button.parentElement.parentElement : null;
+                    const details = wrapper ? wrapper.querySelector('.voyager-relationship-details') : null;
+                    if (details) {
+                        details.style.display = button.classList.contains('open') ? 'block' : 'none';
+                    }
+                    if (button.classList.contains('open')) {
+                        const dropdown = wrapper ? wrapper.querySelector('select.relationship_table') : null;
+                        if (dropdown) {
+                            populateRowsFromTable(dropdown);
+                        }
+                    }
+                });
+            });
+        }
+
+        function handleRelationshipTypeChange(select) {
+            const fieldWrapper = select.parentElement ? select.parentElement.parentElement : null;
+            if (!fieldWrapper) {
+                return;
+            }
+            fieldWrapper.querySelectorAll('.belongsToManyShow, .belongsToShow, .hasOneShow, .hasManyShow').forEach(function (section) {
+                section.style.display = 'none';
+            });
+            const target = fieldWrapper.querySelector('.' + select.value + 'Show');
+            if (target) {
+                target.style.display = '';
+            }
+            const hasOneSelect = fieldWrapper.querySelector('.hasOneShow select');
+            const belongsToSelect = fieldWrapper.querySelector('.belongsToShow select');
+            if (hasOneSelect) {
+                hasOneSelect.disabled = true;
+            }
+            if (belongsToSelect) {
+                belongsToSelect.disabled = false;
+            }
+
+            const relationshipField = fieldWrapper.querySelector('.relationshipField');
+            const relationshipPivot = fieldWrapper.querySelector('.relationshipPivot');
+            const relationshipTaggable = fieldWrapper.querySelector('.relationship_taggable');
+            const hasOneMany = fieldWrapper.querySelector('.hasOneMany');
+            const belongsTo = fieldWrapper.querySelector('.belongsTo');
+
+            if (select.value === 'belongsTo') {
+                if (relationshipField) relationshipField.style.display = '';
+                if (relationshipPivot) relationshipPivot.style.display = 'none';
+                if (relationshipTaggable) relationshipTaggable.style.display = 'none';
+                if (hasOneMany) hasOneMany.classList.remove('flexed');
+                if (belongsTo) belongsTo.classList.add('flexed');
+            } else if (select.value === 'hasOne' || select.value === 'hasMany') {
+                if (relationshipField) relationshipField.style.display = '';
+                if (relationshipPivot) relationshipPivot.style.display = 'none';
+                if (relationshipTaggable) relationshipTaggable.style.display = 'none';
+                if (hasOneMany) hasOneMany.classList.add('flexed');
+                if (belongsTo) belongsTo.classList.remove('flexed');
+                if (hasOneSelect) hasOneSelect.disabled = false;
+                if (belongsToSelect) belongsToSelect.disabled = true;
+            } else {
+                if (relationshipField) relationshipField.style.display = 'none';
+                if (relationshipPivot) relationshipPivot.style.display = 'flex';
+                if (relationshipTaggable) relationshipTaggable.style.display = '';
+            }
+        }
+
+        function showModalById(id) {
+            const modal = document.getElementById(id);
+            if (modal && window.VoyagerBootstrapCompat) {
+                window.VoyagerBootstrapCompat.showModal(modal);
+            }
+        }
+
+        function populateRowsFromTable(dropdown) {
+            if (!dropdown || !dropdown.value) {
+                return;
+            }
+            const tbl = dropdown.value;
+            const container = dropdown.parentElement ? dropdown.parentElement.parentElement : null;
+            if (!container) {
+                return;
+            }
+            const endpoint = '{{ route('voyager.database.index') }}/' + encodeURIComponent(tbl);
+            fetch(endpoint, { headers: { 'Accept': 'application/json' } })
+                .then(function (response) {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch table columns');
+                    }
+                    return response.json();
+                })
+                .then(function (data) {
+                    const options = Object.keys(data || {}).map(function (key) {
+                        return { id: key, text: key };
+                    });
+                    container.querySelectorAll('.rowDrop').forEach(function (select) {
+                        const selectedValue = select.dataset.selected || '';
+                        if (window.VoyagerSelectSetOptions) {
+                            window.VoyagerSelectSetOptions(select, options, selectedValue);
+                            if (selectedValue) {
+                                select.dispatchEvent(new Event('change', { bubbles: true }));
+                            }
+                        } else {
+                            select.innerHTML = '';
+                            options.forEach(function (option) {
+                                const optionEl = document.createElement('option');
+                                optionEl.value = option.id;
+                                optionEl.text = option.text;
+                                select.appendChild(optionEl);
+                            });
+                            select.value = selectedValue || (select.options[0] ? select.options[0].value : '');
+                            select.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    });
+                })
+                .catch(function (error) {
+                    console.error('Voyager BREAD: populateRowsFromTable failed', error);
+                });
+        }
+
+        function updateRelationshipDisplayName(input) {
+            const wrapper = input.parentElement && input.parentElement.parentElement ? input.parentElement.parentElement.parentElement : null;
+            const label = wrapper ? wrapper.querySelector('.label_relationship p') : null;
+            if (label) {
+                label.textContent = input.value || '';
+            }
+        }
+
+        function updateRelationshipTableLabel(dropdown) {
+            const wrapper = dropdown.parentElement ? dropdown.parentElement.parentElement : null;
+            const label = wrapper ? wrapper.querySelector('.label_table_name') : null;
+            if (label) {
+                const selectedOption = dropdown.options[dropdown.selectedIndex];
+                label.textContent = selectedOption ? selectedOption.text : '';
+            }
+        }
         /********** End Relationship Functionality **********/
     </script>
 @stop

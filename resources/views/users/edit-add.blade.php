@@ -128,7 +128,7 @@
 
 @section('javascript')
     <script>
-        $('document').ready(function () {
+        document.addEventListener('DOMContentLoaded', function () {
             if (window.VoyagerInitToggles) {
                 window.VoyagerInitToggles();
             }

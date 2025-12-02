@@ -143,38 +143,85 @@
             },
         }).mount('#table_info');
 
-        $(function () {
+        document.addEventListener('DOMContentLoaded', function () {
+            const bootstrapCompat = window.VoyagerBootstrapCompat;
+            const deleteModal = document.getElementById('delete_builder_modal');
+            const deleteForm = document.getElementById('delete_builder_form');
+            const deleteTitle = document.getElementById('delete_builder_name');
+            const deleteActionTemplate = '{{ route('voyager.bread.delete', ['__id']) }}';
+            const tableInfoModal = document.getElementById('table_info');
 
-            // Setup Delete BREAD
-            //
-            $('table .actions').on('click', '.delete', function (e) {
-                id = $(this).data('id');
-                name = $(this).data('name');
+            const showModal = (modal) => {
+                if (!modal) {
+                    return;
+                }
+                if (bootstrapCompat && typeof bootstrapCompat.showModal === 'function') {
+                    bootstrapCompat.showModal(modal);
+                    return;
+                }
+                modal.classList.add('in');
+                modal.style.display = 'block';
+                modal.setAttribute('aria-hidden', 'false');
+                const backdrop = document.createElement('div');
+                backdrop.className = 'modal-backdrop fade in';
+                backdrop.dataset.modalTarget = modal.id;
+                document.body.appendChild(backdrop);
+                document.body.classList.add('modal-open');
+            };
 
-                $('#delete_builder_name').text(name);
-                $('#delete_builder_form')[0].action = '{{ route('voyager.bread.delete', ['__id']) }}'.replace('__id', id);
-                $('#delete_builder_modal').modal('show');
+            document.querySelectorAll('table .actions .delete').forEach((button) => {
+                button.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    const id = button.dataset.id || '';
+                    const name = button.dataset.name || '';
+                    if (deleteTitle) {
+                        deleteTitle.textContent = name;
+                    }
+                    if (deleteForm) {
+                        deleteForm.action = deleteActionTemplate.replace('__id', id);
+                    }
+                    showModal(deleteModal);
+                });
             });
 
-            // Setup Show Table Info
-            //
-            $('.database-tables').on('click', '.desctable', function (e) {
-                e.preventDefault();
-                href = $(this).attr('href');
-                table.name = $(this).data('name');
-                table.rows = [];
-                $.get(href, function (data) {
-                    $.each(data, function (key, val) {
-                        table.rows.push({
-                            Field: val.field,
-                            Type: val.type,
-                            Null: val.null,
-                            Key: val.key,
-                            Default: val.default,
-                            Extra: val.extra
+            document.querySelectorAll('.database-tables .desctable').forEach((link) => {
+                link.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    const href = link.getAttribute('href');
+                    if (!href) {
+                        return;
+                    }
+                    table.name = link.dataset.name || '';
+                    table.rows = [];
+                    fetch(href, {
+                        headers: {
+                            'Accept': 'application/json',
+                        },
+                    })
+                        .then((response) => {
+                            if (!response.ok) {
+                                throw new Error('Failed to fetch table info');
+                            }
+                            return response.json();
+                        })
+                        .then((data) => {
+                            table.rows = Object.keys(data || {}).map((key) => {
+                                const val = data[key] || {};
+                                return {
+                                    Field: val.field,
+                                    Type: val.type,
+                                    Null: val.null,
+                                    Key: val.key,
+                                    Default: val.default,
+                                    Extra: val.extra,
+                                };
+                            });
+                            showModal(tableInfoModal);
+                        })
+                        .catch((error) => {
+                            console.error('Voyager table info fetch failed', error);
+                            toastr.error("{{ __('voyager::generic.internal_error') }}");
                         });
-                        $('#table_info').modal('show');
-                    });
                 });
             });
         });
