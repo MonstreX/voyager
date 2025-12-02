@@ -1091,26 +1091,27 @@
                             cropperInstance.destroy();
                             cropperInstance = null;
                         }
-                    var croppingImage = document.getElementById('cropping-image_'+vm.uid);
-                    if (!croppingImage) {
-                        console.warn('Voyager media: cropping image element not found');
-                        return;
-                    }
-                    if (typeof window.Cropper === 'undefined') {
-                        console.error('Voyager media: Cropper library is not available');
-                        return;
-                    }
-                    cropperInstance = new window.Cropper(croppingImage, {
-                        crop: function(e) {
-                            document.getElementById('new-image-width_'+vm.uid).innerText = Math.round(e.detail.width) + 'px';
-                            document.getElementById('new-image-height_'+vm.uid).innerText = Math.round(e.detail.height) + 'px';
-                            croppedData = {
-                                x: Math.round(e.detail.x),
-                                y: Math.round(e.detail.y),
-                                height: Math.round(e.detail.height),
-                                width: Math.round(e.detail.width)
-                            };
+                        var croppingImage = document.getElementById('cropping-image_'+vm.uid);
+                        if (!croppingImage) {
+                            console.warn('Voyager media: cropping image element not found');
+                            return;
                         }
+                        if (typeof window.Cropper === 'undefined') {
+                            console.error('Voyager media: Cropper library is not available');
+                            return;
+                        }
+                        cropperInstance = new window.Cropper(croppingImage, {
+                            crop: function(e) {
+                                document.getElementById('new-image-width_'+vm.uid).innerText = Math.round(e.detail.width) + 'px';
+                                document.getElementById('new-image-height_'+vm.uid).innerText = Math.round(e.detail.height) + 'px';
+                                croppedData = {
+                                    x: Math.round(e.detail.x),
+                                    y: Math.round(e.detail.y),
+                                    height: Math.round(e.detail.height),
+                                    width: Math.round(e.detail.width)
+                                };
+                            }
+                        });
                     });
 
                     cropperModal.addEventListener('hidden.bs.modal', function () {

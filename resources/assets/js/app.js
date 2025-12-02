@@ -1671,11 +1671,21 @@ const hideTooltip = () => {
 };
 
 const initTooltips = (scope) => {
-    const elements = scope
-        ? (Array.isArray(scope) ? scope : [scope])
-        : document.querySelectorAll('[data-toggle="tooltip"]');
+    let elements = [];
+    if (scope) {
+        if (Array.isArray(scope)) {
+            elements = scope;
+        } else if (typeof NodeList !== 'undefined' && scope instanceof NodeList) {
+            elements = Array.from(scope);
+        } else {
+            elements = [scope];
+        }
+    } else {
+        elements = Array.from(document.querySelectorAll('[data-toggle="tooltip"]'));
+    }
+
     elements.forEach((element) => {
-        if (element && !element.getAttribute('title') && element.getAttribute('data-original-title')) {
+        if (element && element instanceof Element && !element.getAttribute('title') && element.getAttribute('data-original-title')) {
             element.setAttribute('title', element.getAttribute('data-original-title'));
         }
     });
@@ -1920,9 +1930,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (window.VoyagerInitSlugify) {
         window.VoyagerInitSlugify('.side-body input[data-slug-origin]');
-    }
-    if (window.VoyagerInitNestable) {
-        window.VoyagerInitNestable();
     }
 
     const sideMenuEl = document.querySelector('.side-menu');
