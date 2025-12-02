@@ -136,7 +136,7 @@ const openAceModal = (editor) => {
     }
     
     if (aceEditor) {
-        aceEditor.setValue(editor.getContent(), -1);
+        aceEditor.setValue(editor.getContent({ source_view: true }), -1);
         
         const saveBtn = document.getElementById('voyager-ace-code-save');
         saveBtn.onclick = () => {
@@ -177,6 +177,9 @@ const getConfig = function(options = {}) {
         relative_urls: false,
         remove_script_host: true,
         convert_urls: true,
+        indent: true,
+        apply_source_formatting: true,
+        end_container_on_empty_block: true,
         file_picker_types: 'image',
         file_picker_callback: (callback, value, meta) => {
             if (meta.filetype == 'image') {
