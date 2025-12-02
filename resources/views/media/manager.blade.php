@@ -1065,7 +1065,7 @@
                     var formData = new FormData();
                     formData.append('file', file);
                     formData.append('upload_path', vm.current_folder);
-                    formData.append('filename', vm.filename || '');
+                    formData.append('filename', vm.filename ? vm.filename : 'null');
                     formData.append('details', JSON.stringify(vm.details));
                     formData.append('_token', voyagerMediaCsrfToken);
 
