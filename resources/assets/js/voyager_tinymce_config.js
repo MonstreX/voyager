@@ -170,7 +170,7 @@ const getConfig = function(options = {}) {
         selector: 'textarea.richTextBox',
         base_url: getDefaultBaseUrl(),
         skin: 'oxide',
-        min_height: 600,
+        min_height: 200,
         resize: true,
         plugins: 'link image table lists', // Removed 'code' to avoid conflicts if any, but we override button
         extended_valid_elements : 'input[id|name|value|type|class|style|required|placeholder|autocomplete|onclick]',
