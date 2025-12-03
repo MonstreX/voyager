@@ -520,7 +520,7 @@ export class VoyagerSelect {
         document.body.removeChild(testEl);
 
         if (maxWidth > 0) {
-            const finalWidth = Math.min(maxWidth + 40, 400);
+            const finalWidth = Math.min(maxWidth + 20, 400);
             this.wrapper.style.minWidth = `${finalWidth}px`;
         }
     }
