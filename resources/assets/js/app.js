@@ -1759,8 +1759,9 @@ const initBootstrapCompat = () => {
                         });
                     }
                 }
+                const isExpanded = !isCollapseOpen(target);
                 toggleCollapseElement(target);
-                collapseTrigger.setAttribute('aria-expanded', isCollapseOpen(target) ? 'true' : 'false');
+                collapseTrigger.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
             }
             return;
         }
@@ -1990,6 +1991,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!trigger) {
                 return;
             }
+            event.preventDefault();
+            event.stopPropagation();
             const activeDropdown = trigger.closest('.dropdown');
             if (!activeDropdown) {
                 return;
@@ -1999,6 +2002,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     hideCollapseElement(section);
                 }
             });
+            const target = findTargetElement(trigger);
+            if (target) {
+                const isExpanded = !isCollapseOpen(target);
+                toggleCollapseElement(target);
+                trigger.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+            }
         });
     }
 
