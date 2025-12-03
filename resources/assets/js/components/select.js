@@ -86,6 +86,7 @@ export class VoyagerSelect {
             this.fetchOptions('');
         } else {
             this.renderOptions();
+            this.adjustWrapperWidth();
         }
         this.renderSelection();
     }
@@ -273,6 +274,8 @@ export class VoyagerSelect {
         this.dropdown.classList.remove('select2-dropdown--above');
         this.dropdown.classList.add('select2-dropdown--below');
         this.wrapper.classList.add('select2-container--open');
+        this.dropdown.style.width = 'auto';
+        this.dropdown.style.minWidth = `${rect.width}px`;
         voyagerSelectOpenInstance = this;
         this.highlightIndex = -1;
         if (this.searchInput && !this.disableSearch) {
@@ -494,6 +497,34 @@ export class VoyagerSelect {
         });
     }
 
+    adjustWrapperWidth() {
+        if (this.ajax) {
+            return;
+        }
+        const testEl = document.createElement('span');
+        testEl.style.visibility = 'hidden';
+        testEl.style.position = 'absolute';
+        testEl.style.whiteSpace = 'nowrap';
+        testEl.className = 'select2-results__option';
+        document.body.appendChild(testEl);
+
+        let maxWidth = 0;
+        this.options.forEach((option) => {
+            testEl.textContent = option.text;
+            const width = testEl.getBoundingClientRect().width;
+            if (width > maxWidth) {
+                maxWidth = width;
+            }
+        });
+
+        document.body.removeChild(testEl);
+
+        if (maxWidth > 0) {
+            const finalWidth = Math.min(maxWidth + 40, 400);
+            this.wrapper.style.minWidth = `${finalWidth}px`;
+        }
+    }
+
     filterStaticOptions(term) {
         const lower = term.toLowerCase();
         if (!lower) {
@@ -642,6 +673,7 @@ export class VoyagerSelect {
         this.updateSelectElement(false);
         this.renderSelection();
         this.renderOptions();
+        this.adjustWrapperWidth();
     }
 }
 
