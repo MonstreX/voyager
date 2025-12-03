@@ -236,3 +236,21 @@ export default class SimpleTable {
         });
     }
 }
+
+export const initSimpleTables = () => {
+    if (typeof document === 'undefined') {
+        return;
+    }
+    document.querySelectorAll('[data-simple-table]').forEach((table) => {
+        if (table.__voyagerSimpleTable) {
+            return;
+        }
+        try {
+            const rawConfig = table.getAttribute('data-simple-table');
+            const options = rawConfig ? JSON.parse(rawConfig) : {};
+            table.__voyagerSimpleTable = new SimpleTable(table, options);
+        } catch (error) {
+            console.error('Voyager simple table init failed', error);
+        }
+    });
+};
