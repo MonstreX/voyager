@@ -21,13 +21,13 @@ export default defineConfig({
       input: 'resources/assets/js/app.js',
       output: {
         entryFileNames: 'js/app.js',
+        format: 'iife',
         assetFileNames: (assetInfo) => {
           if (assetInfo.name.endsWith('.css')) {
             return 'css/app.css';
           }
           return 'assets/[name].[ext]';
         },
-        format: 'iife',
         globals: {
           jquery: '$'
         }

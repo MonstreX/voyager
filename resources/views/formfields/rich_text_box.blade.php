@@ -7,6 +7,10 @@
         document.addEventListener('DOMContentLoaded', function () {
             var joditOptions = {!! json_encode($options ?? (object)[]) !!};
             
+            // Extend options with Voyager-specific configurations
+            joditOptions.type_slug = '{{ $dataType->slug }}';
+            joditOptions.upload_url = '{{ route('voyager.upload') }}';
+
             if (window.VoyagerInitJodit) {
                 window.VoyagerInitJodit('textarea.richTextBox[name="{{ $row->field }}"]', joditOptions);
             }

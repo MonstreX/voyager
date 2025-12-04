@@ -20,9 +20,9 @@ import { initSlugifyFields } from './modules/slugify';
 import SimpleTable, { initSimpleTables } from './modules/simple-table';
 
 // Legacy / Vendor
-import './voyager_ace_editor';
+import { initAceEditors } from './voyager_ace_editor'; // Static import
+import { initJodit } from './voyager_jodit';           // Static import
 import './multilingual';
-import './voyager_jodit';
 import * as helpers from './helpers.js';
 import Cropper from 'cropperjs';
 import Sortable from 'sortablejs';
@@ -45,6 +45,9 @@ window.helpers = helpers;
 window.Cropper = Cropper;
 window.toastr = new VoyagerToaster();
 window.Sortable = Sortable;
+window.VoyagerInitJodit = initJodit; // Expose directly
+window.VoyagerInitAceEditors = initAceEditors; // Expose directly
+
 
 document.addEventListener('DOMContentLoaded', () => {
     // Init Core
@@ -64,4 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.VoyagerInitSlugify) {
         window.VoyagerInitSlugify('.side-body input[data-slug-origin]');
     }
+
+    // Init Ace Editors (always)
+    initAceEditors();
 });

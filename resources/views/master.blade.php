@@ -124,8 +124,7 @@ if (\Illuminate\Support\Str::startsWith(Auth::user()->avatar, 'http://') || \Ill
 
 
 <script src="{{ voyager_asset('js/ace/libs/ace.js') }}"></script>
-<script src="{{ voyager_asset('js/app.js') }}"></script>
-
+    <script src="{{ voyager_asset('js/app.js') }}"></script>
 <script>
     @if(Session::has('alerts'))
         let alerts = {!! json_encode(Session::get('alerts')) !!};
