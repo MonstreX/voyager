@@ -95,7 +95,6 @@
                 },
                 data() {
                     return {
-                        autocomplete: null,
                         lat: '',
                         lng: '',
                         map: null,
@@ -110,16 +109,17 @@
                     }
 
                     const loadGoogleMaps = () => {
-                        if (window.google && window.google.maps) {
-                            return Promise.resolve();
-                        }
                         if (!window.voyagerGoogleMapsPromise) {
                             window.voyagerGoogleMapsPromise = new Promise((resolve, reject) => {
+                                if (window.google && window.google.maps) {
+                                    resolve();
+                                    return;
+                                }
                                 window.initVoyagerGoogleMaps = () => {
                                     resolve();
                                 };
                                 const script = document.createElement('script');
-                                script.src = 'https://maps.googleapis.com/maps/api/js?key=' + this.apiKey + '&callback=initVoyagerGoogleMaps&libraries=places&loading=async';
+                                script.src = 'https://maps.googleapis.com/maps/api/js?key=' + this.apiKey + '&callback=initVoyagerGoogleMaps&libraries=places&v=weekly&loading=async';
                                 script.async = true;
                                 script.defer = true;
                                 script.onerror = reject;
@@ -136,50 +136,95 @@
                 methods: {
                     initMap: function() {
                         var vm = this;
-
                         var center = vm.points[vm.points.length - 1];
 
-                        // Set initial LatLng
                         this.setLatLng(center.lat, center.lng);
 
                         // Create map
                         vm.map = new google.maps.Map(vm.$refs.mapContainer, {
                             zoom: vm.zoom,
-                            center: new google.maps.LatLng(center.lat, center.lng)
+                            center: { lat: parseFloat(center.lat), lng: parseFloat(center.lng) },
+                            mapTypeControl: true,
+                            streetViewControl: true,
                         });
 
-                        // Create marker
+                        // Create Marker (Legacy) - Guarantees drag support without Vector Map ID
                         vm.marker = new google.maps.Marker({
-                            position: new google.maps.LatLng(center.lat, center.lng),
                             map: vm.map,
-                            draggable: true
+                            position: { lat: parseFloat(center.lat), lng: parseFloat(center.lng) },
+                            draggable: true,
+                            title: 'Drag to move'
                         });
 
-                        // Listen to map drag events
-                        google.maps.event.addListener(vm.marker, 'drag', vm.onMapDrag);
+                        // Listen to marker drag events
+                        vm.marker.addListener('dragend', function(event) {
+                            vm.onMapDrag(event);
+                        });
 
                         // Setup places Autocomplete
                         if (this.showAutocomplete) {
-                            vm.autocomplete = new google.maps.places.Autocomplete(vm.$refs.autocompleteInput);
-                            
-                            vm.autocomplete.addListener('place_changed', vm.onPlaceChange);
+                            // Use legacy Autocomplete for compatibility with legacy Marker logic
+                            const autocomplete = new google.maps.places.Autocomplete(vm.$refs.autocompleteInput);
+                            autocomplete.addListener('place_changed', vm.onPlaceChange);
                         }
                     },
-
+                    
                     setLatLng: function(lat, lng) {
-                        this.lat = lat;
-                        this.lng = lng;
+                        this.lat = parseFloat(lat);
+                        this.lng = parseFloat(lng);
                     },
 
                     moveMapAndMarker: function(lat, lng) {
-                        this.marker.setPosition(new google.maps.LatLng(lat, lng));
-                        this.map.panTo(new google.maps.LatLng(lat, lng));
+                        let position = new google.maps.LatLng(parseFloat(lat), parseFloat(lng));
+                        if (this.marker) {
+                            this.marker.setPosition(position);
+                        }
+                        if (this.map) {
+                            this.map.panTo(position);
+                        }
                     },
 
                     onMapDrag: function(event) {
-                        this.setLatLng(event.latLng.lat(), event.latLng.lng());
-
+                        let lat = event.latLng.lat();
+                        let lng = event.latLng.lng();
+                        this.setLatLng(lat, lng);
                         this.onChange('mapDragged');
+                    },
+
+                    setLatLng: function(lat, lng) {
+                        this.lat = parseFloat(lat);
+                        this.lng = parseFloat(lng);
+                    },
+
+                    moveMapAndMarker: function(lat, lng) {
+                        let position = { lat: parseFloat(lat), lng: parseFloat(lng) };
+                        // Update AdvancedMarker position directly
+                        if (this.marker) {
+                            this.marker.position = position;
+                        }
+                        if (this.map) {
+                            this.map.panTo(position);
+                        }
+                    },
+
+                    onMapDrag: function(event) {
+                        // Read position from the marker property
+                        if (this.marker && this.marker.position) {
+                            const pos = this.marker.position;
+                            // AdvancedMarker position is usually a plain object {lat, lng} or LatLng object
+                            let lat, lng;
+                            
+                            if (typeof pos.lat === 'function') {
+                                lat = pos.lat();
+                                lng = pos.lng();
+                            } else {
+                                lat = pos.lat;
+                                lng = pos.lng;
+                            }
+                            
+                            this.setLatLng(lat, lng);
+                            this.onChange('mapDragged');
+                        }
                     },
 
                     onInputKeyPress: function(event) {
@@ -201,7 +246,6 @@
 
                     onLatLngInputChange: function(event) {
                         this.moveMapAndMarker(this.lat, this.lng);
-
                         this.onChange('latLngChanged');
                     },
 
