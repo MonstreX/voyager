@@ -569,10 +569,11 @@
             window.Sortable.create(container, {
                 handle: '.handler',
                 animation: 150,
+                ghostClass: 'bread-sortable-ghost',
+                dragClass: 'bread-sortable-drag',
                 onEnd: function () {
                     updateRowOrders();
-                },
-                onStart: sortBreadItems
+                }
             });
 
             sortBreadItems();

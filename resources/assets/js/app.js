@@ -26,6 +26,7 @@ import voyagerTinyMCE from './voyager_tinymce_config';
 import { loadVoyagerTinyMCE } from './tinymce-loader';
 import * as helpers from './helpers.js';
 import Cropper from 'cropperjs';
+import Sortable from 'sortablejs';
 
 // Global Exports
 window.VoyagerBootstrapCompat = { init: initBootstrapCompat, showModal, hideModal };
@@ -46,6 +47,7 @@ window.loadVoyagerTinyMCE = loadVoyagerTinyMCE;
 window.helpers = helpers;
 window.Cropper = Cropper;
 window.toastr = new VoyagerToaster();
+window.Sortable = Sortable;
 
 document.addEventListener('DOMContentLoaded', () => {
     // Init Core

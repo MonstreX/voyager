@@ -1,0 +1,35 @@
+// Optimization for BREAD builder sortable
+
+// The placeholder element in the list (where the item will be dropped)
+.bread-sortable-ghost {
+    opacity: 0.4;
+    background-color: #F5F8FC;
+    border: 2px dashed #ddd;
+    
+    // Hide content in the placeholder to reduce height/complexity if desired, 
+    // OR keep it visible but simplified. 
+    // Usually we want the ghost to have the same dimensions, so 'visibility: hidden' is safer than 'display: none' for the root,
+    // but internal heavy elements can be removed.
+    
+    .ace_editor, 
+    .voyager-relationship-details,
+    .panel-body { 
+        display: none !important; 
+    }
+    
+    // Ensure the row keeps some height so it doesn't collapse to 0
+    min-height: 60px;
+}
+
+// The element being dragged (following the cursor)
+.bread-sortable-drag {
+    background: #fff;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    opacity: 0.9;
+    
+    // Hide heavy elements in the dragged item to improve FPS
+    .ace_editor, 
+    .voyager-relationship-details {
+        display: none !important;
+    }
+}
