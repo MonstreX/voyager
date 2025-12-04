@@ -5,6 +5,7 @@ import inject from '@rollup/plugin-inject';
 import path from 'path';
 
 export default defineConfig({
+  base: '/vendor/voyager/',
   plugins: [
     vue(),
     viteStaticCopy({
@@ -44,7 +45,16 @@ export default defineConfig({
   resolve: {
     alias: {
       'vue': 'vue/dist/vue.esm-bundler.js',
-      '@': path.resolve(__dirname, 'resources/assets/js')
+      '@': path.resolve(__dirname, 'resources/assets/js'),
+      '/vendor/voyager': path.resolve(__dirname, 'publishable/assets')
+    }
+  },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        silenceDeprecations: ['import', 'global-builtin'],
+        quietDeps: true,
+      }
     }
   }
 });

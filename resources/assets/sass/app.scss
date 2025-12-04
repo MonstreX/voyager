@@ -1040,7 +1040,7 @@ a:hover {
   margin-top: 15px; }
 
 body.login-page {
-  background: url(../../img/app-header-bg.jpg) no-repeat center center fixed;
+  /* background: url(../../img/app-header-bg.jpg) no-repeat center center fixed; */
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -1576,7 +1576,7 @@ table.dataTable.no-footer{
   padding: 0 15px; }
 .landing-page .app-header {
   padding-top: 100px;
-  background-image: url("../img/app-header-bg.jpg");
+  /* background-image: url("../img/app-header-bg.jpg"); */
   background-repeat: no-repeat;
   -webkit-background-size: cover;
   -moz-background-size: cover;
@@ -1592,7 +1592,7 @@ table.dataTable.no-footer{
   padding-top: 50px;
   padding-bottom: 20px; }
 .landing-page .app-content-b.feature-1 {
-  background-image: url("../img/bg/picjumbo.com_HNCK3558.jpg");
+  /* background-image: url("../img/bg/picjumbo.com_HNCK3558.jpg"); */
   background-repeat: no-repeat;
   -webkit-background-size: cover;
   -moz-background-size: cover;
@@ -1603,7 +1603,7 @@ table.dataTable.no-footer{
 .landing-page .app-content-b.contact-us {
   padding-top: 60px;
   padding-bottom: 60px;
-  background-image: url("../img/contact-us-bg.jpg");
+  /* background-image: url("../img/contact-us-bg.jpg"); */
   background-repeat: no-repeat;
   -webkit-background-size: cover;
   -moz-background-size: cover;
@@ -4259,7 +4259,7 @@ a.text-action{color:#a3afb7}a.text-action,a.text-action:focus,a.text-action:hove
 }
 
 .page-login-v2:before {
-    background: url('../images/bg.jpg');
+    background: url('/vendor/voyager/images/bg.jpg');
     background-repeat: no-repeat;
     background-size: cover;
     background-position-x: -200px !important;
@@ -4416,7 +4416,7 @@ table a.btn-sm{
 #dashboard_bg{
   width:100%;
   height:100px;
-  background: url('../images/dashboard-bg.jpg');
+  /* background: url('../images/dashboard-bg.jpg'); */
   background-size:cover;
   position:absolute;
   top:0px;
@@ -7066,7 +7066,7 @@ limitations under the License.
 }
 
 .Header-auth .gapi-analytics-auth-styles-signinbutton-image {
-  background: url('/public/images/ga-mark-white.svg') no-repeat 0 50%;
+  /* background: url('/public/images/ga-mark-white.svg') no-repeat 0 50%; */
   background-size: 1.5em;
   border: 0;
   height: 1.5em;
