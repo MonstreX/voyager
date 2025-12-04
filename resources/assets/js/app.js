@@ -22,8 +22,7 @@ import SimpleTable, { initSimpleTables } from './modules/simple-table';
 // Legacy / Vendor
 import './voyager_ace_editor';
 import './multilingual';
-import voyagerTinyMCE from './voyager_tinymce_config';
-import { loadVoyagerTinyMCE } from './tinymce-loader';
+import './voyager_jodit';
 import * as helpers from './helpers.js';
 import Cropper from 'cropperjs';
 import Sortable from 'sortablejs';
@@ -42,8 +41,6 @@ window.VoyagerSerializeNestable = serializeNestable;
 window.VoyagerSimpleTable = SimpleTable;
 window.VoyagerInitSimpleTables = initSimpleTables;
 window.VoyagerInitSlugify = initSlugifyFields;
-window.voyagerTinyMCE = voyagerTinyMCE;
-window.loadVoyagerTinyMCE = loadVoyagerTinyMCE;
 window.helpers = helpers;
 window.Cropper = Cropper;
 window.toastr = new VoyagerToaster();
