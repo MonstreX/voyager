@@ -17,22 +17,25 @@ export default defineConfig({
   build: {
     outDir: 'publishable/assets',
     emptyOutDir: false,
+    cssCodeSplit: false,
     rollupOptions: {
-      input: 'resources/assets/js/app.js',
+      input: {
+        app: 'resources/assets/js/app.js',
+        'vue-bundle': 'resources/assets/js/vue-bundle.js',
+        editors: 'resources/assets/js/editors.js'
+      },
       output: {
-        entryFileNames: 'js/app.js',
-        format: 'iife',
+        entryFileNames: 'js/[name].js',
+        format: 'es',
+        // Prevent automatic chunk splitting
+        manualChunks: undefined,
         assetFileNames: (assetInfo) => {
           if (assetInfo.name.endsWith('.css')) {
             return 'css/app.css';
           }
           return 'assets/[name].[ext]';
-        },
-        globals: {
-          jquery: '$'
         }
-      },
-      external: []
+      }
     }
   },
   resolve: {

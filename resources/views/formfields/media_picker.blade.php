@@ -28,6 +28,8 @@
 </div>
 @push('javascript')
 <script>
-window.createVueApp({}).mount('#media_picker_{{ $row->field }}');
+window.whenVueReady(function() {
+    window.createVueApp({}).mount('#media_picker_{{ $row->field }}');
+});
 </script>
 @endpush

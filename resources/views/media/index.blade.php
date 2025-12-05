@@ -38,8 +38,10 @@
 
 @section('javascript')
 <script>
-window.createVueApp({
-    data: () => ({})
-}).mount('#filemanager');
+window.whenVueReady(function() {
+    window.createVueApp({
+        data: () => ({})
+    }).mount('#filemanager');
+});
 </script>
 @endsection

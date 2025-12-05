@@ -384,7 +384,7 @@
                                         <div class="alert alert-danger validation-error">
                                             {{ __('voyager::json.invalid') }}
                                         </div>
-                                        <textarea id="json-input-{{ json_encode($data['field']) }}"
+                                        <textarea id="json-input-{{ $data['field'] }}"
                                                   class="resizable-editor"
                                                   data-editor="json"
                                                   name="field_details_{{ $data['field'] }}">
@@ -423,6 +423,8 @@
 
 @stop
 
+@include('voyager::partials.editors-assets')
+
 @section('javascript')
     <script>
         window.invalidEditors = [];
@@ -442,7 +444,12 @@
             @endif
 
             initBreadItemsSortable();
-            initAceEditors();
+
+            // Init Ace editors when editors bundle is ready
+            window.whenEditorsReady(function() {
+                initBreadAceEditors();
+            });
+
             initRelationshipControls();
 
             if (typeof window.VoyagerInitToggles === 'function') {
@@ -470,7 +477,7 @@
             }
         }
 
-        function initAceEditors() {
+        function initBreadAceEditors() {
             document.querySelectorAll('textarea[data-editor]').forEach(function (textarea) {
                 const mode = textarea.dataset.editor || 'json';
                 const editDiv = document.createElement('div');
@@ -496,12 +503,11 @@
                 });
 
                 editor.on('focus', function () {
-                    session.setUseWorker(true);
+                    // Worker disabled globally to avoid CORS errors
                 });
                 editor.on('blur', function () {
                     if (isValid) {
                         showValidationForTextarea(textarea, false);
-                        session.setUseWorker(false);
                     } else {
                         showValidationForTextarea(textarea, true);
                     }

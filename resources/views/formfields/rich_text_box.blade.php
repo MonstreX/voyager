@@ -2,6 +2,8 @@
     {{ old($row->field, $dataTypeContent->{$row->field} ?? '') }}
 </textarea>
 
+@include('voyager::partials.editors-assets')
+
 @push('javascript')
     <script>
         document.addEventListener('DOMContentLoaded', function () {

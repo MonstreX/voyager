@@ -4,7 +4,6 @@ import '../sass/app.scss';
 // Core
 import { initBootstrapCompat, showModal, hideModal, initTooltips } from './core/bootstrap-compat';
 import { initGlobalEvents } from './core/events';
-import { initVueBridge } from './core/vue-bridge';
 
 // Components
 import { initDatePickers } from './components/datepicker';
@@ -20,8 +19,6 @@ import { initSlugifyFields } from './modules/slugify';
 import SimpleTable, { initSimpleTables } from './modules/simple-table';
 
 // Legacy / Vendor
-import { initAceEditors } from './voyager_ace_editor'; // Static import
-import { initJodit } from './voyager_jodit';           // Static import
 import './multilingual';
 import * as helpers from './helpers.js';
 import Cropper from 'cropperjs';
@@ -45,15 +42,12 @@ window.helpers = helpers;
 window.Cropper = Cropper;
 window.toastr = new VoyagerToaster();
 window.Sortable = Sortable;
-window.VoyagerInitJodit = initJodit; // Expose directly
-window.VoyagerInitAceEditors = initAceEditors; // Expose directly
 
 
 document.addEventListener('DOMContentLoaded', () => {
     // Init Core
     initBootstrapCompat();
     initGlobalEvents();
-    initVueBridge();
 
     // Init Components
     initSimpleTables();
@@ -67,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.VoyagerInitSlugify) {
         window.VoyagerInitSlugify('.side-body input[data-slug-origin]');
     }
-
-    // Init Ace Editors (always)
-    initAceEditors();
 });
+
+// Signal that app bundle is ready
+document.dispatchEvent(new CustomEvent('voyager:app-ready'));

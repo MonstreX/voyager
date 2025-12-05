@@ -268,9 +268,11 @@
                 }
             };
 
-            const app = window.createVueApp({});
-            app.component('coordinates', coordinatesComponent);
-            app.mount('#coordinates-formfield-{{ $row->field }}');
+            window.whenVueReady(function() {
+                const app = window.createVueApp({});
+                app.component('coordinates', coordinatesComponent);
+                app.mount('#coordinates-formfield-{{ $row->field }}');
+            });
         })();
     </script>
 @endpush

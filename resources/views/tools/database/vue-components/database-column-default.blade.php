@@ -23,7 +23,8 @@
         disabled: false
     };
 
-    window.VueRegisterComponent('database-column-default', {
+    window.whenVueReady(function() {
+        window.VueRegisterComponent('database-column-default', {
         props: {
             column: {
                 type: Object,
@@ -75,4 +76,5 @@
             }
         }
     });
+    }); // end whenVueReady
 </script>

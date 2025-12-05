@@ -177,13 +177,15 @@
             rows: []
         };
 
-        window.createVueApp({
-            data() {
-                return {
-                    table: table,
-                };
-            },
-        }).mount('#table_info');
+        window.whenVueReady(function() {
+            window.createVueApp({
+                data() {
+                    return {
+                        table: table,
+                    };
+                },
+            }).mount('#table_info');
+        });
 
         document.addEventListener('DOMContentLoaded', function () {
             const bootstrapCompat = window.VoyagerBootstrapCompat;

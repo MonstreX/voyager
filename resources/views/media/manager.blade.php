@@ -374,7 +374,8 @@
 
     let croppedData = {};
 
-    window.VueRegisterComponent('media-manager', {
+    window.whenVueReady(function() {
+        window.VueRegisterComponent('media-manager', {
         template: `@yield('media-manager')`,
         props: {
             basePath: {
@@ -1312,6 +1313,7 @@
             });
         },
     });
+    }); // end whenVueReady
 </script>
 <style>
 .dd-placeholder {

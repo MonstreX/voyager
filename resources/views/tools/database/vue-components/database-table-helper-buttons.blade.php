@@ -7,45 +7,47 @@
 @endsection
 
 <script>
-    window.VueRegisterComponent('database-table-helper-buttons', {
-        template: `@yield('database-table-helper-buttons-template')`,
-        methods: {
-            addColumn(column) {
-                this.$emit('columnAdded', column);
-            },
-            makeColumn(options) {
-                return Object.assign({
-                    name: '',
-                    oldName: '',
-                    type: getDbType('integer'),
-                    length: null,
-                    fixed: false,
-                    unsigned: false,
-                    autoincrement: false,
-                    notnull: false,
-                    default: null
-                }, options);
-            },
-            addNewColumn() {
-                this.addColumn(this.makeColumn());
-            },
-            addTimestamps() {
-                this.addColumn(this.makeColumn({
-                    name: 'created_at',
-                    type: getDbType('timestamp')
-                }));
+    window.whenVueReady(function() {
+        window.VueRegisterComponent('database-table-helper-buttons', {
+            template: `@yield('database-table-helper-buttons-template')`,
+            methods: {
+                addColumn(column) {
+                    this.$emit('columnAdded', column);
+                },
+                makeColumn(options) {
+                    return Object.assign({
+                        name: '',
+                        oldName: '',
+                        type: getDbType('integer'),
+                        length: null,
+                        fixed: false,
+                        unsigned: false,
+                        autoincrement: false,
+                        notnull: false,
+                        default: null
+                    }, options);
+                },
+                addNewColumn() {
+                    this.addColumn(this.makeColumn());
+                },
+                addTimestamps() {
+                    this.addColumn(this.makeColumn({
+                        name: 'created_at',
+                        type: getDbType('timestamp')
+                    }));
 
-                this.addColumn(this.makeColumn({
-                    name: 'updated_at',
-                    type: getDbType('timestamp')
-                }));
-            },
-            addSoftDeletes() {
-                this.addColumn(this.makeColumn({
-                    name: 'deleted_at',
-                    type: getDbType('timestamp')
-                }));
+                    this.addColumn(this.makeColumn({
+                        name: 'updated_at',
+                        type: getDbType('timestamp')
+                    }));
+                },
+                addSoftDeletes() {
+                    this.addColumn(this.makeColumn({
+                        name: 'deleted_at',
+                        type: getDbType('timestamp')
+                    }));
+                }
             }
-        }
-    });
+        });
+    }); // end whenVueReady
 </script>

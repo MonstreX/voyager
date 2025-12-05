@@ -455,6 +455,8 @@
 
 @stop
 
+@include('voyager::partials.editors-assets')
+
 @section('javascript')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -573,13 +575,15 @@
     </div>
 
     <script>
-        var options_editor = ace.edit('options_editor');
-        options_editor.getSession().setMode("ace/mode/json");
+        window.whenEditorsReady(function() {
+            var options_editor = ace.edit('options_editor');
+            options_editor.getSession().setMode("ace/mode/json");
 
-        var options_textarea = document.getElementById('options_textarea');
-        options_editor.getSession().on('change', function() {
-            console.log(options_editor.getValue());
-            options_textarea.value = options_editor.getValue();
+            var options_textarea = document.getElementById('options_textarea');
+            options_editor.getSession().on('change', function() {
+                console.log(options_editor.getValue());
+                options_textarea.value = options_editor.getValue();
+            });
         });
     </script>
 @stop

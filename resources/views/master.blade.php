@@ -10,6 +10,28 @@
     <script>
         window.voyagerAceBase = "{{ voyager_asset('js/ace/libs') }}";
         window.voyagerTinyMCEBase = "{{ voyager_asset('js') }}";
+
+        // Helper to wait for Vue bundle to load
+        window.whenVueReady = function(callback) {
+            if (window.createVueApp && window.VueRegisterComponent) {
+                // Vue is already loaded
+                callback();
+            } else {
+                // Wait for Vue bundle to load
+                document.addEventListener('voyager:vue-ready', callback, { once: true });
+            }
+        };
+
+        // Helper to wait for Editors bundle to load
+        window.whenEditorsReady = function(callback) {
+            if (window.VoyagerInitJodit && window.VoyagerInitAceEditors && window.ace) {
+                // Editors are already loaded
+                callback();
+            } else {
+                // Wait for Editors bundle to load
+                document.addEventListener('voyager:editors-ready', callback, { once: true });
+            }
+        };
     </script>
 
     <!-- Google Fonts -->
@@ -122,9 +144,11 @@ if (\Illuminate\Support\Str::startsWith(Auth::user()->avatar, 'http://') || \Ill
 
 <!-- Javascript Libs -->
 
+<!-- Load Vue bundle first (provides global helpers) -->
+<script type="module" src="{{ voyager_asset('js/vue-bundle.js') }}"></script>
+<!-- Load app bundle (core functionality) -->
+<script type="module" src="{{ voyager_asset('js/app.js') }}"></script>
 
-<script src="{{ voyager_asset('js/ace/libs/ace.js') }}"></script>
-    <script src="{{ voyager_asset('js/app.js') }}"></script>
 <script>
     @if(Session::has('alerts'))
         let alerts = {!! json_encode(Session::get('alerts')) !!};

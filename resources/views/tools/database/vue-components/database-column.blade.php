@@ -56,7 +56,8 @@
 @include('voyager::tools.database.vue-components.database-column-default')
 
 <script>
-    window.VueRegisterComponent('database-column', {
+    window.whenVueReady(function() {
+        window.VueRegisterComponent('database-column', {
         data() {
             return {
                 lengthInputType: 'number'
@@ -123,4 +124,5 @@
             this.setLengthInputType();
         },
     });
+    }); // end whenVueReady
 </script>

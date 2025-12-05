@@ -60,31 +60,33 @@
     @include('voyager::tools.database.vue-components.database-table-editor')
 
     <script>
-        window.createVueApp({
-            data() {
-                return {
-                    table: {},
-                    originalTable: {!! $db->table->toJson() !!}, // to do comparison later?
-                    oldTable: {!! $db->oldTable !!},
-                    tableJson: ''
-                };
-            },
-            created() {
-                // If old table is set, use it to repopulate the form
-                if (this.oldTable) {
-                    this.table = this.oldTable;
-                } else {
-                    this.table = JSON.parse(JSON.stringify(this.originalTable));
-                }
-            },
-            methods: {
-                stringifyTable() {
-                    this.tableJson = JSON.stringify(this.table);
+        window.whenVueReady(function() {
+            window.createVueApp({
+                data() {
+                    return {
+                        table: {},
+                        originalTable: {!! $db->table->toJson() !!}, // to do comparison later?
+                        oldTable: {!! $db->oldTable !!},
+                        tableJson: ''
+                    };
+                },
+                created() {
+                    // If old table is set, use it to repopulate the form
+                    if (this.oldTable) {
+                        this.table = this.oldTable;
+                    } else {
+                        this.table = JSON.parse(JSON.stringify(this.originalTable));
+                    }
+                },
+                methods: {
+                    stringifyTable() {
+                        this.tableJson = JSON.stringify(this.table);
 
-                    this.$nextTick(() => this.$refs.form.submit());
+                        this.$nextTick(() => this.$refs.form.submit());
+                    }
                 }
-            }
-        }).mount('#dbManager');
+            }).mount('#dbManager');
+        });
     </script>
 
 @stop

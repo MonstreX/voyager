@@ -39,26 +39,28 @@
         return databaseTypes.Numbers[0];
     }
 
-    window.VueRegisterComponent('database-types', {
-        props: {
-            column: {
-                type: Object,
-                required: true
-            }
-        },
-        data() {
-            return {
-                dbTypes: databaseTypes
-            };
-        },
-        template: `@yield('database-types-template')`,
-        methods: {
-            onTypeChange(event) {
-                this.$emit('typeChanged', this.getType(event.target.value));
+    window.whenVueReady(function() {
+        window.VueRegisterComponent('database-types', {
+            props: {
+                column: {
+                    type: Object,
+                    required: true
+                }
             },
-            getType(name) {
-                return getDbType(name);
+            data() {
+                return {
+                    dbTypes: databaseTypes
+                };
+            },
+            template: `@yield('database-types-template')`,
+            methods: {
+                onTypeChange(event) {
+                    this.$emit('typeChanged', this.getType(event.target.value));
+                },
+                getType(name) {
+                    return getDbType(name);
+                }
             }
-        }
-    });
+        });
+    }); // end whenVueReady
 </script>
