@@ -11,6 +11,17 @@
         window.voyagerAceBase = "{{ voyager_asset('js/ace/libs') }}";
         window.voyagerTinyMCEBase = "{{ voyager_asset('js') }}";
 
+        // Helper to wait for App bundle to load
+        window.whenAppReady = function(callback) {
+            if (window.toastr && window.helpers) {
+                // App is already loaded
+                callback();
+            } else {
+                // Wait for App bundle to load
+                document.addEventListener('voyager:app-ready', callback, { once: true });
+            }
+        };
+
         // Helper to wait for Vue bundle to load
         window.whenVueReady = function(callback) {
             if (window.createVueApp && window.VueRegisterComponent) {
@@ -150,24 +161,26 @@ if (\Illuminate\Support\Str::startsWith(Auth::user()->avatar, 'http://') || \Ill
 <script type="module" src="{{ voyager_asset('js/app.js') }}"></script>
 
 <script>
-    @if(Session::has('alerts'))
-        let alerts = {!! json_encode(Session::get('alerts')) !!};
-        helpers.displayAlerts(alerts, toastr);
-    @endif
+    window.whenAppReady(function() {
+        @if(Session::has('alerts'))
+            let alerts = {!! json_encode(Session::get('alerts')) !!};
+            helpers.displayAlerts(alerts, toastr);
+        @endif
 
-    @if(Session::has('message'))
+        @if(Session::has('message'))
 
-    // TODO: change Controllers to use AlertsMessages trait... then remove this
-    var alertType = {!! json_encode(Session::get('alert-type', 'info')) !!};
-    var alertMessage = {!! json_encode(Session::get('message')) !!};
-    var alerter = toastr[alertType];
+        // TODO: change Controllers to use AlertsMessages trait... then remove this
+        var alertType = {!! json_encode(Session::get('alert-type', 'info')) !!};
+        var alertMessage = {!! json_encode(Session::get('message')) !!};
+        var alerter = toastr[alertType];
 
-    if (alerter) {
-        alerter(alertMessage);
-    } else {
-        toastr.error("toastr alert-type " + alertType + " is unknown");
-    }
-    @endif
+        if (alerter) {
+            alerter(alertMessage);
+        } else {
+            toastr.error("toastr alert-type " + alertType + " is unknown");
+        }
+        @endif
+    });
 </script>
 @include('voyager::media.manager')
 <script>

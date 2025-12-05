@@ -126,8 +126,9 @@
 @section('javascript')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            var csrfMeta = document.querySelector('meta[name="csrf-token"]');
-            var csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
+            window.whenAppReady(function() {
+                var csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                var csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
             var addLabel = @json(__('voyager::generic.add'));
             var updateLabel = @json(__('voyager::generic.update'));
             var menuModal = document.getElementById('menu_item_modal');
@@ -455,6 +456,7 @@
                     });
                 });
             }
+            }); // end whenAppReady
         });
     </script>
 @stop
