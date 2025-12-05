@@ -425,14 +425,11 @@
 
             var menuNestable = document.querySelector('.dd');
             if (menuNestable && window.VoyagerInitNestable) {
-                console.debug('[VoyagerNestable:MenuBuilder] init', menuNestable);
                 window.VoyagerInitNestable(menuNestable);
                 menuNestable.addEventListener('voyager.sortable.updated', function (event) {
-                    console.debug('[VoyagerNestable:MenuBuilder] voyager.sortable.updated', event);
                     var structure = event.detail && event.detail.structure
                         ? event.detail.structure
                         : (window.VoyagerSerializeNestable ? window.VoyagerSerializeNestable(menuNestable) : []);
-                    console.debug('[VoyagerNestable:MenuBuilder] serialize result', structure);
 
                     var payload = new URLSearchParams();
                     payload.append('order', JSON.stringify(structure));
@@ -450,7 +447,6 @@
                         if (!response.ok) {
                             throw new Error('Menu order update failed with status ' + response.status);
                         }
-                        console.debug('[VoyagerNestable:MenuBuilder] order saved');
                         toastr.success("{{ __('voyager::menu_builder.updated_order') }}");
                     })
                     .catch(function (error) {

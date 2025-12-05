@@ -4,7 +4,8 @@ const logNestable = (...args) => {
     if (typeof console === 'undefined' || typeof console.debug !== 'function') {
         return;
     }
-    if (typeof window !== 'undefined' && window.VoyagerNestableDebug === false) {
+    // Debug logs disabled by default. Enable with: window.VoyagerNestableDebug = true
+    if (typeof window === 'undefined' || window.VoyagerNestableDebug !== true) {
         return;
     }
     console.debug('[VoyagerNestable]', ...args);
