@@ -122,6 +122,17 @@ class ImageProcessor
             throw new RuntimeException("No image loaded");
         }
 
+        // Sanitize inputs (handle strings from JSON/Request)
+        if ($width === 'null') $width = null;
+        if ($height === 'null') $height = null;
+
+        if ($width !== null) $width = (int)$width;
+        if ($height !== null) $height = (int)$height;
+
+        // Treat 0 as null (auto calculate)
+        if ($width === 0) $width = null;
+        if ($height === 0) $height = null;
+
         if ($width === null && $height === null) {
             return $this;
         }
@@ -137,7 +148,8 @@ class ImageProcessor
             $width = (int)($height * $srcWidth / $srcHeight);
         }
 
-        $scaledImage = imagescale($this->imageResource, $width, $height);
+        // Ensure strictly int for imagescale
+        $scaledImage = imagescale($this->imageResource, (int)$width, (int)$height);
         if (!$scaledImage) {
             throw new RuntimeException("Failed to scale image");
         }
