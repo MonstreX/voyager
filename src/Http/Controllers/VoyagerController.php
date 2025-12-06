@@ -86,7 +86,11 @@ class VoyagerController extends Controller
         }
 
         // Return URL for Jodit (as JSON)
-        return response()->json(Voyager::image($fullFilename));
+        $url = Voyager::image($fullFilename);
+        // Convert to relative path to avoid domain lock-in (e.g. /storage/path/img.jpg)
+        $path = parse_url($url, PHP_URL_PATH);
+        
+        return response()->json($path);
     }
 
     protected function userCannotUploadImageIn($dataType, $action)
