@@ -21,7 +21,7 @@
   "require": {
     "php": "^8.2",
     "illuminate/support": "^11.0|^12.0",
-    "doctrine/dbal": "^3.6|^4.0",
+    "doctrine/dbal": "^4.0",
     "arrilot/laravel-widgets": "^3.13",
     "league/flysystem": "^3.0",
     "ext-json": "*"
