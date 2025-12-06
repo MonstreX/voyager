@@ -101,6 +101,7 @@
                         marker: null,
                         onChangeDebounceTimeout: null,
                         place: null,
+                        autocomplete: null,
                     };
                 },
                 mounted() {
@@ -119,6 +120,7 @@
                                     resolve();
                                 };
                                 const script = document.createElement('script');
+                                // Keep loading 'places' library, removed 'marker' as we use legacy Marker
                                 script.src = 'https://maps.googleapis.com/maps/api/js?key=' + this.apiKey + '&callback=initVoyagerGoogleMaps&libraries=places&v=weekly&loading=async';
                                 script.async = true;
                                 script.defer = true;
@@ -134,21 +136,25 @@
                     });
                 },
                 methods: {
-                    initMap: function() {
+                    initMap: async function() {
                         var vm = this;
                         var center = vm.points[vm.points.length - 1];
 
                         this.setLatLng(center.lat, center.lng);
 
+                        // Import libraries (modern loading, legacy usage)
+                        const { Map } = await google.maps.importLibrary("maps");
+                        const { Autocomplete } = await google.maps.importLibrary("places");
+
                         // Create map
-                        vm.map = new google.maps.Map(vm.$refs.mapContainer, {
+                        vm.map = new Map(vm.$refs.mapContainer, {
                             zoom: vm.zoom,
                             center: { lat: parseFloat(center.lat), lng: parseFloat(center.lng) },
                             mapTypeControl: true,
                             streetViewControl: true,
                         });
 
-                        // Create Marker (Legacy) - Guarantees drag support without Vector Map ID
+                        // Create Marker (Legacy) - Works without Map ID
                         vm.marker = new google.maps.Marker({
                             map: vm.map,
                             position: { lat: parseFloat(center.lat), lng: parseFloat(center.lng) },
@@ -163,9 +169,18 @@
 
                         // Setup places Autocomplete
                         if (this.showAutocomplete) {
-                            // Use legacy Autocomplete for compatibility with legacy Marker logic
-                            const autocomplete = new google.maps.places.Autocomplete(vm.$refs.autocompleteInput);
-                            autocomplete.addListener('place_changed', vm.onPlaceChange);
+                            const autocomplete = new Autocomplete(vm.$refs.autocompleteInput);
+                            autocomplete.addListener('place_changed', () => {
+                                vm.place = autocomplete.getPlace();
+
+                                if (vm.place.geometry) {
+                                    vm.setLatLng(vm.place.geometry.location.lat(), vm.place.geometry.location.lng());
+                                    vm.moveMapAndMarker(vm.place.geometry.location.lat(), vm.place.geometry.location.lng());
+                                }
+
+                                vm.onChange('placeChanged');
+                            });
+                            vm.autocomplete = autocomplete;
                         }
                     },
                     
@@ -175,7 +190,7 @@
                     },
 
                     moveMapAndMarker: function(lat, lng) {
-                        let position = new google.maps.LatLng(parseFloat(lat), parseFloat(lng));
+                        let position = { lat: parseFloat(lat), lng: parseFloat(lng) };
                         if (this.marker) {
                             this.marker.setPosition(position);
                         }
@@ -185,63 +200,18 @@
                     },
 
                     onMapDrag: function(event) {
+                        // Legacy Marker event has latLng method
                         let lat = event.latLng.lat();
                         let lng = event.latLng.lng();
+                        
                         this.setLatLng(lat, lng);
                         this.onChange('mapDragged');
-                    },
-
-                    setLatLng: function(lat, lng) {
-                        this.lat = parseFloat(lat);
-                        this.lng = parseFloat(lng);
-                    },
-
-                    moveMapAndMarker: function(lat, lng) {
-                        let position = { lat: parseFloat(lat), lng: parseFloat(lng) };
-                        // Update AdvancedMarker position directly
-                        if (this.marker) {
-                            this.marker.position = position;
-                        }
-                        if (this.map) {
-                            this.map.panTo(position);
-                        }
-                    },
-
-                    onMapDrag: function(event) {
-                        // Read position from the marker property
-                        if (this.marker && this.marker.position) {
-                            const pos = this.marker.position;
-                            // AdvancedMarker position is usually a plain object {lat, lng} or LatLng object
-                            let lat, lng;
-                            
-                            if (typeof pos.lat === 'function') {
-                                lat = pos.lat();
-                                lng = pos.lng();
-                            } else {
-                                lat = pos.lat;
-                                lng = pos.lng;
-                            }
-                            
-                            this.setLatLng(lat, lng);
-                            this.onChange('mapDragged');
-                        }
                     },
 
                     onInputKeyPress: function(event) {
                         if (event.which === 13) {
                             event.preventDefault();
                         }
-                    },
-
-                    onPlaceChange: function() {
-                        this.place = this.autocomplete.getPlace();
-
-                        if (this.place.geometry) {
-                            this.setLatLng(this.place.geometry.location.lat(), this.place.geometry.location.lng());
-                            this.moveMapAndMarker(this.place.geometry.location.lat(), this.place.geometry.location.lng());
-                        }
-
-                        this.onChange('placeChanged');
                     },
 
                     onLatLngInputChange: function(event) {
