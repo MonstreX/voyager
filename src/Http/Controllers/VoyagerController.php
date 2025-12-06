@@ -30,6 +30,19 @@ class VoyagerController extends Controller
         $slug = $request->input('type_slug');
         $file = $request->file('image');
 
+        if (!$file) {
+            $files = $request->file('files');
+            if (is_array($files)) {
+                $file = $files[0] ?? null;
+            } else {
+                $file = $files;
+            }
+        }
+
+        if (!$file) {
+            return;
+        }
+
         $dataType = Voyager::model('DataType')->where('slug', '=', $slug)->firstOrFail();
 
         if ($this->userCannotUploadImageIn($dataType, 'add') && $this->userCannotUploadImageIn($dataType, 'edit')) {
