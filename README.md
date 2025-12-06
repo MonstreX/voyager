@@ -15,6 +15,21 @@ View the Voyager Cheat Sheet: https://voyager-cheatsheet.ulties.com/
 
 <hr>
 
+> **⚠️ IMPORTANT NOTE: Voyager Reborn (v1.8+)**
+>
+> This repository is a modernized, drop-in replacement for the original TCG Voyager, revived to support the latest PHP and Laravel ecosystems.
+>
+> **Key Modernization Features:**
+> *   **Modern Stack Support:** Fully compatible with **PHP 8.2+** and **Laravel 11 / 12**.
+> *   **Zero Legacy Dependencies:** Removed `jQuery`, `Intervention/Image v2`, `TinyMCE`, and other outdated libraries.
+> *   **New Rich Text Editor:** Replaced TinyMCE with **Jodit Editor** (lightweight, fast, and reliable).
+> *   **Native Image Processing:** Replaced Intervention with a custom lightweight GD-based processor (faster, no external deps).
+> *   **Modern Build Tooling:** Migrated from Webpack/Mix to **Vite**.
+> *   **CSS Grid Shim:** Replaced Bootstrap 3's float-based grid with a modern **Flexbox implementation** (preserving visual compatibility).
+> *   **Google Maps:** Updated to work with modern APIs (removed dependency on deprecated Map IDs).
+>
+> This version aims to keep the classic Voyager experience alive while running on a strictly modern technology stack.
+
 Laravel Admin & BREAD System (Browse, Read, Edit, Add, & Delete), supporting Laravel 8 and newer!
 
 > Want to use Laravel 6 or 7? Use [Voyager 1.5](https://github.com/the-control-group/voyager/tree/1.5)
