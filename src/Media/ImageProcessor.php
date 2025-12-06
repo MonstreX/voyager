@@ -48,14 +48,26 @@ class ImageProcessor
      */
     public function read($source)
     {
-        if (@is_file($source)) {
+        // Handle UploadedFile / SplFileInfo
+        if (is_object($source) && method_exists($source, 'getRealPath')) {
+            $source = $source->getRealPath();
+        }
+
+        if (is_string($source) && @is_file($source)) {
             $this->mimeType = mime_content_type($source);
             $content = file_get_contents($source);
         } else {
-            // Assume string data
+            // Assume string data (binary)
             $content = $source;
             $finfo = new \finfo(FILEINFO_MIME_TYPE);
-            $this->mimeType = $finfo->buffer($content);
+            // Check if content is not empty to avoid warning
+            if (!empty($content)) {
+                $this->mimeType = $finfo->buffer($content);
+            }
+        }
+        
+        if (empty($content)) {
+             throw new RuntimeException("Image content is empty");
         }
 
         try {
