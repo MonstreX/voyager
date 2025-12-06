@@ -85,8 +85,8 @@ class VoyagerController extends Controller
             $status = __('voyager::media.uploading_wrong_type');
         }
 
-        // Return URL for TinyMCE
-        return Voyager::image($fullFilename);
+        // Return URL for Jodit (as JSON)
+        return response()->json(Voyager::image($fullFilename));
     }
 
     protected function userCannotUploadImageIn($dataType, $action)
