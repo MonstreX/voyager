@@ -1,0 +1,80 @@
+@use "sass:math";
+
+// _flex-grid.scss
+// Modern Flexbox Grid System to replace Bootstrap 3 Floats
+// Preserves .col-*-* class names for backward compatibility
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -15px;
+  margin-left: -15px;
+
+  &:before,
+  &:after {
+    display: none !important; // Kill clearfix
+  }
+}
+
+[class*="col-"] {
+  float: none !important;
+  position: relative;
+  min-height: 1px;
+  padding-right: 15px;
+  padding-left: 15px;
+  width: 100%; // Default mobile stack
+}
+
+// Mixin to generate grid columns
+@mixin make-grid-columns($class) {
+  @for $i from 1 through 12 {
+    .col-#{$class}-#{$i} {
+      flex: 0 0 percentage(math.div($i, 12));
+      max-width: percentage(math.div($i, 12));
+      width: auto; // Reset width: 100%
+    }
+  }
+  @for $i from 1 through 12 {
+    .col-#{$class}-offset-#{$i} {
+        margin-left: percentage(math.div($i, 12));
+    }
+  }
+}
+
+// XS (Extra Small) - Always horizontal if defined
+@include make-grid-columns('xs');
+
+// SM (Small) - Tablets >= 768px
+@media (min-width: 768px) {
+  @include make-grid-columns('sm');
+}
+
+// MD (Medium) - Desktops >= 992px
+@media (min-width: 992px) {
+  @include make-grid-columns('md');
+}
+
+// LG (Large) - Large Desktops >= 1200px
+@media (min-width: 1200px) {
+  @include make-grid-columns('lg');
+}
+
+// Utility: Vertical Alignment in rows
+.align-items-center {
+    align-items: center;
+}
+.align-items-start {
+    align-items: flex-start;
+}
+.align-items-end {
+    align-items: flex-end;
+}
+.justify-content-center {
+    justify-content: center;
+}
+.justify-content-between {
+    justify-content: space-between;
+}
+.d-flex {
+    display: flex !important;
+}
