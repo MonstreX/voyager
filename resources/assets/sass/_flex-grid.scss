@@ -4,6 +4,10 @@
 // Modern Flexbox Grid System to replace Bootstrap 3 Floats
 // Preserves .col-*-* class names for backward compatibility
 
+.container-fluid {
+    width: 100%;
+}
+
 .row {
   display: flex;
   flex-wrap: wrap;
