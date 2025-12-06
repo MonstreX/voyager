@@ -5,9 +5,8 @@ namespace TCG\Voyager\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Constraint;
-use Intervention\Image\Facades\Image;
 use TCG\Voyager\Facades\Voyager;
+use TCG\Voyager\Media\VoyagerImage as Image;
 
 class VoyagerController extends Controller
 {
@@ -53,7 +52,7 @@ class VoyagerController extends Controller
 
         if (in_array($ext, ['jpeg', 'jpg', 'png', 'gif'])) {
             $image = Image::make($file)
-                ->resize($resizeWidth, $resizeHeight, function (Constraint $constraint) {
+                ->resize($resizeWidth, $resizeHeight, function ($constraint) {
                     $constraint->aspectRatio();
                     $constraint->upsize();
                 });

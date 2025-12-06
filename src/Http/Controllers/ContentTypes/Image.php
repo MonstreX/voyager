@@ -4,8 +4,7 @@ namespace TCG\Voyager\Http\Controllers\ContentTypes;
 
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Intervention\Image\Constraint;
-use Intervention\Image\Facades\Image as InterventionImage;
+use TCG\Voyager\Media\VoyagerImage;
 
 class Image extends BaseType
 {
@@ -18,7 +17,7 @@ class Image extends BaseType
 
             $filename = $this->generateFileName($file, $path);
 
-            $image = InterventionImage::make($file)->orientate();
+            $image = VoyagerImage::make($file)->orientate();
 
             $fullPath = $path.$filename.'.'.$file->getClientOriginalExtension();
 
@@ -43,7 +42,7 @@ class Image extends BaseType
             $image = $image->resize(
                 $resize_width,
                 $resize_height,
-                function (Constraint $constraint) {
+                function ($constraint) {
                     $constraint->aspectRatio();
                     if (isset($this->options->upsize) && !$this->options->upsize) {
                         $constraint->upsize();
@@ -74,12 +73,12 @@ class Image extends BaseType
                             $thumb_resize_height = intval($thumb_resize_height * $scale);
                         }
 
-                        $image = InterventionImage::make($file)
+                        $image = VoyagerImage::make($file)
                             ->orientate()
                             ->resize(
                                 $thumb_resize_width,
                                 $thumb_resize_height,
-                                function (Constraint $constraint) {
+                                function ($constraint) {
                                     $constraint->aspectRatio();
                                     if (isset($this->options->upsize) && !$this->options->upsize) {
                                         $constraint->upsize();
@@ -89,7 +88,7 @@ class Image extends BaseType
                     } elseif (isset($thumbnails->crop->width) && isset($thumbnails->crop->height)) {
                         $crop_width = $thumbnails->crop->width;
                         $crop_height = $thumbnails->crop->height;
-                        $image = InterventionImage::make($file)
+                        $image = VoyagerImage::make($file)
                             ->orientate()
                             ->fit($crop_width, $crop_height)
                             ->encode($file->getClientOriginalExtension(), $resize_quality);
