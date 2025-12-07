@@ -6,7 +6,6 @@
 @import "flex-grid";
 @import "fonts";
 @import "core/global";
-@import "core/voyager-theme";
 
 // Third-party Vendors
 @import "vendor/animate";
@@ -36,6 +35,9 @@
 @import "components/panels";
 @import "components/forms";
 @import "components/modals";
+
+// Voyager Theme (Overrides)
+@import "core/voyager-theme";
 
 // Layouts
 @import "layouts/login";
