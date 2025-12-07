@@ -1,6 +1,6 @@
 # Introduction
 
-When adding or editing the current BREAD for a database table you will first see the BREAD info which allows you to set the Display Names, slug, icon, `Model` and Controller Namespace, Policy Name. You can also choose if you would like to Generate permissions for that BREAD type.
+When adding or editing the current BREAD for a database table you will first see the BREAD info which allows you to set the Display Names, slug, icon, `Model` and Controller Namespace, Policy Name. By default, generated models will use the `App\Models` namespace, which can be configured via `voyager.models.namespace`. You can also choose if you would like to Generate permissions for that BREAD type.
 
 ![](../.gitbook/assets/bread_details.png)
 

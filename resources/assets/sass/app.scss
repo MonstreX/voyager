@@ -430,7 +430,8 @@ body {
   outline: none; }
 
 .row > [class*="col-"] {
-  margin-bottom: 25px; }
+  // margin-bottom: 25px;
+}
 
 .row.no-margin-bottom > [class*="col-"] {
   margin-bottom: 10px; }
@@ -8682,3 +8683,11 @@ div.cropper-container img {
 }
 
 /********** END SimpleMDE Style **********/
+
+.no-padding {
+  padding: 0 !important;
+}
+
+.no-margin {
+  margin: 0;
+}

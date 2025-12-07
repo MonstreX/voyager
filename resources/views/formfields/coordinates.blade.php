@@ -21,7 +21,7 @@
         <div class="alert alert-warning" v-if="!apiKey">
             <strong>{{ __('voyager::generic.error') }}:</strong> Google Maps API key is missing. Please configure <code>GOOGLE_MAPS_KEY</code> in your .env file.
         </div>
-        <div class="form-group" v-else>
+        <div class="form-group row" v-else>
             <div class="col-md-5" v-if="showAutocomplete">
                 <label class="control-label">{{ __('voyager::generic.find_by_place') }}</label>
                 <input
