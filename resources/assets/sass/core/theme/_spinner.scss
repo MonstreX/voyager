@@ -1,0 +1,52 @@
+.spinnerRotate {
+  -webkit-animation: spinnerRotate 900ms ease-out both;
+  animation: spinnerRotate 900ms ease-out both;
+}
+
+@keyframes spinnerRotate {
+  0% {
+    transform: scale(0.7) rotate(0deg);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1) rotate(270deg);
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes spinnerRotate {
+  0% {
+    -webkit-transform: scale(0.7) rotate(0deg);
+    opacity: 0;
+  }
+
+  100% {
+    -webkit-transform: scale(1) rotate(270deg);
+    opacity: 1;
+  }
+}
+
+@-moz-keyframes spinnerRotate {
+  0% {
+    -moz-transform: scale(0.7) rotate(0deg);
+    opacity: 0;
+  }
+
+  100% {
+    -moz-transform: scale(1) rotate(270deg);
+    opacity: 1;
+  }
+}
+
+@-ms-keyframes spinnerRotate {
+  0% {
+    -ms-transform: scale(0.7) rotate(0deg);
+    opacity: 0;
+  }
+
+  100% {
+    -ms-transform: scale(1) rotate(270deg);
+    opacity: 1;
+  }
+}
