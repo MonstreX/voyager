@@ -71,3 +71,16 @@
     padding: 0 0.5em;
   }
 }
+
+/* Fix navbar responsiveness */
+.navbar-nav.navbar-right {
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: auto;
+  background: none !important;
+}
+
+.navbar-nav.navbar-right li.dropdown.open .dropdown-menu {
+  display: block;
+}
