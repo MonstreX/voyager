@@ -370,7 +370,7 @@
                 <h3 class="panel-title"><i class="voyager-plus"></i> {{ __('voyager::settings.new') }}</h3>
             </div>
             <div class="panel-body">
-                <form action="{{ route('voyager.settings.store') }}" method="POST">
+                <form action="{{ route('voyager.settings.store') }}" method="POST" class="row">
                     {{ csrf_field() }}
                     <input type="hidden" name="setting_tab" class="setting_tab" value="{{ $active }}" />
                     <div class="col-md-3">
