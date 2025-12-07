@@ -1,0 +1,116 @@
+.voyager .side-menu {
+    background-color: #FFF;
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.voyager .side-menu .navbar-header {
+    background-color: #22A7F0;
+    margin-bottom: 4px;
+}
+
+.voyager .side-menu .navbar-header .navbar-brand {
+    color: #19B5FE;
+}
+
+.voyager .side-menu .navbar-nav {
+    width: 100%;
+}
+
+.voyager .side-menu .navbar {
+    background-color: #FFF;
+    border-bottom: 0;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+.voyager .side-menu .navbar li > a {
+    color: #363c46;
+}
+
+.voyager .side-menu .navbar li.active {
+    border-left: 0;
+}
+
+.voyager .side-menu .navbar li.active > a {
+    border-right: 4px solid #22A7F0;
+    background-color: #FFF;
+}
+
+.voyager .side-menu .navbar > li:hover > a {
+    background-color: #FA2A00;
+    color: #FFF;
+}
+
+.voyager .side-menu .navbar li.dropdown {
+    background-color: transparent;
+}
+
+.voyager .side-menu .navbar li.dropdown > .panel-collapse {
+    background-color: #E4E4E4;
+}
+
+.voyager .side-menu .navbar li.dropdown .panel-body {
+    padding: 0 7px;
+}
+
+.voyager .side-menu.sidebar-inverse {
+    background-color: #353d47;
+    box-shadow: 0px 0px 0px;
+}
+
+.voyager .side-menu.sidebar-inverse .navbar {
+    background-color: #353d47;
+    border-bottom: 0;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+.voyager .side-menu.sidebar-inverse .navbar li {
+    border-left: 0;
+}
+
+.voyager .side-menu.sidebar-inverse .navbar li > a {
+    color: #FFF;
+}
+
+.voyager .side-menu.sidebar-inverse .navbar li.active > a {
+    color: #353d47;
+    border-left: 3px solid #22A7F0;
+    border-right: 0 solid #22A7F0;
+    background-color: #FFF;
+    font-weight:400;
+}
+
+.voyager .side-menu.sidebar-inverse .navbar li.active > a .icon {
+    margin-left: -3px;
+}
+
+.voyager .side-menu.sidebar-inverse .navbar > li:hover > a {
+    background-color: #FA2A00;
+    color: #FFF;
+}
+
+.voyager .side-menu.sidebar-inverse .navbar li.dropdown > .panel-collapse {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.voyager .side-menu.sidebar-inverse .navbar li.dropdown .panel-body {
+    padding: 0 7px;
+}
+
+@media (max-width: 768px) {
+    .voyager .navbar.navbar-default .navbar-nav > li {
+        border-left: 0;
+    }
+    .voyager .navbar.navbar-default .navbar-right {
+        background-color: #FFF;
+    }
+    .voyager .navbar.navbar-inverse .navbar-nav > li {
+        border-left: 0;
+    }
+    .voyager .navbar.navbar-inverse .navbar-right {
+        background-color: #353d47;
+    }
+}

@@ -1,0 +1,213 @@
+.voyager .panel.panel-primary .panel-heading {
+    border-bottom: 1px solid #353d47;
+    background-color: #73849d;
+    color: #FFF;
+}
+
+.voyager .panel.panel-success {
+    border: 1px solid #1ABC9C;
+}
+
+.voyager .panel.panel-success .panel-heading {
+    border-bottom: 1px solid #1ABC9C;
+    background-color: #99e9d9;
+    color: #006551;
+}
+
+.voyager .panel.panel-info {
+    border: 1px solid #22A7F0;
+}
+
+.voyager .panel.panel-info .panel-heading {
+    border-bottom: 1px solid #22A7F0;
+    background-color: #91d5fb;
+    color: #09486b;
+}
+
+.voyager .panel.panel-warning {
+    border: 1px solid #FABE28;
+}
+
+.voyager .panel.panel-warning .panel-heading {
+    border-bottom: 1px solid #FABE28;
+    background-color: #ffe5a2;
+    color: #85630f;
+}
+
+.voyager .panel.panel-danger {
+    border: 1px solid #fb927d;
+}
+
+.voyager .panel.panel-danger .panel-heading {
+    border-bottom: 1px solid #fb927d;
+    background-color: #ffb8aa;
+    color: #7c1a06;
+}
+
+.voyager .panel.fresh-color.panel-primary {
+    border: 1px solid #353d47;
+}
+
+.voyager .panel.fresh-color.panel-primary .panel-heading {
+    border-bottom: 1px solid #353d47;
+    background-color: #353d47;
+    color: #FFF;
+}
+
+.voyager .panel.fresh-color.panel-success {
+    border: 1px solid #1ABC9C;
+}
+
+.voyager .panel.fresh-color.panel-success .panel-heading {
+    border-bottom: 1px solid #1ABC9C;
+    background-color: #1ABC9C;
+    color: #FFF;
+}
+
+.voyager .panel.fresh-color.panel-info {
+    border: 1px solid #22A7F0;
+}
+
+.voyager .panel.fresh-color.panel-info .panel-heading {
+    border-bottom: 1px solid #22A7F0;
+    background-color: #22A7F0;
+    color: #FFF;
+}
+
+.voyager .panel.fresh-color.panel-warning {
+    border: 1px solid #FABE28;
+}
+
+.voyager .panel.fresh-color.panel-warning .panel-heading {
+    border-bottom: 1px solid #FABE28;
+    background-color: #FABE28;
+    color: #FFF;
+}
+
+.voyager .panel.fresh-color.panel-danger {
+    border: 1px solid #FA2A00;
+}
+
+.voyager .panel.fresh-color.panel-danger .panel-heading {
+    border-bottom: 1px solid #FA2A00;
+    background-color: #FA2A00;
+    color: #FFF;
+}
+
+
+
+.voyager .btn.btn-success {
+    background:#2ecc71;
+    color:#fff;
+    border: 0px;
+    border-radius: 3px;
+    opacity:0.9;
+}
+
+.voyager .btn.btn-success:hover {
+
+  opacity:1;
+}
+
+.voyager .btn.btn-warning {
+    background: #f39c12;
+    color: #fff;
+    border: 0px;
+    border-radius: 3px;
+    opacity:0.9;
+}
+
+.voyager .btn.btn-warning:hover {
+  opacity:1;
+}
+
+.voyager .btn.btn-info {
+    background-color: #22A7F0;
+    color: #FFF;
+    border-color: #22A7F0;
+}
+
+.voyager .btn.btn-sm.btn-info {
+  background:#22A7F0;
+}
+
+.voyager .btn.btn-danger {
+    background:#FA2A00;
+    color: #fff;
+    border:0px;
+    border-radius:3px;
+    opacity:0.9;
+}
+
+.voyager .btn.btn-danger:hover{
+  opacity:1;
+}
+
+.voyager .btn.btn-link {
+    color: #353d47;
+}
+
+.voyager .progress .progress-bar {
+    background-color: #353d47;
+    color: #FFF;
+}
+
+.voyager .progress .progress-bar.progress-bar-success {
+    background-color: #1ABC9C;
+}
+
+.voyager .progress .progress-bar.progress-bar-info {
+    background-color: #22A7F0;
+}
+
+.voyager .progress .progress-bar.progress-bar-warning {
+    background-color: #FABE28;
+}
+
+.voyager .progress .progress-bar.progress-bar-danger {
+    background-color: #FA2A00;
+}
+
+.voyager .color-white {
+    color: #FFF;
+}
+
+.voyager .pagination > li > a {
+    color: #353d47;
+}
+
+.voyager .pagination .active > a,
+.voyager .pagination .active > a:focus,
+.voyager .pagination .active > a:hover,
+.voyager .pagination .active span,
+.voyager .pagination .active > span:focus,
+.voyager .pagination .active > span:hover {
+    background-color: #353d47;
+    border-color: #353d47;
+    color: #FFF;
+}
+
+.voyager .modal.modal-primary .modal-header {
+    background-color: #353d47;
+    color: #FFF;
+}
+
+.voyager .modal.modal-success .modal-header {
+    background-color: #1ABC9C;
+    color: #FFF;
+}
+
+.voyager .modal.modal-info .modal-header {
+    background-color: #22A7F0;
+    color: #FFF;
+}
+
+.voyager .modal.modal-warning .modal-header {
+    background-color: #FABE28;
+    color: #FFF;
+}
+
+.voyager .modal.modal-danger .modal-header {
+    background-color: #FA2A00;
+    color: #FFF;
+}

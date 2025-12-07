@@ -1,0 +1,30 @@
+.breadcrumb{
+    padding: 4px 10px;
+    list-style: none;
+    background-color: #fff;
+    border-radius: 25px;
+    position: relative;
+    top: 2px;
+    border: 1px solid #f9f9f9;
+    font-size: 12px;
+    padding-right: 15px;
+}
+
+.breadcrumb a{
+  color:#22A7F0;
+  font-family:'Open Sans';
+  font-weight:400;
+}
+
+.breadcrumb i{
+  position:relative;
+  top:2px;
+}
+
+.breadcrumb>.active, .breadcrumb>li{
+  font-weight:400;
+}
+
+.site-footer-right{
+  padding-right:20px;
+}

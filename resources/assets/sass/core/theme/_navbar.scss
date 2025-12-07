@@ -1,0 +1,220 @@
+.voyager {
+    background-color: #F9F9F9;
+    /* small screen */
+}
+
+.voyager .app-footer {
+    opacity: 0.7;
+    color: #353d47;
+    width: 100%;
+    text-align: right;
+    padding: 10px 0;
+    background: #fff;
+    left: 0px;
+}
+
+.voyager .app-footer i {
+    color: #D9534F;
+    position: relative;
+    top: 2px;
+}
+
+.voyager .navbar,
+.voyager .navbar.navbar-default {
+    border-bottom: 0;
+    box-shadow: 0 0 0;
+    background:rgba(250, 250, 250, 0.9);
+}
+
+.voyager .navbar > .container-fluid,
+.voyager .navbar.navbar-default > .container-fluid:after {
+    border-bottom: 1px solid #eee;
+    width: 99.5%;
+    height: 1px;
+}
+
+.voyager .expanded .navbar > .container-fluid,
+.voyager .expanded .navbar.navbar-default > .container-fluid:after {
+  border-bottom:0px;
+}
+
+.voyager .navbar .navbar-header .navbar-brand,
+.voyager .navbar.navbar-default .navbar-header .navbar-brand {
+    color: #F9F9F9;
+}
+
+.voyager .navbar .navbar-header .navbar-expand-toggle,
+.voyager .navbar.navbar-default .navbar-header .navbar-expand-toggle {
+    color: #353d47;
+}
+
+.voyager .navbar .navbar-header .navbar-right-expand-toggle,
+.voyager .navbar.navbar-default .navbar-header .navbar-right-expand-toggle {
+    color: #353d47;
+}
+
+.voyager .navbar .navbar-breadcrumb li,
+.voyager .navbar.navbar-default .navbar-breadcrumb li {
+    color: #353d47;
+}
+
+.voyager .navbar .navbar-breadcrumb li a,
+.voyager .navbar.navbar-default .navbar-breadcrumb li a {
+    color: #353d47;
+}
+
+.voyager .navbar .navbar-nav > li,
+.voyager .navbar.navbar-default .navbar-nav > li {
+    border-left: 1px solid #F9F9F9;
+}
+
+.voyager .navbar .navbar-nav > li.profile,
+.voyager .navbar.navbar-default .navbar-nav > li.provile {
+  border-left:0px;
+}
+
+.voyager .navbar .navbar-nav > li > a,
+.voyager .navbar.navbar-default .navbar-nav > li > a {
+    color: #353d47;
+}
+
+.voyager .navbar .navbar-nav > li:hover > a,
+.voyager .navbar.navbar-default .navbar-nav > li:hover > a {
+    color: #22A7F0;
+}
+
+.voyager .navbar .navbar-nav > li.open > a,
+.voyager .navbar.navbar-default .navbar-nav > li.open > a {
+    background-color: transparent;
+    color: #22A7F0;
+}
+
+.voyager .navbar .navbar-nav > li.danger > a,
+.voyager .navbar.navbar-default .navbar-nav > li.danger > a {
+    background-color: transparent;
+    border-bottom: 4px solid #FA2A00;
+    color: #FA2A00;
+}
+
+.voyager .navbar .navbar-nav > li.danger.open > a,
+.voyager .navbar.navbar-default .navbar-nav > li.danger.open > a {
+    background-color: #FA2A00;
+    color: #FFF;
+}
+
+.voyager .navbar .navbar-nav .dropdown-menu,
+.voyager .navbar.navbar-default .navbar-nav .dropdown-menu {
+    background-color: #F9F9F9;
+    border-color: #E4E4E4;
+}
+
+.voyager .navbar .navbar-nav .dropdown-menu .title,
+.voyager .navbar.navbar-default .navbar-nav .dropdown-menu .title {
+    background-color: #FFF;
+}
+
+.voyager .navbar .navbar-nav .dropdown-menu .title .badge,
+.voyager .navbar.navbar-default .navbar-nav .dropdown-menu .title .badge {
+    background-color: #353d47;
+}
+
+.voyager .navbar .navbar-nav .dropdown-menu.danger,
+.voyager .navbar.navbar-default .navbar-nav .dropdown-menu.danger {
+    border-color: #FA2A00;
+}
+
+.voyager .navbar .navbar-nav .dropdown-menu.danger .title,
+.voyager .navbar.navbar-default .navbar-nav .dropdown-menu.danger .title {
+    background-color: #FA2A00;
+    color: #FFF;
+}
+
+.voyager .navbar .navbar-nav .dropdown-menu.danger .title .badge,
+.voyager .navbar.navbar-default .navbar-nav .dropdown-menu.danger .title .badge {
+    background-color: #FFF;
+    color: #FA2A00;
+}
+
+.voyager .navbar.navbar-inverse {
+    background-color: #353d47;
+    border-bottom: 0;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+.voyager .navbar.navbar-inverse > .container-fluid {
+    background-color: #353d47;
+}
+
+.voyager .navbar.navbar-inverse .navbar-header .navbar-brand {
+    color: #F9F9F9;
+}
+
+.voyager .navbar.navbar-inverse .navbar-header .navbar-expand-toggle {
+    color: #FFF;
+}
+
+.voyager .navbar.navbar-inverse .navbar-header .navbar-right-expand-toggle {
+    color: #FFF;
+}
+
+.voyager .navbar.navbar-inverse .navbar-breadcrumb li {
+    color: #FFF;
+}
+
+.voyager .navbar.navbar-inverse .navbar-breadcrumb li a {
+    color: #FFF;
+}
+
+.voyager .navbar.navbar-inverse .navbar-nav > li {
+    border-left: 1px solid #363c46;
+}
+
+.voyager .navbar.navbar-inverse .navbar-nav > li > a {
+    color: #FFF;
+}
+
+.voyager .navbar.navbar-inverse .navbar-nav > li:hover > a {
+    color: #22A7F0;
+}
+
+.voyager .navbar.navbar-inverse .navbar-nav > li.open > a {
+    background-color: transparent;
+    color: #22A7F0;
+}
+
+.voyager .navbar.navbar-inverse .navbar-nav > li.danger > a {
+    background-color: transparent;
+    border-bottom: 4px solid #FA2A00;
+    color: #FFF;
+}
+
+.voyager .navbar.navbar-inverse .navbar-nav > li.danger.open > a {
+    background-color: #FA2A00;
+}
+
+.voyager .navbar.navbar-inverse .navbar-nav .dropdown-menu {
+    background-color: #F9F9F9;
+    border-color: #353d47;
+}
+
+.voyager .navbar.navbar-inverse .navbar-nav .dropdown-menu .title {
+    background-color: #FFF;
+}
+
+.voyager .navbar.navbar-inverse .navbar-nav .dropdown-menu .title .badge {
+    background-color: #353d47;
+}
+
+.voyager .navbar.navbar-inverse .navbar-nav .dropdown-menu.danger {
+    border-color: #FA2A00;
+}
+
+.voyager .navbar.navbar-inverse .navbar-nav .dropdown-menu.danger .title {
+    background-color: #FA2A00;
+    color: #FFF;
+}
+
+.voyager .navbar.navbar-inverse .navbar-nav .dropdown-menu.danger .title .badge {
+    background-color: #FFF;
+    color: #FA2A00;
+}

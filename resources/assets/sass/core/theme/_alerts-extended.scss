@@ -1,0 +1,56 @@
+.voyager .alert{
+    margin-right: 0px;
+    margin-bottom: 5px;
+    border-radius: 0;
+    color: #fff;
+    border: 0;
+    border-left: 5px solid rgba(0, 0, 0, 0.1);
+    border-color:rgba(0, 0, 0, 0.1);
+    border-radius:3px;
+    margin-bottom:30px;
+}
+
+.voyager .alert.alert-success{
+  background-color: #55B559;
+  color:#fff;
+  border-color:rgba(0, 0, 0, 0.1);
+}
+.voyager .alert.alert-danger{
+  background-color: #F55145;
+  color:#fff;
+  border-color:rgba(0, 0, 0, 0.1);
+}
+.voyager .alert.alert-warning{
+  background-color: #FF9E0F;
+  color:#fff;
+  border-color:rgba(0, 0, 0, 0.1);
+}
+.voyager .alert.alert-info{
+  background-color:#22A7F0;
+  color:#fff;
+  border-color:rgba(0, 0, 0, 0.1);
+}
+
+.voyager .panel-body .alert{
+  margin-right:0px;
+  margin-bottom:10px;
+  margin-top:10px;
+}
+
+.voyager input[type="file"]{
+  padding: 20px;
+  background: #fff;
+  border-radius: 4px;
+  border: 1px solid #f1f1f1;
+  outline: none;
+  cursor: pointer;
+  line-height: 16px;
+  color: #aaa;
+  font-weight: 500;
+  font-size: 12px;
+  transition:all 0.3s ease-in-out;
+}
+
+.voyager input[type="file"]:hover, .voyager input[type="file"]:active{
+  background: #fcfcfc;
+}

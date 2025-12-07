@@ -1,0 +1,144 @@
+ html, body{
+  padding:0px;
+  margin:0px;
+  height:100%;
+  font-family: Open Sans,sans-serif;
+  font-size: 14px;
+  line-height: 1.57142857;
+  color: #76838f;
+  background-color: #fff;
+ }
+.skin-voyager .main-header .navbar {
+  background-color: #fff;
+  border-bottom:1px solid #f1f1f1;
+}
+.skin-voyager .main-header .navbar .nav > li > a {
+  color: #212936;
+}
+.skin-voyager .main-header .navbar .nav > li > a:hover,
+.skin-voyager .main-header .navbar .nav > li > a:active,
+.skin-voyager .main-header .navbar .nav > li > a:focus,
+.skin-voyager .main-header .navbar .nav .open > a,
+.skin-voyager .main-header .navbar .nav .open > a:hover,
+.skin-voyager .main-header .navbar .nav .open > a:focus,
+.skin-voyager .main-header .navbar .nav > .active > a {
+  background: rgba(0, 0, 0, 0.05);
+  color: #212936;
+}
+.skin-voyager .main-header .navbar .sidebar-toggle {
+  color: #212936;
+}
+@media (max-width: 767px) {
+  .skin-voyager .main-header .navbar .dropdown-menu li.divider {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  .skin-voyager .main-header .navbar .dropdown-menu li a {
+    color: #fff;
+  }
+  .skin-voyager .main-header .navbar .dropdown-menu li a:hover {
+    background: #367fa9;
+  }
+}
+.skin-voyager .main-header .logo {
+  background-color: #212936;
+  color: #ffffff;
+  border-bottom: 0 solid transparent;
+}
+.skin-voyager .main-header .logo:hover {
+  background-color: #212936;
+}
+.skin-voyager .main-header li.user-header {
+  background-color: #212936;
+}
+.skin-voyager .content-header {
+  background: transparent;
+}
+.skin-voyager .wrapper,
+.skin-voyager .main-sidebar,
+.skin-voyager .left-side {
+  background-color: #1B1E24;
+}
+.skin-voyager .user-panel > .info,
+.skin-voyager .user-panel > .info > a {
+  color: #fff;
+}
+.skin-voyager .sidebar-menu > li.header {
+  color: #4b646f;
+  background: #1a2226;
+}
+.skin-voyager .sidebar-menu > li > a {
+  border-left: 3px solid transparent;
+}
+.skin-voyager .sidebar-menu > li:hover > a,
+.skin-voyager .sidebar-menu > li.active > a {
+  color: #ffffff;
+  background: #1e282c;
+  border-left-color: #3c8dbc;
+}
+.skin-voyager .sidebar-menu > li > .treeview-menu {
+  margin: 0 1px;
+  background: #2c3b41;
+}
+.skin-voyager .sidebar a {
+  color: #b8c7ce;
+}
+.skin-voyager .sidebar a:hover {
+  text-decoration: none;
+}
+.skin-voyager .treeview-menu > li > a {
+  color: #8aa4af;
+}
+.skin-voyager .treeview-menu > li.active > a,
+.skin-voyager .treeview-menu > li > a:hover {
+  color: #ffffff;
+}
+.skin-voyager .sidebar-form {
+  border-radius: 3px;
+  border: 1px solid #374850;
+  margin: 10px 10px;
+}
+.skin-voyager .sidebar-form input[type="text"],
+.skin-voyager .sidebar-form .btn {
+  box-shadow: none;
+  background-color: #374850;
+  border: 1px solid transparent;
+  height: 35px;
+  -webkit-transition: all 0.3s ease-in-out;
+  -o-transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+}
+.skin-voyager .sidebar-form input[type="text"] {
+  color: #666;
+  border-top-left-radius: 2px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 2px;
+}
+.skin-voyager .sidebar-form input[type="text"]:focus,
+.skin-voyager .sidebar-form input[type="text"]:focus + .input-group-btn .btn {
+  background-color: #fff;
+  color: #666;
+}
+.skin-voyager .sidebar-form input[type="text"]:focus + .input-group-btn .btn {
+  border-left-color: #fff;
+}
+.skin-voyager .sidebar-form .btn {
+  color: #999;
+  border-top-left-radius: 0;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+  border-bottom-left-radius: 0;
+}
+.skin-voyager.layout-top-nav .main-header > .logo {
+  background-color: #22262E;
+  color: #ffffff;
+  border-bottom: 0 solid transparent;
+}
+.skin-voyager.layout-top-nav .main-header > .logo:hover {
+  background-color: #3b8ab8;
+}
+
+/*
+* End Skin: Voyager
+* ----------
+*/

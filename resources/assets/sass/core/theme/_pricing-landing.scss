@@ -1,0 +1,139 @@
+.voyager .pricing-table {
+    box-shadow: 0 1px 1px #CCC;
+}
+
+.voyager .pricing-table .pt-header {
+    background-color: #E4E4E4;
+}
+
+.voyager .pricing-table .pt-header .plan-pricing .pricing {
+    text-shadow: 0 1px 1px #FFF;
+}
+
+.voyager .pricing-table .pt-body {
+    background-color: #F9F9F9;
+}
+
+.voyager .pricing-table .pt-body .plan-detail {
+    border-top: 1px dashed rgba(255, 255, 255, 0.6);
+    padding-top: 1em;
+    margin-top: 1em;
+}
+
+.voyager .pricing-table .pt-footer {
+    background-color: #F9F9F9;
+}
+
+.voyager .pricing-table.dark-blue .pt-header {
+    background-color: #353d47;
+    color: #FFF;
+}
+
+.voyager .pricing-table.dark-blue .pt-body {
+    background-color: #9eaabd;
+    color: #363c46;
+}
+
+.voyager .pricing-table.green .pt-header {
+    background-color: #1ABC9C;
+    color: #FFF;
+}
+
+.voyager .pricing-table.green .pt-body {
+    background-color: #99e9d9;
+    color: #006551;
+}
+
+.voyager .pricing-table.blue .pt-header {
+    background-color: #22A7F0;
+    color: #FFF;
+}
+
+.voyager .pricing-table.blue .pt-body {
+    background-color: #91d5fb;
+    color: #09486b;
+}
+
+.voyager .pricing-table.yellow .pt-header {
+    background-color: #FABE28;
+    color: #FFF;
+}
+
+.voyager .pricing-table.yellow .pt-body {
+    background-color: #ffe5a2;
+    color: #85630f;
+}
+
+.voyager .pricing-table.red .pt-header {
+    background-color: #FA2A00;
+    color: #FFF;
+}
+
+.voyager .pricing-table.red .pt-body {
+    background-color: #ffb8aa;
+    color: #7c1a06;
+}
+
+.voyager.landing-page .navbar-inverse .navbar-toggle:focus,
+.voyager.landing-page .navbar-inverse .navbar-toggle:hover {
+    background-color: transparent;
+}
+
+.voyager.landing-page .navbar {
+    background-color: transparent;
+    box-shadow: none;
+}
+
+.voyager.landing-page .navbar .navbar-nav > .active > a {
+    background-color: transparent;
+}
+
+.voyager.landing-page .navbar .navbar-nav > li {
+    border-left: 0 solid #F9F9F9;
+}
+
+.voyager.landing-page .navbar .navbar-nav > li > a {
+    color: #FFF;
+}
+
+.voyager.landing-page .navbar .navbar-collapse {
+    border: 0;
+}
+
+.voyager.landing-page .navbar.affix .navbar-nav > li > a {
+    color: #353d47;
+}
+
+.voyager.landing-page .navbar.affix .navbar-nav > li:hover > a {
+    color: #22A7F0;
+}
+
+@media (max-width: 768px) {
+    .voyager.landing-page .navbar .navbar-collapse {
+        background-color: #333;
+    }
+    .voyager.landing-page .navbar .navbar-right {
+        background-color: transparent;
+        color: #FFF;
+    }
+    .voyager.landing-page .navbar.affix .navbar-nav > li > a {
+        color: #FFF;
+    }
+}
+
+.voyager.landing-page .navbar.affix .navbar-brand {
+    color: #353d47;
+}
+
+.voyager.landing-page .navbar.affix .navbar-toggle .icon-bar {
+    background-color: #353d47;
+}
+
+.voyager.landing-page .app-header .app-btn {
+    background-color: transparent;
+    border: 2px solid #FFF;
+}
+
+.voyager.landing-page .app-content-a {
+    background-color: #EAEAEA;
+}

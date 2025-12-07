@@ -1,0 +1,118 @@
+.voyager .card.red {
+    background-color: #FA2A00;
+    color: #FFF;
+}
+
+.voyager .card.yellow {
+    background-color: #ffb400;
+    color: #FFF;
+}
+
+.voyager .card.green {
+    background-color: #1ABC9C;
+    color: #FFF;
+}
+
+.voyager .card.blue {
+    background-color: #22A7F0;
+    color: #FFF;
+}
+
+.voyager .card.dark {
+    background-color: #353d47;
+    color: #FFF;
+}
+
+.voyager .card.red,
+.voyager .card.yellow,
+.voyager .card.green,
+.voyager .card.blue,
+.voyager .card.dark {
+    border: 0;
+}
+
+.voyager .card.red .card-header,
+.voyager .card.yellow .card-header,
+.voyager .card.green .card-header,
+.voyager .card.blue .card-header,
+.voyager .card.dark .card-header {
+    border-bottom: 0;
+}
+
+.voyager .card.red .card-header .title,
+.voyager .card.yellow .card-header .title,
+.voyager .card.green .card-header .title,
+.voyager .card.blue .card-header .title,
+.voyager .card.dark .card-header .title {
+    color: #FFF;
+}
+
+.voyager .card {
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    border: 0 solid #E4E4E4;
+}
+
+.voyager .card .card-header {
+    border-bottom: 1px solid #E4E4E4;
+}
+
+.voyager .card .card-header .title {
+    color: #353d47;
+}
+
+.voyager .card .card-body .sub-title {
+    border-bottom: 1px solid #EAEAEA;
+}
+
+.voyager .card .card-header.no-border {
+    border-bottom: 0;
+}
+
+.voyager .card .card-jumbotron {
+    background-color: #EAEAEA;
+}
+
+.voyager .card.primary .card-jumbotron {
+    background-color: #353d47;
+    color: #FFF;
+}
+
+.voyager .card.profile .card-footer {
+    border-top: 1px solid #F9F9F9;
+}
+
+.voyager .card.summary-inline.red:hover {
+    background-color: #7c1a06;
+}
+
+.voyager .card.summary-inline.yellow:hover {
+    background-color: #85630f;
+}
+
+.voyager .card.summary-inline.green:hover {
+    background-color: #006551;
+}
+
+.voyager .card.summary-inline.blue:hover {
+    background-color: #353d47;
+}
+
+.voyager .card.summary-inline.dark:hover {
+    background-color: #09486b;
+}
+
+.voyager .card.card-success .card-header {
+    background-color: #1ABC9C;
+}
+
+.voyager .card.card-success .card-header .title {
+    color: #FFF;
+}
+
+.voyager .card.card-info .card-header {
+    background-color: #22A7F0;
+}
+
+.voyager .card.card-info .card-header .title {
+    color: #FFF;
+}

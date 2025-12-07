@@ -1,0 +1,97 @@
+.voyager .panel.panel-warning .panel-heading {
+    background-color: #F2A654;
+    border-bottom:0px;
+}
+
+.voyager .panel.panel-primary .panel-heading{
+  background-color:#62A8EA;
+  border-bottom:0px;
+}
+
+.voyager .panel.panel-primary .panel-info, .voyager .panel.panel-info .panel-heading{
+  background-color:#57C7D4;
+  border-bottom:0px;
+}
+
+.panel-title {
+    display: block;
+    padding: 20px 30px;
+    padding-left:15px;
+    font-size: 18px;
+    text-align:left;
+}
+
+.panel-footer{
+  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#fcfcfc+0,ffffff+100 */
+  background: #fdfdfd; /* Old browsers */
+  background: -moz-linear-gradient(top,  rgba(252,252,252,1) 0%, rgba(255,255,255,1) 100%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(255,255,255,1) 100%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom,  rgba(252,252,252,1) 0%,rgba(255,255,255,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcfcfc', endColorstr='#ffffff',GradientType=0 ); /* IE6-9 */
+
+}
+
+.voyager .panel.panel-warning, .voyager .panel.panel-primary, .voyager .panel.panel-info{
+  border:0px;
+}
+
+.voyager .pagination .active > a, .voyager .pagination .active > a:focus, .voyager .pagination .active > a:hover, .voyager .pagination .active span, .voyager .pagination .active > span:focus, .voyager .pagination .active > span:hover {
+    z-index: 3;
+    color: #fff;
+    cursor: default;
+    background-color: #62a8ea;
+    border-color: #62a8ea;
+    outline: none;
+}
+
+.pagination li>a:focus, .pagination li>a:hover, .pagination li>span:focus, .pagination li>span:hover{
+  outline:none;
+}
+
+.panel-bordered>.panel-body {
+    padding:20px;
+    padding-top: 30px;
+    overflow:hidden;
+}
+
+.voyager .panel {
+    margin-bottom: 22px;
+    background-color: #fff;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    -webkit-box-shadow: 0 2px 10px rgba(0,0,0,.05);
+    box-shadow:0 2px 10px rgba(0,0,0,.05);
+}
+
+
+
+.voyager .btn.btn-circle{
+  border-radius:50px;
+}
+
+.voyager .btn.btn-sm{
+  opacity:0.9;
+}
+
+.voyager .btn.btn-sm:hover{
+  opacity:1;
+}
+
+.voyager .btn.btn-sm, .voyager .btn.btn-sm:hover{
+  border-width:1px;
+  border-color:rgba(255, 255, 255, 0);
+  color:#fff;
+}
+.voyager .btn.btn-default.btn-sm, .voyager .btn.btn-default.btn-sm:hover{
+  color:inherit;
+}
+
+.btn-primary.focus, .btn-primary:focus, .btn-primary:hover, .btn-primary:active {
+    opacity:1;
+}
+
+.widgets{
+  display:flex;
+  flex-direction:row;
+  padding:0px;
+}

@@ -1,0 +1,195 @@
+.voyager .badge.primary {
+    background-color: #353d47;
+}
+
+.voyager .badge.success {
+    background-color: #1ABC9C;
+}
+
+.voyager .badge.info {
+    background-color: #22A7F0;
+}
+
+.voyager .badge.warning {
+    background-color: #FABE28;
+}
+
+.voyager .badge.danger {
+    background-color: #FA2A00;
+}
+
+.voyager .nav-tabs {
+    background-color: #EAEAEA;
+}
+
+.voyager .nav-tabs > li > a:hover {
+    background-color: #EAEAEA;
+}
+
+.voyager .nav-tabs > li.active > a:hover {
+    background-color: #FFF;
+}
+
+.voyager .tabs-below > .nav-tabs {
+    border-top: 1px solid #E4E4E4;
+}
+
+.voyager .tabs-below > .nav-tabs > li > a:hover,
+.voyager .tabs-below > .nav-tabs > li > a:focus {
+    border-top-color: #E4E4E4;
+    border-bottom-color: transparent;
+}
+
+.voyager .tabs-below > .nav-tabs > .active > a,
+.voyager .tabs-below > .nav-tabs > .active > a:hover,
+.voyager .tabs-below > .nav-tabs > .active > a:focus {
+    border-color: transparent #E4E4E4 #E4E4E4 #E4E4E4;
+}
+
+.voyager .tabs-left > .nav-tabs {
+    border-right: 1px solid #E4E4E4;
+}
+
+.voyager .tabs-left > .nav-tabs > li > a:hover,
+.voyager .tabs-left > .nav-tabs > li > a:focus {
+    border-color: #E4E4E4 #E4E4E4 #E4E4E4 #E4E4E4;
+}
+
+.voyager .tabs-left > .nav-tabs .active > a,
+.voyager .tabs-left > .nav-tabs .active > a:hover,
+.voyager .tabs-left > .nav-tabs .active > a:focus {
+    border-color: #E4E4E4 transparent #E4E4E4 #E4E4E4;
+}
+
+.voyager .tabs-right > .nav-tabs {
+    border-left: 1px solid #E4E4E4;
+}
+
+.voyager .tabs-right > .nav-tabs > li > a:hover,
+.voyager .tabs-right > .nav-tabs > li > a:focus {
+    border-color: #E4E4E4 #E4E4E4 #E4E4E4 #E4E4E4;
+}
+
+.voyager .tabs-right > .nav-tabs .active > a,
+.voyager .tabs-right > .nav-tabs .active > a:hover,
+.voyager .tabs-right > .nav-tabs .active > a:focus {
+    border-color: #E4E4E4 #E4E4E4 #E4E4E4 transparent;
+}
+
+.voyager .step .nav-tabs {
+    background-color: #FFF;
+}
+
+.voyager .step .nav-tabs > li {
+    border: 1px solid #E4E4E4;
+    border-right: 0;
+}
+
+.voyager .step .nav-tabs > li:after {
+    border-top: 15px solid transparent;
+    border-bottom: 15px solid transparent;
+    border-left: 15px solid #FFF;
+}
+
+.voyager .step .nav-tabs > li:before {
+    border-top: 16px solid transparent;
+    border-bottom: 16px solid transparent;
+    border-left: 16px solid #E4E4E4;
+}
+
+.voyager .step .nav-tabs > li.active {
+    background-color: #EAEAEA;
+}
+
+.voyager .step .nav-tabs > li.active > a,
+.voyager .step .nav-tabs > li.active > a:focus,
+.voyager .step .nav-tabs > li.active > a:hover {
+    background: transparent;
+}
+
+.voyager .step .nav-tabs > li:hover {
+    background-color: #EAEAEA;
+}
+
+.voyager .step .nav-tabs > li:hover:after,
+.voyager .step .nav-tabs > li.active:after {
+    border-left: 15px solid #EAEAEA;
+}
+
+.voyager .step .nav-tabs > li:last-child {
+    border-right: 1px solid #E4E4E4;
+}
+
+.voyager .step .nav-tabs > li.step-success {
+    background-color: #99e9d9;
+    border: 1px solid #1ABC9C;
+}
+
+.voyager .step .nav-tabs > li.step-success a {
+    color: #006551;
+}
+
+.voyager .step .nav-tabs > li.step-disabled {
+    background-color: #99e9d9;
+}
+
+.voyager .step .nav-tabs > li.step-success:after {
+    border-left: 15px solid #99e9d9;
+}
+
+.voyager .step .nav-tabs > li.step-success.active:hover:after {
+    border-left: 15px solid #99e9d9;
+}
+
+.voyager .step .nav-tabs > li.step-success:hover:after {
+    border-left: 15px solid #EAEAEA;
+}
+
+.voyager .step.card-no-padding .nav-tabs > li {
+    border: 0 solid transparent;
+    border-right: 1px solid #E4E4E4;
+    border-bottom: 1px solid #E4E4E4;
+}
+
+.voyager .step.card-no-padding .nav-tabs > li:last-child {
+    border-right: 0 solid #E4E4E4;
+}
+
+.voyager .step.tabs-left .nav-tabs > li {
+    border: 1px solid #E4E4E4;
+}
+
+.voyager .step.tabs-left .nav-tabs > li:after {
+    border-top: 15px solid transparent;
+    border-bottom: 15px solid transparent;
+    border-left: 15px solid #FFF;
+}
+
+.voyager .step.tabs-left .nav-tabs > li:before {
+    border-top: 16px solid transparent;
+    border-bottom: 16px solid transparent;
+    border-left: 16px solid #E4E4E4;
+}
+
+.voyager .step.tabs-left .nav-tabs > li.active {
+    background-color: #EAEAEA;
+}
+
+.voyager .step.tabs-left .nav-tabs > li.active > a,
+.voyager .step.tabs-left .nav-tabs > li.active > a:focus,
+.voyager .step.tabs-left .nav-tabs > li.active > a:hover {
+    background: transparent;
+}
+
+.voyager .step.tabs-left .nav-tabs > li:hover {
+    background-color: #EAEAEA;
+}
+
+.voyager .step.tabs-left .nav-tabs > li:hover:after,
+.voyager .step.tabs-left .nav-tabs > li.active:after {
+    border-left: 15px solid #EAEAEA;
+}
+
+.voyager .step.tabs-left.card-no-padding .nav-tabs > li {
+    border: 0 solid transparent;
+}

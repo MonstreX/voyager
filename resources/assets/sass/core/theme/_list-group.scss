@@ -1,0 +1,53 @@
+.voyager .list-group .list-group-item.active {
+    background-color: #353d47;
+    color: #FFF;
+    border-color: #353d47;
+}
+
+.voyager .list-group .list-group-item.active .badge {
+    color: #353d47;
+}
+
+.voyager .list-group .list-group-item.list-group-item-success {
+    background-color: #99e9d9;
+    color: #006551;
+    border-color: #99e9d9;
+}
+
+.voyager .list-group .list-group-item.list-group-item-success .badge {
+    background-color: #FFF;
+    color: #1ABC9C;
+}
+
+.voyager .list-group .list-group-item.list-group-item-info {
+    background-color: #91d5fb;
+    color: #09486b;
+    border-color: #91d5fb;
+}
+
+.voyager .list-group .list-group-item.list-group-item-info .badge {
+    background-color: #FFF;
+    color: #22A7F0;
+}
+
+.voyager .list-group .list-group-item.list-group-item-warning {
+    background-color: #ffe5a2;
+    color: #85630f;
+    border-color: #ffe5a2;
+}
+
+.voyager .list-group .list-group-item.list-group-item-warning .badge {
+    background-color: #FFF;
+    color: #FABE28;
+}
+
+.voyager .list-group .list-group-item.list-group-item-danger {
+    background-color: #ffb8aa;
+    color: #7c1a06;
+    border-color: #ffb8aa;
+}
+
+.voyager .list-group .list-group-item.list-group-item-danger .badge {
+    background-color: #FFF;
+    color: #FA2A00;
+}

@@ -1,0 +1,133 @@
+.app-container .content-container .side-menu .navbar-nav li a .icon{
+  margin-top: 2px;
+  font-size: 18px;
+}
+
+.voyager .side-menu.sidebar-inverse .navbar li.active > a .icon{
+  margin-left:0px;
+}
+
+.app-container .content-container .side-menu .navbar-header .navbar-brand .icon {
+    font-size: 26px;
+    top: 3px;
+    position: relative;
+}
+
+.app-container .content-container .side-menu .navbar-header .navbar-brand .logo-icon-container{
+  width:60px;
+  height:60px;
+  display: inline-block;
+  text-align:center;
+}
+
+.app-container .content-container .side-menu .navbar-header .navbar-brand img {
+    max-width: 50%;
+    max-height: 50%;
+    position: relative;
+    top:-1px;
+    display:inline-block;
+}
+
+.page-content.read .panel .panel-body:not(:last-child) {
+  border-bottom: 1px solid #eeeeee;
+}
+
+.page-content {
+
+  &.browse {
+
+    .form-search {
+      position: relative;
+      z-index: 1;
+    }
+
+  }
+
+}
+
+.page-content > .row > [class*="col-"]:not(:first-child) {
+  padding-left: 8px;
+}
+.page-content > .row > [class*="col-"]:not(:last-child) {
+  padding-right: 8px;
+}
+
+.app-container.expanded .content-container .side-menu .navbar-header .navbar-brand .title{
+    position: relative;
+    top:0px;
+    left:4px;
+    text-transform: uppercase;
+    font-weight:400;
+
+}
+
+.page-content.dashboard{
+  margin-top:360px;
+}
+
+.page-content .settings{
+  padding-right:20px;
+}
+
+.page-content.col-md-12{
+    padding-right:0px;
+}
+
+.page-content .form-edit-add ul.permissions {
+    list-style-type: none;
+    li {
+        list-style-type: none;
+    }
+}
+
+.app-container .content-container .side-menu .navbar-header .navbar-brand .title{
+  text-transform: uppercase;
+  position:relative;
+  top:0px;
+  left:4px;
+}
+
+.app-container .content-container .side-menu .navbar-nav li a .title{
+  position:relative;
+  top:-4px;
+}
+
+.voyager .side-menu.sidebar-inverse .navbar li.active > a{
+  color: #fff;
+  background: none;
+  border-left:0px;
+}
+
+.voyager .side-menu.sidebar-inverse .navbar li > a {
+    color: #76838f;
+}
+
+.voyager .side-menu.sidebar-inverse .navbar{
+  background:none;
+  font-weight:400;
+}
+
+.voyager .side-menu.sidebar-inverse{
+ /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#353d47+0,21292e+100 */
+background: rgb(53,61,71); /* Old browsers */
+background: -moz-linear-gradient(45deg,  rgba(53,61,71,1) 0%, rgba(33,41,46,1) 100%); /* FF3.6-15 */
+background: -webkit-linear-gradient(45deg,  rgba(53,61,71,1) 0%,rgba(33,41,46,1) 100%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(45deg,  rgba(53,61,71,1) 0%,rgba(33,41,46,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#353d47', endColorstr='#21292e',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+overflow-x: hidden;
+    -webkit-transition: width 500ms cubic-bezier(0.19, 1, 0.22, 1);
+    transition: width  500ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.app-container .side-body, .app-container.expanded .content-container .navbar-top, .app-container .content-container .navbar-top{
+  transition:all 500ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.app-container.expanded.no-animation .content-container, .app-container.expanded.no-animation{
+  transition:none;
+}
+
+.voyager .side-menu.sidebar-inverse .navbar li > a:hover{
+  color: #fff;
+  background: #2A363B;
+}

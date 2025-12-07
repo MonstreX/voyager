@@ -1,0 +1,113 @@
+.dd .item_actions{
+  z-index:9;
+  position:relative;
+  top:4px;
+  right:10px;
+}
+
+.dd .item_actions .delete, .dd .item_actions .edit{
+  cursor:pointer;
+}
+
+.dd .item_actions .edit{
+  margin-right:5px;
+}
+
+.dd .dd-handle .url{
+  font-weight:normal;
+  margin-left:10px;
+}
+
+.toggle-group .btn, .toggle-group .btn.btn-default{
+  padding-bottom:0px;
+  margin-top:0px;
+  margin-bottom:0px;
+  padding-top:5px;
+}
+
+.toggle-group span.btn, .toggle-group span.btn-default{
+  margin-top:0px;
+  margin-bottom:0px;
+  line-height:20px;
+}
+
+.toggle.btn{
+  margin-top:0px;
+  height:30px !important;
+  line-height:20px !important;
+  margin-bottom:0px;
+}
+
+.delete-row{
+  margin-top:0px;
+  margin-bottom:0px;
+  padding-bottom:4px;
+}
+
+.drag{
+  text-align:center;
+}
+
+.drag i{
+  font-size:20px;
+  margin-top:5px;
+  cursor:move;
+  display:block;
+  color:#A6B3BF;
+}
+
+.drag i:hover{
+  color:#76838F;
+}
+
+.newTableRow.ui-sortable-helper{
+  width:100%;
+  border:1px solid #EAEAEA;
+  border-top:0px;
+  background:#fff;
+  display: table;
+}
+
+.newTableRow{
+  position:relative;
+  width:100%;
+}
+
+.newTableRow td{
+  position:relative;
+}
+
+.enum_val{
+  display:none;
+}
+
+.enum_val input{
+  width:auto;
+}
+
+#delete_builder_form{
+  margin-left:10px;
+  float:right;
+}
+
+.btn-outline{
+  background:none;
+  border:1px solid #ddd;
+}
+
+@media(min-width:800px){
+  #table_info .modal-dialog{
+    width:750px;
+  }
+}
+
+#table_info .modal-title{
+  padding-left:36px;
+}
+
+#table_info .modal-title i{
+  font-size: 25px;
+  position: absolute;
+  left: 20px;
+  top: 13px;
+}

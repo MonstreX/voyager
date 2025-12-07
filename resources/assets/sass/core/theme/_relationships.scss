@@ -1,0 +1,208 @@
+.voyager .modal.modal-relationships{
+    border:0px;
+    h5{
+        font-size: 42px;
+        margin-top: 0px;
+        margin-bottom:20px;
+        text-align:center;
+    }
+    h4{
+        i{
+            position: relative;
+            top: 2px;
+            margin-right: 5px;
+        }
+    }
+    :not(.toggle-group) > label {
+        height: 38px;
+        background: #f1f1f1;
+        padding: 7px 12px;
+        font-size: 11px;
+        line-height: 23px;
+        font-weight: bold;
+        margin-bottom:0px;
+        border-top: 1px solid #eaeaea;
+        border-bottom: 1px solid #eaeaea;
+        &:first-child{
+            border-left: 1px solid #eaeaea;
+            border-top-left-radius: 3px;
+            border-bottom-left-radius: 3px;
+        }
+    }
+    .panel-body{
+        padding-top:25px;
+    }
+    &.modal-danger .modal-header, .btn-relationship{
+        background:#F2435C;
+        color:#fff;
+    }
+    .modal-body{
+      background:#ffffff;
+      .col-md-12{
+        margin-bottom:0px;
+      }
+    }
+    .modal-footer{
+        background: #f7f7f9;
+        border-bottom-left-radius: 3px;
+        border-bottom-right-radius: 3px;
+    }
+    .well{
+        background-color: #f9f9fc;
+        border: 1px solid #eaeaea;
+    }
+    p.relationship-warn{
+        text-align:center;
+    }
+
+    .relationship_details{
+        display:flex;
+        &.relationshipPivot{
+            display:none;
+        }
+        .hasOneMany.flexed, .belongsTo.flexed{
+          display:flex;
+        }
+        .hasOneMany, .belongsTo{
+          width:100%;
+          display:none;
+          label{
+            span{
+              color:#444;
+            }
+          }
+        }
+        &.col-md-12{
+            margin-bottom:20px;
+        }
+        p{
+            float: left;
+            padding: 6px 10px;
+            background: #fff;
+            line-height: 22px;
+            margin-right: 0;
+            border: 1px solid #eaeaea;
+            border-top-left-radius: 3px;
+            border-bottom-left-radius: 3px;
+            color: #333;
+            margin-bottom: 0;
+            border-right: 0px;
+            &.flex{
+                display:flex;
+                border-radius: 0px;
+                border-top-right-radius: 3px;
+                border-bottom-right-radius: 3px;
+                border-right: 1px solid #eaeaea;
+                padding-right: 10px;
+                span{
+                    margin-left: 4px;
+                    margin-right: 5px;
+                    line-height: 24px;
+                }
+                input{
+                    position:relative;
+                    top:3px;
+                }
+            }
+            &.relationship_table_select{
+                background: #EFEFEF;
+                color: #76838f;
+                font-weight: bold;
+                font-size: 12px;
+                padding-top: 8px;
+                select{
+                    margin-left:5px;
+                }
+            }
+        }
+        span.label_table_name{
+            display:inline-block;
+        }
+        .relationship_type + span{
+            font-weight:bold;
+        }
+        select{
+            border: 1px solid #f1f1f1;
+            margin-left: 10px;
+        }
+        .select2{
+            flex:1;
+            border: 1px solid #eaeaea;
+            border-right:0px;
+            margin-right:0px;
+            height:38px;
+            .select2-selection{
+                border-radius:5px;
+                border:0px;
+            }
+        }
+        .select2:last-child {
+            border-right: 1px solid #eaeaea;
+            border-top-right-radius: 2px;
+            border-bottom-right-radius: 4px;
+        }
+        .form-control {
+            border-radius:0px;
+            height: 38px;
+            flex:1;
+            &:last-child{
+                border-top-right-radius: 3px;
+                border-bottom-right-radius: 3px;
+            }
+        }
+    }
+    .relationship_details_more{
+        position:relative;
+        margin-bottom:0px;
+
+        :not(.toggle-group) > label {
+            height: 38px;
+            background: #f1f1f1;
+            padding: 7px 12px;
+            font-size: 11px;
+            line-height: 23px;
+            font-weight: 700;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            width:100%;
+            border: 0px;
+        }
+        .select2-container--default .select2-selection--single{
+            border:1px solid #f1f1f1;
+        }
+        .relationship_taggable{
+          display:none;
+        }
+        .well{
+            position:relative;
+            padding-top:55px;
+            margin-bottom:5px;
+            background: none;
+            border: 1px solid #f1f1f1;
+        }
+    }
+
+}
+
+.btn-new-relationship{
+    background: #F2435C;
+    border: 1px solid #F2435C;
+    color: #fff;
+    &:hover{
+        color:#fff;
+    }
+    i{
+        position: relative;
+        top: 2px;
+    }
+}
+
+.relationship-btn-container{
+    .btn{
+        i{
+            position:relative;
+            top:2px;
+        }
+    }
+}

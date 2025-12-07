@@ -1,0 +1,56 @@
+.voyager .table .active td,
+.voyager .table .active th {
+    background-color: #EAEAEA;
+}
+
+.voyager .table .success {
+    color: #006551;
+}
+
+.voyager .table .success td,
+.voyager .table .success th {
+    background-color: #99e9d9;
+}
+
+.voyager .table .info {
+    color: #09486b;
+}
+
+.voyager .table .info td,
+.voyager .table .info th {
+    background-color: #91d5fb;
+}
+
+.voyager .table .warning {
+    color: #85630f;
+}
+
+.voyager .table .warning td,
+.voyager .table .warning th {
+    background-color: #ffe5a2;
+}
+
+.voyager .table .danger {
+    color: #7c1a06;
+}
+
+.voyager .table .danger td,
+.voyager .table .danger th {
+    background-color: #ffb8aa;
+}
+
+.voyager .table > tbody > tr > td,
+.voyager .table > tbody > tr > th,
+.voyager .table > tfoot > tr > td,
+.voyager .table > tfoot > tr > th {
+    border-color: #EAEAEA;
+}
+
+.voyager .table > thead > tr > th {
+    border-color: #EAEAEA;
+    background: #F8FAFC;
+}
+
+.voyager .table.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: #FDFDFD;
+}
