@@ -1,0 +1,296 @@
+.voyager .panel.panel-default {
+    border: 1px solid #EAEAEA;
+}
+
+.voyager .panel.panel-default .panel-heading {
+    border-bottom: 1px solid #EAEAEA;
+    background-color: #F0F0F0;
+}
+
+.voyager .panel.panel-primary {
+    border: 1px solid #353d47;
+}
+
+.voyager .panel.panel-primary .panel-heading {
+    background-color: #62a8ea;
+    border-bottom: 0;
+    color: #FFF;
+}
+
+.voyager .panel.panel-success {
+    border: 1px solid #1ABC9C;
+}
+
+.voyager .panel.panel-success .panel-heading {
+    border-bottom: 1px solid #1ABC9C;
+    background-color: #99e9d9;
+    color: #006551;
+}
+
+.voyager .panel.panel-info {
+    border: 1px solid #22A7F0;
+}
+
+.voyager .panel.panel-info .panel-heading {
+    border-bottom: 1px solid #22A7F0;
+    background-color: #91d5fb;
+    color: #09486b;
+}
+
+.voyager .panel.panel-warning {
+    border: 1px solid #FABE28;
+}
+
+.voyager .panel.panel-warning .panel-heading {
+    border-bottom: 1px solid #FABE28;
+    background-color: #ffe5a2;
+    color: #85630f;
+}
+
+.voyager .panel.panel-danger {
+    border: 1px solid #fb927d;
+}
+
+.voyager .panel.panel-danger .panel-heading {
+    border-bottom: 1px solid #fb927d;
+    background-color: #ffb8aa;
+    color: #7c1a06;
+}
+
+.voyager .panel.fresh-color.panel-primary {
+    border: 1px solid #353d47;
+}
+
+.voyager .panel.fresh-color.panel-primary .panel-heading {
+    border-bottom: 1px solid #353d47;
+    background-color: #353d47;
+    color: #FFF;
+}
+
+.voyager .panel.fresh-color.panel-success {
+    border: 1px solid #1ABC9C;
+}
+
+.voyager .panel.fresh-color.panel-success .panel-heading {
+    border-bottom: 1px solid #1ABC9C;
+    background-color: #1ABC9C;
+    color: #FFF;
+}
+
+.voyager .panel.fresh-color.panel-info {
+    border: 1px solid #22A7F0;
+}
+
+.voyager .panel.fresh-color.panel-info .panel-heading {
+    border-bottom: 1px solid #22A7F0;
+    background-color: #22A7F0;
+    color: #FFF;
+}
+
+.voyager .panel.fresh-color.panel-warning {
+    border: 1px solid #FABE28;
+}
+
+.voyager .panel.fresh-color.panel-warning .panel-heading {
+    border-bottom: 1px solid #FABE28;
+    background-color: #FABE28;
+    color: #FFF;
+}
+
+.voyager .panel.fresh-color.panel-danger {
+    border: 1px solid #FA2A00;
+}
+
+.voyager .panel.fresh-color.panel-danger .panel-heading {
+    border-bottom: 1px solid #FA2A00;
+    background-color: #FA2A00;
+    color: #FFF;
+}
+
+.panel-bordered>.panel-body {
+    padding:20px;
+    padding-top: 30px;
+    overflow:hidden;
+}
+
+.voyager .panel {
+    margin-bottom: 22px;
+    background-color: #fff;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    -webkit-box-shadow: 0 2px 10px rgba(0,0,0,.05);
+    box-shadow:0 2px 10px rgba(0,0,0,.05);
+}
+
+.panel-title {
+    display: block;
+    padding: 20px 30px;
+    padding-left:15px;
+    font-size: 18px;
+    text-align:left;
+}
+
+.panel-footer{
+  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#fcfcfc+0,ffffff+100 */
+  background: #fdfdfd; /* Old browsers */
+  background: -moz-linear-gradient(top,  rgba(252,252,252,1) 0%, rgba(255,255,255,1) 100%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(255,255,255,1) 100%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom,  rgba(252,252,252,1) 0%,rgba(255,255,255,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcfcfc', endColorstr='#ffffff',GradientType=0 ); /* IE6-9 */
+
+}
+
+.voyager .panel.panel-warning, .voyager .panel.panel-primary, .voyager .panel.panel-info{
+  border:0px;
+}
+
+.panel.widget{
+  padding:30px;
+  border:0px;
+  border-radius:3px;
+  flex:1;
+  margin:10px;
+}
+
+.panel.widget.center{
+  text-align:center;
+}
+
+.panel.widget .avatar{
+    width: 100px;
+    height: auto;
+    border: 0 none;
+    border-radius: 50%;
+}
+
+.panel.widget i{
+    font-size: 48px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    display: block;
+    margin: 0 auto;
+    color: #eee;
+    line-height: 110px;
+}
+
+.panel.widget h4{
+  color:#fff;
+  font-weight:300;
+  margin-top:20px;
+  font-size:20px;
+}
+
+.panel.widget p{
+  margin:30px 0;
+  font-size: 14px;
+  line-height: 1.57142857;
+  color: #DDD;
+  display:block;
+  max-height:65px;
+  margin-bottom:0px;
+}
+
+.panel.widget .readm-link{
+  margin-top:20px;
+  color:#fff;
+  text-decoration: underline;
+}
+
+.panel.widget .btn-primary{
+  margin-top:20px;
+  color:#fff;
+}
+
+.panel.widget.bgimage{
+  background-size:cover;
+  background-position:center center;
+  position:relative;
+}
+
+.panel.widget .panel-content{
+  z-index:9;
+  position:relative;
+}
+
+.panel.widget .dimmer{
+  background:rgba(45,53,61, 0.5);
+  background: -moz-linear-gradient(-45deg,  rgba(45,53,61,0.79) 0%, rgba(45,53,61,0.5) 100%);
+  background: -webkit-linear-gradient(-45deg,  rgba(45,53,61,0.79) 0%,rgba(45,53,61,0.5) 100%);
+  background: linear-gradient(135deg,  rgba(45,53,61,0.79) 0%,rgba(45,53,61,0.5) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#c92d353d', endColorstr='#802d353d',GradientType=1 );
+  opacity:1;
+  transition:all 0.3s ease;
+  position:absolute;
+  left:0px;
+  top:0px;
+  width:100%;
+  height:100%;
+  border-radius:0px;
+}
+
+.side-menu .panel.widget .dimmer{
+  border-radius:0px;
+}
+
+.side-menu:hover .panel.widget .dimmer,
+.expanded .side-menu .panel.widget .dimmer{
+  background: -moz-linear-gradient(275deg, rgba(36,44,50,1) 0%, rgba(36,44,50,0.95) 34%, rgba(36,44,50,0.7) 100%);
+  background: -webkit-linear-gradient(275deg, rgba(36,44,50,1) 0%,rgba(36,44,50,0.95) 34%,rgba(36,44,50,0.7) 100%);
+  background: linear-gradient(275deg, rgba(36,44,50,1) 0%,rgba(36,44,50,0.95) 34%,rgba(36,44,50,0.7) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#242c32', endColorstr='#00242c32',GradientType=1 );
+}
+
+.side-menu .panel.widget{
+  padding:12px 0;
+  margin:0px;
+  border-radius:0px;
+}
+
+.app-container .side-menu .panel.widget p,
+.app-container .side-menu .panel.widget h4,
+.app-container .side-menu .panel.widget a{
+  display:none;
+}
+
+.app-container .side-menu .panel.widget p{
+  font-size:12px;
+  margin-top:0px;
+}
+
+.app-container .side-menu .panel.widget .avatar{
+    width: 36px;
+    height: 36px;
+    float: left;
+    margin-left: 12px;
+    border: 0px;
+    position: relative;
+    top: 3px;
+}
+
+.app-container .side-menu .panel.widget h4 {
+    float: left;
+    display: block;
+    position: absolute;
+    left: 56px;
+    top: -7px;
+    width: 190px;
+    text-align: left;
+    opacity:0;
+    transition:opacity 0.3s ease;
+    margin-top: 17px;
+    overflow: hidden;
+    height: 26px;
+}
+
+.app-container.expanded .panel.widget h4,
+.app-container .side-menu:hover .panel.widget h4 {
+  opacity:1;
+}
+
+.app-container .side-menu:hover .panel.widget .avatar{
+  float:left;
+  margin-left:12px;
+  transition:none;
+}

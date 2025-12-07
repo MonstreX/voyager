@@ -1,0 +1,31 @@
+/********** Overriding Data Tables Icons **********/
+
+.voyager table.dataTable thead th.sorting:after, .voyager table.dataTable thead th.sorting_asc:after, .voyager table.dataTable thead th.sorting_desc:after, div.dataTables_paginate li.last a:after, div.dataTables_paginate li.next a:after, div.dataTables_paginate li.first a:before, div.dataTables_paginate li.previous a:before{
+  font-family:Voyager;
+}
+
+.voyager table.dataTable thead th.sorting:after{
+  content: 'o';
+  margin-top:3px;
+}
+
+.voyager table.dataTable thead th.sorting_asc:after{
+  content: 'p';
+  margin-top:5px;
+}
+
+.voyager table.dataTable thead th.sorting_desc:after{
+  content: 'q';
+}
+
+.voyager div.dataTables_paginate li.previous a:before{
+    content: "\e039";
+    margin-top: 3px;
+    margin-left: -3px;
+}
+
+.voyager div.dataTables_paginate li.next a:after{
+    content: "\e046";
+    margin-top: 3px;
+    margin-right: -3px;
+}

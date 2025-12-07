@@ -1,0 +1,63 @@
+/* Card */
+.card {
+  background-color: #FFF;
+  border-radius: 1px;
+  overflow: hidden;
+  position: relative; }
+.card .card-body {
+  padding: 25px; }
+.card .card-body .sub-title {
+  font-size: 1.2em;
+  padding: 1.2em 0 0.4em 0;
+  margin-bottom: 25px; }
+.card .card-body .sub-title .description {
+  padding-left: 0.4em;
+  font-size: 0.8em;
+  opacity: 0.8; }
+.card .card-body.half-padding {
+  padding: 12.5px; }
+.card .card-header .card-title {
+  padding: 1.2em 25px;
+  float: left; }
+.card .card-header .card-title .title {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 1.5em;
+  text-decoration: none; }
+.card .card-header .pull-right {
+  padding: 0.5em 1em; }
+.card .card-header:after {
+  content: '';
+  display: block;
+  clear: both; }
+.card .card-profile-img img {
+  width: 100%;
+  height: auto; }
+.card .card-jumbotron {
+  padding: 1.5em 1.5em; }
+
+.card:hover .card-header .title {
+  text-decoration: none !important; }
+
+.card.summary-inline .card-body {
+  padding: 20px; }
+.card.summary-inline .card-body .content {
+  float: right; }
+.card.summary-inline .card-body .content .title {
+  font-family: 'Lato', sans-serif;
+  margin-top: -0.3em;
+  font-size: 3.5em;
+  text-align: right; }
+.card.summary-inline .card-body .content .sub-title {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.9em;
+  text-align: right;
+  margin-top: -10px;
+  margin-bottom: 0;
+  padding: 0;
+  border-bottom: 0; }
+
+.card.profile .card-body {
+  padding: 0.5em 0.8em; }
+
+.card.profile .card-footer {
+  padding: 0.5em 0.8em; }

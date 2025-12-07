@@ -1,0 +1,135 @@
+
+.landing-page {
+  font-family: 'Open Sans', sans-serif; }
+.landing-page .navbar .navbar-toggle {
+  position: absolute;
+  right: 0;
+  border-radius: 0;
+  border: 0;
+  height: 44px;
+  padding: 0 15px; }
+.landing-page .app-header {
+  padding-top: 100px;
+  /* background-image: url("../img/app-header-bg.jpg"); */
+  background-repeat: no-repeat;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  background-position: center;
+  margin-bottom: 0; }
+.landing-page .app-header .app-logo {
+  margin-bottom: 20px; }
+.landing-page .app-header .app-description {
+  margin-bottom: 40px; }
+.landing-page .app-content-a, .landing-page .app-content-b {
+  padding-top: 50px;
+  padding-bottom: 20px; }
+.landing-page .app-content-b.feature-1 {
+  /* background-image: url("../img/bg/picjumbo.com_HNCK3558.jpg"); */
+  background-repeat: no-repeat;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  background-position: center;
+  margin-bottom: 0; }
+.landing-page .app-content-b.contact-us {
+  padding-top: 60px;
+  padding-bottom: 60px;
+  /* background-image: url("../img/contact-us-bg.jpg"); */
+  background-repeat: no-repeat;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  background-position: center;
+  margin-bottom: 0; }
+.landing-page .app-content-b.contact-us .contact-us-header {
+  font-weight: 300;
+  font-size: 46px; }
+.landing-page .app-content-b.contact-us .contact-us-description {
+  font-weight: 300;
+  font-size: 18px;
+  opacity: 0.9;
+  text-indent: 40px; }
+.landing-page .app-content-b.contact-us form {
+  margin-top: 20px; }
+.landing-page .app-content-b.contact-us form input {
+  padding: 10px;
+  width: 100%;
+  border: 0; }
+.landing-page .app-content-header {
+  font-weight: 300;
+  font-size: 46px; }
+.landing-page .app-content-description {
+  font-weight: 300;
+  font-size: 18px; }
+.landing-page .app-footer {
+  padding-top: 15px;
+  padding-bottom: 15px;
+  margin-bottom: 0; }
+.landing-page .app-footer p {
+  margin: 0; }
+.landing-page .navbar-affix {
+  width: 100%;
+  height: 60px;
+  border-top: 2px rgba(78, 205, 196, 0.8);
+  -webkit-transition: all 0.2s ease-in;
+  transition: all 0.2s ease-in;
+  position: fixed;
+  -webkit-box-shadow: 0 0 6px 0 rgba(96, 100, 109, 0.4);
+  box-shadow: 0 0 6px 0 rgba(96, 100, 109, 0.4); }
+.landing-page .navbar.affix {
+  z-index: 4000;
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  height: 60px;
+  opacity: 1;
+  margin-top: 0; }
+.landing-page .navbar-affix.affix li a {
+  height: 60px;
+  line-height: 60px; }
+.landing-page .navbar-affix.affix .navbar-nav > li > a {
+  background-color: transparent;
+  font-weight: 400;
+  color: #333; }
+.landing-page .navbar {
+  padding-left: 0;
+  background-color: transparent;
+  box-shadow: none; }
+.landing-page .navbar .navbar-right {
+  position: relative;
+  right: 0; }
+.landing-page .navbar .navbar-header {
+  border-bottom: 0 solid #e7e7e7; }
+.landing-page .navbar .navbar-header .navbar-brand {
+  width: 45px;
+  line-height: 60px;
+  height: 60px;
+  padding: 0;
+  width: 100%;
+  overflow: hidden;
+  padding-left: 0;
+  font-family: 'Open Sans', sans-serif; }
+.landing-page .navbar .navbar-header .navbar-brand .icon {
+  width: 50px;
+  text-align: center;
+  display: inline-block; }
+.landing-page .navbar .navbar-header .navbar-brand .title {
+  margin-left: -10px;
+  display: inline-block; }
+.landing-page .navbar .navbar-header .navbar-expand-toggle {
+  position: absolute;
+  right: 0;
+  width: 60px;
+  height: 60px;
+  background-color: transparent;
+  border: 0;
+  -moz-transition: all 0.25s linear;
+  -webkit-transition: all 0.25s linear;
+  transition: all 0.25s linear;
+  opacity: 0.75; }
+
+@media only screen and (max-width: 768px) {
+  .landing-page .navbar .navbar-header .navbar-brand {
+    padding-left: 15px; } }

@@ -265,7 +265,7 @@
                                 </div>
                             </div>
 
-                            <div class="panel-body no-padding-left-right">
+                            <div class="panel-body no-padding-left-right row">
                                 <div class="col-md-10 no-padding-left-right">
                                     @if ($setting->type == "text")
                                         <input type="text" class="form-control" name="{{ $setting->key }}" value="{{ $setting->value }}">

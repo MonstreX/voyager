@@ -1,8 +1,22 @@
 const DEFAULT_OPTIONS = {
     perPage: 25,
+    perPageOptions: [10, 25, 50, 100],
     search: true,
-    searchPlaceholder: 'Search...',
-    order: null
+    searchPlaceholder: '',
+    order: null,
+    lang: {
+        show: 'Show',
+        entries: 'entries',
+        search: 'Search:',
+        showing: 'Showing',
+        to: 'to',
+        of: 'of',
+        results: 'results',
+        prev: 'Previous',
+        next: 'Next',
+        first: 'First',
+        last: 'Last'
+    }
 };
 
 const UNSORTABLE_CLASSES = ['actions', 'no-sort', 'dt-not-orderable', 'js-no-sort'];
@@ -14,17 +28,25 @@ export default class SimpleTable {
         if (!this.tbody) {
             return;
         }
-        this.options = Object.assign({}, DEFAULT_OPTIONS, options);
+
+        // Deep merge for options to handle nested lang object
+        this.options = {
+            ...DEFAULT_OPTIONS,
+            ...options,
+            lang: { ...DEFAULT_OPTIONS.lang, ...(options.lang || {}) }
+        };
+
         this.options.perPage = parseInt(this.options.perPage, 10);
         if (isNaN(this.options.perPage) || this.options.perPage < 0) {
             this.options.perPage = 0;
         }
+
         this.rows = Array.from(this.tbody.rows);
         this.currentPage = 1;
         this.searchTerm = '';
         this.order = this.normalizeOrder(this.options.order);
 
-        this.buildControls();
+        this.buildLayout();
         this.bindHeaderSorting();
         this.render();
     }
@@ -41,64 +63,121 @@ export default class SimpleTable {
         return [column, direction];
     }
 
-    buildControls() {
-        this.controlsWrapper = document.createElement('div');
-        this.controlsWrapper.className = 'simple-table-controls';
+    buildLayout() {
+        // 1. Header (Length & Search)
+        this.header = document.createElement('div');
+        this.header.className = 'row simple-table-header';
+
+        // 1a. Length Menu (Left)
+        const lengthCol = document.createElement('div');
+        lengthCol.className = 'col-sm-6';
+        
+        if (this.options.perPage > 0 || this.options.perPageOptions.length > 0) {
+            const lengthWrapper = document.createElement('div');
+            lengthWrapper.className = 'simple-table-length';
+            
+            const lengthLabel = document.createElement('label');
+            
+            // Text: Show
+            lengthLabel.appendChild(document.createTextNode(this.options.lang.show + ' '));
+
+            // Select
+            this.lengthSelect = document.createElement('select');
+            this.lengthSelect.className = 'form-control input-sm';
+            
+            this.options.perPageOptions.forEach(opt => {
+                const option = document.createElement('option');
+                option.value = opt;
+                option.text = opt;
+                if (opt === this.options.perPage) {
+                    option.selected = true;
+                }
+                this.lengthSelect.appendChild(option);
+            });
+
+            this.lengthSelect.addEventListener('change', (e) => {
+                this.options.perPage = parseInt(e.target.value, 10);
+                this.currentPage = 1;
+                this.render();
+            });
+
+            lengthLabel.appendChild(this.lengthSelect);
+            
+            // Text: entries
+            lengthLabel.appendChild(document.createTextNode(' ' + this.options.lang.entries));
+
+            lengthWrapper.appendChild(lengthLabel);
+            lengthCol.appendChild(lengthWrapper);
+        }
+        this.header.appendChild(lengthCol);
+
+        // 1b. Search (Right)
+        const searchCol = document.createElement('div');
+        searchCol.className = 'col-sm-6';
 
         if (this.options.search !== false) {
             const searchWrapper = document.createElement('div');
-            searchWrapper.className = 'simple-table-search form-group';
+            searchWrapper.className = 'simple-table-search';
 
+            const searchLabel = document.createElement('label');
+            
+            // Text: Search:
+            searchLabel.appendChild(document.createTextNode(this.options.lang.search + ' '));
+
+            // Input
             this.searchInput = document.createElement('input');
             this.searchInput.type = 'search';
-            this.searchInput.className = 'form-control';
+            this.searchInput.className = 'form-control input-sm';
             this.searchInput.placeholder = this.options.searchPlaceholder;
+            
             this.searchInput.addEventListener('input', () => {
                 this.searchTerm = this.searchInput.value.toLowerCase();
                 this.currentPage = 1;
                 this.render();
             });
 
-            searchWrapper.appendChild(this.searchInput);
-            this.controlsWrapper.appendChild(searchWrapper);
+            searchLabel.appendChild(this.searchInput);
+            searchWrapper.appendChild(searchLabel);
+            searchCol.appendChild(searchWrapper);
         }
+        this.header.appendChild(searchCol);
 
+        // Insert Header before table
+        this.table.parentNode.insertBefore(this.header, this.table);
+
+
+        // 2. Footer (Info & Pagination)
+        this.footer = document.createElement('div');
+        this.footer.className = 'row simple-table-footer';
+
+        // 2a. Info (Left)
+        const infoCol = document.createElement('div');
+        infoCol.className = 'col-sm-6';
+        
         this.infoElement = document.createElement('div');
-        this.infoElement.className = 'simple-table-info text-muted';
-        this.controlsWrapper.appendChild(this.infoElement);
+        this.infoElement.className = 'simple-table-info';
+        this.infoElement.setAttribute('role', 'status');
+        this.infoElement.setAttribute('aria-live', 'polite');
+        
+        infoCol.appendChild(this.infoElement);
+        this.footer.appendChild(infoCol);
 
-        if (this.options.perPage > 0) {
-            const paginationWrapper = document.createElement('div');
-            paginationWrapper.className = 'simple-table-pagination btn-group';
+        // 2b. Pagination (Right)
+        const paginateCol = document.createElement('div');
+        paginateCol.className = 'col-sm-6';
+        
+        const paginateWrapper = document.createElement('div');
+        paginateWrapper.className = 'simple-table-pagination';
 
-            this.prevButton = document.createElement('button');
-            this.prevButton.type = 'button';
-            this.prevButton.className = 'btn btn-sm btn-default';
-            this.prevButton.innerText = '‹';
-            this.prevButton.addEventListener('click', () => {
-                if (this.currentPage > 1) {
-                    this.currentPage -= 1;
-                    this.render();
-                }
-            });
+        this.paginationList = document.createElement('ul');
+        this.paginationList.className = 'pagination';
+        
+        paginateWrapper.appendChild(this.paginationList);
+        paginateCol.appendChild(paginateWrapper);
+        this.footer.appendChild(paginateCol);
 
-            this.nextButton = document.createElement('button');
-            this.nextButton.type = 'button';
-            this.nextButton.className = 'btn btn-sm btn-default';
-            this.nextButton.innerText = '›';
-            this.nextButton.addEventListener('click', () => {
-                if (this.currentPage < this.totalPages) {
-                    this.currentPage += 1;
-                    this.render();
-                }
-            });
-
-            paginationWrapper.appendChild(this.prevButton);
-            paginationWrapper.appendChild(this.nextButton);
-            this.controlsWrapper.appendChild(paginationWrapper);
-        }
-
-        this.table.parentNode.insertBefore(this.controlsWrapper, this.table);
+        // Insert Footer after table
+        this.table.parentNode.insertBefore(this.footer, this.table.nextSibling);
     }
 
     bindHeaderSorting() {
@@ -110,6 +189,7 @@ export default class SimpleTable {
             }
 
             th.classList.add('simple-table-sortable');
+            
             th.addEventListener('click', () => {
                 let direction = 'asc';
                 if (this.order && this.order[0] === index) {
@@ -196,29 +276,77 @@ export default class SimpleTable {
         }
 
         if (this.totalRows === 0) {
-            this.infoElement.innerText = '0 results';
+            this.infoElement.innerText = `0 ${this.options.lang.entries}`;
             return;
         }
 
+        let infoText = '';
         if (this.options.perPage > 0) {
             const start = (this.currentPage - 1) * this.options.perPage + 1;
             const end = Math.min(this.currentPage * this.options.perPage, this.totalRows);
-            this.infoElement.innerText = `Showing ${start}-${end} of ${this.totalRows}`;
+            infoText = `${this.options.lang.showing} ${start} ${this.options.lang.to} ${end} ${this.options.lang.of} ${this.totalRows} ${this.options.lang.entries}`;
         } else {
-            this.infoElement.innerText = `Showing ${this.totalRows} entries`;
+            infoText = `${this.options.lang.showing} ${this.totalRows} ${this.options.lang.entries}`;
         }
+        this.infoElement.innerText = infoText;
     }
 
     updatePagination() {
-        if (!this.prevButton || !this.nextButton) {
+        if (!this.paginationList) {
             return;
         }
-        this.prevButton.disabled = this.currentPage <= 1;
-        this.nextButton.disabled = this.currentPage >= this.totalPages;
-        if (this.totalRows <= this.options.perPage) {
-            this.prevButton.parentElement.style.display = 'none';
+        this.paginationList.innerHTML = '';
+
+        const createPageItem = (text, page, type = 'number') => {
+            const li = document.createElement('li');
+            li.className = `simple-table-page-item ${type}`;
+            if (type === 'previous' && this.currentPage <= 1) li.classList.add('disabled');
+            if (type === 'next' && this.currentPage >= this.totalPages) li.classList.add('disabled');
+            if (type === 'number' && page === this.currentPage) li.classList.add('active');
+
+            const a = document.createElement('a');
+            a.href = '#';
+            a.innerText = text;
+            a.setAttribute('tabindex', '0');
+            
+            a.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (li.classList.contains('disabled') || li.classList.contains('active')) return;
+                
+                this.currentPage = page;
+                this.render();
+            });
+
+            li.appendChild(a);
+            return li;
+        };
+
+        this.paginationList.appendChild(createPageItem(this.options.lang.prev, this.currentPage - 1, 'previous'));
+
+        let startPage = 1;
+        let endPage = this.totalPages;
+        
+        if (this.totalPages > 10) {
+             if (this.currentPage <= 6) {
+                 endPage = 10;
+             } else if (this.currentPage + 4 >= this.totalPages) {
+                 startPage = this.totalPages - 9;
+             } else {
+                 startPage = this.currentPage - 5;
+                 endPage = this.currentPage + 4;
+             }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            this.paginationList.appendChild(createPageItem(i, i, 'number'));
+        }
+
+        this.paginationList.appendChild(createPageItem(this.options.lang.next, this.currentPage + 1, 'next'));
+        
+        if (this.totalRows === 0) {
+            this.footer.style.display = 'none';
         } else {
-            this.prevButton.parentElement.style.display = '';
+            this.footer.style.display = '';
         }
     }
 

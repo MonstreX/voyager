@@ -1,0 +1,62 @@
+.app-container {
+  min-height: 100%;
+  position: relative;
+  background:#f9f9f9;
+  padding-bottom: 30px; }
+.app-container .app-footer {
+  display: block;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  left: 65px;
+  -webkit-transition: all 0.25s;
+  transition: all 0.25s;
+  font-size: 12px;
+  font-family: 'Open Sans', sans-serif; }
+.app-container .app-footer .wrapper {
+  padding: 10px 35px;
+  padding-left: 25px;
+  height: 50px;
+  line-height: 50px;
+  vertical-align: middle; }
+.app-container .content-container {
+  margin-right: 0;
+  margin-left: 0; }
+
+.app-container .content-container .side-body {
+  padding-top: 70px; }
+.app-container .content-container .side-body.padding-top {
+  padding-top: 84px; }
+
+.app-container.expanded .app-footer {
+  left: 250px; }
+.app-container.expanded .app-footer .wrapper {
+  padding-left: 25px; }
+
+.app-container.expanded .content-container .navbar-top {
+  padding-left: 250px; }
+
+/* Main body section */
+.app-container .side-body {
+  margin-left: 75px;
+  margin-right: 0px;
+  -webkit-transition: all 500ms cubic-bezier(0.19, 1, 0.22, 1);
+  transition: all 500ms cubic-bezier(0.19, 1, 0.22, 1) }
+.app-container .side-body .container-fluid {
+  padding-right: 0;
+}
+.app-container.expanded .side-body {
+  margin-left: 235px; }
+
+@media (max-width: 768px) {
+  .app-container .navbar-top {
+    min-width: 300px; }
+  .app-container .content-container .side-body {
+    margin-left: 10px; }
+  .app-container.expanded .navbar-top {
+    min-width: 480px;
+    padding-left: 0; }
+  .app-container.expanded .side-body {
+    margin-left: 10px; }
+  .app-container .app-footer .wrapper, .app-container.expanded .app-footer .wrapper {
+    padding-left: 25px; } }

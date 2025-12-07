@@ -1,0 +1,145 @@
+.voyager .alert.alert-success {
+    background-color: #99e9d9;
+    color: #006551;
+    border-color: #1ABC9C;
+}
+
+.voyager .alert.alert-success .alert-link {
+    color: #006551;
+    text-decoration: underline;
+}
+
+.voyager .alert.alert-success .btn-link {
+    color: #006551;
+}
+
+.voyager .alert.alert-info {
+    background-color: #91d5fb;
+    color: #09486b;
+    border-color: #22A7F0;
+}
+
+.voyager .alert.alert-info .alert-link {
+    color: #09486b;
+    text-decoration: underline;
+}
+
+.voyager .alert.alert-info .btn-link {
+    color: #09486b;
+}
+
+.voyager .alert.alert-warning {
+    background-color: #ffe5a2;
+    border-color: #FABE28;
+    color: #85630f;
+}
+
+.voyager .alert.alert-warning .alert-link {
+    color: #85630f;
+    text-decoration: underline;
+}
+
+.voyager .alert.alert-warning .btn-link {
+    color: #85630f;
+}
+
+.voyager .alert.alert-danger {
+    background-color: #ffb8aa;
+    border-color: #fb927d;
+    color: #7c1a06;
+}
+
+.voyager .alert.alert-danger .alert-link {
+    color: #7c1a06;
+    text-decoration: underline;
+}
+
+.voyager .alert.alert-danger .btn-link {
+    color: #7c1a06;
+}
+
+.voyager .alert.fresh-color {
+    color: #FFF;
+}
+
+.voyager .alert.fresh-color .alert-link {
+    color: #FFF;
+    text-decoration: underline;
+}
+
+.voyager .alert.fresh-color .btn-link {
+    color: #FFF;
+}
+
+.voyager .alert.fresh-color.alert-success {
+    background-color: #1ABC9C;
+}
+
+.voyager .alert.fresh-color.alert-info {
+    background-color: #22A7F0;
+}
+
+.voyager .alert.fresh-color.alert-warning {
+    background-color: #FABE28;
+}
+
+.voyager .alert.fresh-color.alert-danger {
+    background-color: #FA2A00;
+    border-color: #FA2A00;
+}
+
+.voyager .alert{
+    margin-right: 0px;
+    margin-bottom: 5px;
+    border-radius: 0;
+    color: #fff;
+    border: 0;
+    border-left: 5px solid rgba(0, 0, 0, 0.1);
+    border-color:rgba(0, 0, 0, 0.1);
+    border-radius:3px;
+    margin-bottom:30px;
+}
+
+.voyager .alert.alert-success{
+  background-color: #55B559;
+  color:#fff;
+  border-color:rgba(0, 0, 0, 0.1);
+}
+.voyager .alert.alert-danger{
+  background-color: #F55145;
+  color:#fff;
+  border-color:rgba(0, 0, 0, 0.1);
+}
+.voyager .alert.alert-warning{
+  background-color: #FF9E0F;
+  color:#fff;
+  border-color:rgba(0, 0, 0, 0.1);
+}
+.voyager .alert.alert-info{
+  background-color:#22A7F0;
+  color:#fff;
+  border-color:rgba(0, 0, 0, 0.1);
+}
+
+.voyager .panel-body .alert{
+  margin-right:0px;
+  margin-bottom:10px;
+  margin-top:10px;
+}
+
+.alerts {
+  padding: 10px 10px 0;
+  padding-left: 25px;
+  padding-right: 25px;
+  position: relative;
+  top: 10px;
+}
+
+.alerts .alert {
+  margin-right: 0px;
+}
+
+.alerts .alert>p,
+.alerts .alert>ul {
+  margin-top: 0;
+}

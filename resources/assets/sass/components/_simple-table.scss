@@ -1,0 +1,163 @@
+// Simple Table Component
+// Replaces DataTables with a lightweight, dependency-free implementation
+
+.simple-table-header,
+.simple-table-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 10px;
+
+    &.simple-table-footer {
+        margin-top: 10px;
+        margin-bottom: 0;
+    }
+}
+
+// Length Selector (Top Left)
+.simple-table-length {
+    label {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 0;
+        font-weight: normal;
+        white-space: nowrap;
+    }
+
+    select {
+        display: inline-block;
+        width: auto;
+    }
+}
+
+// Search Input (Top Right)
+.simple-table-search {
+    display: flex;
+    justify-content: flex-end;
+
+    label {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 0;
+        font-weight: normal;
+        white-space: nowrap;
+        max-width: 300px;
+    }
+
+    input {
+        display: inline-block;
+        width: auto;
+    }
+}
+
+// Info Text (Bottom Left)
+.simple-table-info {
+    padding-top: 8px;
+    white-space: nowrap;
+    color: #76838f;
+}
+
+// Pagination (Bottom Right)
+.simple-table-pagination {
+    display: flex;
+    justify-content: flex-end;
+    margin: 0;
+    white-space: nowrap;
+    text-align: right;
+
+    ul.pagination {
+        margin: 0;
+        white-space: nowrap;
+        justify-content: flex-end;
+    }
+
+    .simple-table-page-item {
+        display: inline-block;
+        margin-left: -1px;
+
+        a {
+            position: relative;
+            float: left;
+            padding: 6px 12px;
+            margin-left: -1px;
+            line-height: 1.42857143;
+            color: #337ab7;
+            text-decoration: none;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            cursor: pointer;
+
+            &:hover,
+            &:focus {
+                z-index: 2;
+                color: #23527c;
+                background-color: #eee;
+                border-color: #ddd;
+            }
+        }
+
+        &.active a {
+            z-index: 3;
+            color: #fff;
+            cursor: default;
+            background-color: #337ab7;
+            border-color: #337ab7;
+        }
+
+        &.disabled a {
+            color: #777;
+            cursor: not-allowed;
+            background-color: #fff;
+            border-color: #ddd;
+            pointer-events: none;
+        }
+
+        // Rounded corners for first/last
+        &:first-child a {
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+        }
+
+        &:last-child a {
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+    }
+}
+
+// Sorting Indicators (Table Headers)
+th.simple-table-sortable {
+    cursor: pointer;
+    position: relative;
+    padding-right: 18px;
+    user-select: none;
+
+    &::after {
+        content: '';
+        position: absolute;
+        right: 6px;
+        top: 50%;
+        margin-top: -4px;
+        border: 4px solid transparent;
+    }
+
+    &.simple-table-sort-asc::after {
+        border-bottom-color: #555;
+        margin-top: -6px;
+    }
+
+    &.simple-table-sort-desc::after {
+        border-top-color: #555;
+        margin-top: 2px;
+    }
+
+    &:hover {
+        background-color: #f5f5f5;
+    }
+}
+
+th.simple-table-no-sort {
+    cursor: default;
+}
