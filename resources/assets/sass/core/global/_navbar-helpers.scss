@@ -1,0 +1,73 @@
+.container-fluid > .navbar-collapse,
+.container-fluid > .navbar-header,
+.container > .navbar-collapse,
+.container > .navbar-header {
+  margin-left: -15px;
+  margin-right: -15px;
+}
+
+.page-title {
+  display: inline-block;
+  height: auto;
+  padding-left: 75px;
+  padding-top: 28px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 43px;
+  color: #555;
+  margin: 3px 20px 0 0;
+  position: relative;
+  height: 100px;
+
+  > i {
+    font-size: 36px;
+    position: absolute;
+    top: 30px;
+    left: 25px;
+    margin-right: 10px;
+  }
+
+  .title {
+    font-size: 2em;
+  }
+
+  .page-action {
+    float: right;
+    height: 40px;
+    line-height: 40px;
+    vertical-align: middle;
+  }
+}
+
+.voyager .btn-add-new,
+.voyager #bulk_delete_btn {
+  margin-top: 2px;
+}
+
+@media (max-width: 768px) {
+  .btn-add-new span,
+  #bulk_delete_btn span {
+    display: none;
+  }
+}
+
+.sub-title {
+  font-family: 'Open Sans', sans-serif;
+
+  > * {
+    display: inline-block;
+  }
+
+  h3 {
+    margin-right: 10px;
+  }
+
+  .description {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.9em;
+  }
+
+  .action .btn {
+    padding: 0 0.5em;
+  }
+}

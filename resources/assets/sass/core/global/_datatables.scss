@@ -1,0 +1,43 @@
+.dataTables_wrapper .row {
+  margin-bottom: 0.5em;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.dataTables_wrapper .top {
+  margin-bottom: 6px;
+  position: relative;
+}
+
+.dataTables_wrapper .bottom {
+  margin-top: 6px;
+}
+
+.dataTables_wrapper .top:after,
+.dataTables_wrapper .bottom:after {
+  position: relative;
+  clear: both;
+  display: block;
+  content: '';
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  padding: 0;
+  margin-left: 0;
+  border: 0;
+
+  &:hover,
+  &.disabled,
+  &.disabled:hover,
+  &.disabled:active {
+    border: 0;
+  }
+}
+
+.dataTables_wrapper tfoot {
+  display: none;
+}
+
+table.dataTable.no-footer {
+  border-bottom: 1px solid #f1f1f1;
+}

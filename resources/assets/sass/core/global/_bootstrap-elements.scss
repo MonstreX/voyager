@@ -1,0 +1,92 @@
+.progress {
+  border-radius: 1px;
+  box-shadow: none;
+
+  .progress-bar {
+    box-shadow: none;
+  }
+}
+
+.pagination {
+  margin-top: 5px;
+  margin-bottom: 5px;
+
+  li:first-child > a,
+  li:first-child span {
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+  }
+
+  li:last-child > a,
+  li:last-child span {
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+  }
+}
+
+.alert {
+  border-width: 0;
+  border-radius: 1px;
+}
+
+.list-group .badge {
+  border-radius: 1px;
+}
+
+.list-group .list-group-item:last-child {
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+
+.list-group .list-group-item:first-child {
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+}
+
+.checkbox3,
+.radio3 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.checkbox-inline {
+  margin-bottom: 5px;
+}
+
+.checkbox3 label,
+.radio3 label {
+  padding: 8px 0 8px 30px;
+
+  &::before {
+    top: 5px;
+  }
+
+  &::after {
+    top: 5px;
+  }
+}
+
+.checkbox3 label,
+.radio3 label,
+.checkbox-inline,
+.radio-inline {
+  font-weight: normal;
+}
+
+.thumbnail {
+  border-radius: 1px;
+  padding: 0;
+
+  .caption {
+    padding: 0.5em 1.2em;
+
+    .h1,
+    .h2,
+    .h3,
+    h1,
+    h2,
+    h3 {
+      margin-top: 15px;
+    }
+  }
+}

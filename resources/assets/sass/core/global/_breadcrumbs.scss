@@ -1,0 +1,9 @@
+﻿.breadcrumb {
+  margin-bottom: 0; }
+.breadcrumb > li + li:before {
+  font-family: Voyager;
+  content: '\e046';
+  position:relative;
+  top:1px;
+  margin-right: 3px; }
+

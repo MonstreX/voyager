@@ -1,0 +1,24 @@
+﻿.icons-list {
+  list-style: none;
+  margin: 0;
+  padding: 0; }
+.icons-list > li {
+  float: left;
+  text-align: center;
+  width: 100px;
+  height: 100px;
+  padding: 8px; }
+.icons-list > li span {
+  display: block; }
+.icons-list > li .glyphicon {
+  font-size: 1.5em; }
+.icons-list > li .glyphicon-class {
+  margin-top: 8px;
+  font-size: 0.75em; }
+
+.icons-list:after {
+  content: '';
+  display: block;
+  position: relative;
+  clear: both; }
+

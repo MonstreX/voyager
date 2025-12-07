@@ -1,0 +1,11 @@
+﻿.bs-example > * {
+  margin-bottom: 20px; }
+
+.bs-example > *:last-child {
+  margin-bottom: 5px; }
+
+.row-example > [class*="col-"] {
+  margin-bottom: 0; }
+
+/* Row Sortable (Drag and Drop), used in BREAD edit
+-------------------------------------------------- */

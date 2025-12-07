@@ -1,0 +1,52 @@
+.toggle.btn-primary,
+.toggle-on.btn-primary {
+    background-color: #62a8ea;
+    border-color: #62a8ea;
+    color: #fff;
+}
+
+.toggle.btn-primary:focus,
+.toggle.btn-primary:hover {
+    background-color: #4f92d2;
+    border-color: #4f92d2;
+}
+
+.toggle.btn-primary .toggle-handle {
+    background-color: #fff;
+    border-color: rgba(0, 0, 0, 0.12);
+}
+
+.voyager-tooltip {
+    position: absolute;
+    z-index: 9999;
+    background: rgba(15, 23, 42, 0.9);
+    color: #fff;
+    font-size: 12px;
+    line-height: 1.2;
+    padding: 4px 8px;
+    border-radius: 3px;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, -6px);
+    transition: opacity 0.15s ease;
+}
+
+.voyager-tooltip.visible {
+    opacity: 1;
+}
+
+.collapse {
+    display: none;
+}
+
+.collapse.in,
+.collapse.show {
+    display: block;
+}
+
+.collapsing {
+    position: relative;
+    height: 0;
+    overflow: hidden;
+    transition: height 0.35s ease;
+}

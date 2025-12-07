@@ -1,0 +1,17 @@
+.panel {
+  border-radius: 1px;
+}
+
+.panel .panel-heading {
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+}
+
+.chart {
+  padding: 15px;
+
+  &.no-padding {
+    padding: 0;
+    margin-bottom: -5px;
+  }
+}
