@@ -411,17 +411,17 @@
                             <label for="options">{{ __('voyager::generic.options') }}
                                 <small>{{ __('voyager::settings.help_option') }}</small>
                             </label>
-                            <div id="options_editor" class="form-control min_height_200" data-language="json"></div>
+                            <div id="options_editor" class="form-control min_height_200" data-theme="github" data-language="json"></div>
                             <textarea id="options_textarea" name="details" class="hidden"></textarea>
                             <div id="valid_options" class="alert-success alert" style="display:none">{{ __('voyager::json.valid') }}</div>
                             <div id="invalid_options" class="alert-danger alert" style="display:none">{{ __('voyager::json.invalid') }}</div>
                         </div>
                     </div>
-                    <div style="clear:both"></div>
-                    <button type="submit" class="btn btn-primary pull-right new-setting-btn">
-                        <i class="voyager-plus"></i> {{ __('voyager::settings.add_new') }}
-                    </button>
-                    <div style="clear:both"></div>
+                    <div class="col-md-12">
+                        <button type="submit" class="btn btn-primary pull-right ">
+                            <i class="voyager-plus"></i> {{ __('voyager::settings.add_new') }}
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -486,7 +486,7 @@
                 toggleOptions.addEventListener('click', function () {
                     optionsSections.forEach((section) => {
                         const isHidden = window.getComputedStyle(section).display === 'none';
-                        section.style.display = isHidden ? '' : 'none';
+                        section.style.display = isHidden ? 'block' : 'none';
                     });
                     const icon = toggleOptions.querySelector('.voyager-double-down, .voyager-double-up');
                     if (icon) {
