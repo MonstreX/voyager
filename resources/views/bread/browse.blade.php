@@ -47,14 +47,14 @@
                             <form method="get" class="form-search">
                                 <div id="search-input">
                                     <div class="col-1 no-padding">
-                                        <select id="search_key" name="key">
+                                        <select id="search_key" class="form-control" name="key">
                                             @foreach($searchNames as $key => $name)
                                                 <option value="{{ $key }}" @if($search->key == $key || (empty($search->key) && $key == $defaultSearchKey)) selected @endif>{{ $name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
                                     <div class="col-1 no-padding">
-                                        <select id="filter" name="filter">
+                                        <select id="filter" class="form-control" name="filter">
                                             <option value="contains" @if($search->filter == "contains") selected @endif>{{ __('voyager::generic.contains') }}</option>
                                             <option value="equals" @if($search->filter == "equals") selected @endif>=</option>
                                         </select>

@@ -265,7 +265,7 @@
                                 </div>
                             </div>
 
-                            <div class="panel-body no-padding-left-right row">
+                            <div class="panel-body row">
                                 <div class="col-md-10 no-padding-left-right">
                                     @if ($setting->type == "text")
                                         <input type="text" class="form-control" name="{{ $setting->key }}" value="{{ $setting->value }}">
@@ -305,7 +305,7 @@
                                     @elseif($setting->type == "select_dropdown")
                                         <?php $options = json_decode($setting->details); ?>
                                         <?php $selected_value = (isset($setting->value) && !empty($setting->value)) ? $setting->value : NULL; ?>
-                                        <select class="form-control" name="{{ $setting->key }}">
+                                        <select class="form-control voyager-select" name="{{ $setting->key }}">
                                             <?php $default = (isset($options->default)) ? $options->default : NULL; ?>
                                             @if(isset($options->options))
                                                 @foreach($options->options as $index => $option)
@@ -341,7 +341,7 @@
                                     @endif
                                 </div>
                                 <div class="col-md-2 no-padding-left-right">
-                                    <select class="form-control group_select" name="{{ $setting->key }}_group">
+                                    <select class="form-control group_select voyager-select" name="{{ $setting->key }}_group">
                                         @foreach($groups as $group)
                                         <option value="{{ $group }}" {!! $setting->group == $group ? 'selected' : '' !!}>{{ $group }}</option>
                                         @endforeach
@@ -383,7 +383,7 @@
                     </div>
                     <div class="col-md-3">
                         <label for="type">{{ __('voyager::generic.type') }}</label>
-                        <select name="type" class="form-control" required="required">
+                        <select name="type" class="form-control voyager-select" required="required">
                             <option value="">{{ __('voyager::generic.choose_type') }}</option>
                             <option value="text">{{ __('voyager::form.type_textbox') }}</option>
                             <option value="text_area">{{ __('voyager::form.type_textarea') }}</option>
@@ -399,7 +399,7 @@
                     </div>
                     <div class="col-md-3">
                         <label for="group">{{ __('voyager::settings.group') }}</label>
-                        <select class="form-control group_select group_select_new" name="group">
+                        <select class="form-control group_select group_select_new voyager-select" name="group">
                             @foreach($groups as $group)
                                 <option value="{{ $group }}">{{ $group }}</option>
                             @endforeach

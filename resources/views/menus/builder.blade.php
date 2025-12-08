@@ -79,7 +79,7 @@
                             <input type="text" class="form-control" id="m_title" name="title" placeholder="{{ __('voyager::generic.title') }}"><br>
                         </div>
                         <label for="type">{{ __('voyager::menu_builder.link_type') }}</label>
-                        <select id="m_link_type" class="form-control" name="type">
+                        <select id="m_link_type" class="form-control voyager-select" name="type">
                             <option value="url" selected="selected">{{ __('voyager::menu_builder.static_url') }}</option>
                             <option value="route">{{ __('voyager::menu_builder.dynamic_route') }}</option>
                         </select><br>
@@ -102,7 +102,7 @@
                         <input type="color" class="form-control" id="m_color" name="color"
                                placeholder="{{ __('voyager::menu_builder.color_ph') }}"><br>
                         <label for="target">{{ __('voyager::menu_builder.open_in') }}</label>
-                        <select id="m_target" class="form-control" name="target">
+                        <select id="m_target" class="form-control voyager-select" name="target">
                             <option value="_self" selected="selected">{{ __('voyager::menu_builder.open_same') }}</option>
                             <option value="_blank">{{ __('voyager::menu_builder.open_new') }}</option>
                         </select>

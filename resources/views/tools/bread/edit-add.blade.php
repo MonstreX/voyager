@@ -356,7 +356,7 @@
                                             <input type="hidden" value="timestamp"
                                                    name="field_input_type_{{ $data['field'] }}">
                                         @else
-                                            <select name="field_input_type_{{ $data['field'] }}">
+                                            <select name="field_input_type_{{ $data['field'] }}" class="form-control voyager-select">
                                                 @foreach (Voyager::formFields() as $formField)
                                                     @php
                                                     $selected = (isset($dataRow->type) && $formField->getCodename() == $dataRow->type) || (!isset($dataRow->type) && $formField->getCodename() == 'text');

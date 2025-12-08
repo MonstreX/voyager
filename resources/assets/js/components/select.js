@@ -119,7 +119,7 @@ export class VoyagerSelect {
 
     buildDom() {
         this.wrapper = document.createElement('span');
-        this.wrapper.className = 'voyager-select select2 select2-container select2-container--default';
+        this.wrapper.className = 'voyager-select-wrapper select2 select2-container select2-container--default';
         this.wrapper.style.width = this.select.style.width || '100%';
         this.wrapper.dataset.select2Id = this.id;
 

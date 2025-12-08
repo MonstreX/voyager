@@ -52,6 +52,21 @@
     color:#8c9bA6;
 }
 
+.voyager-select{
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='4' viewBox='0 0 10 6'%3E%3Cpath fill='%2376838f' d='M0 0l5 6 5-6H0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 7px 4px;
+    padding-right: 28px;
+}
+
+.voyager .voyager-select{
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='4' viewBox='0 0 10 6'%3E%3Cpath fill='%2376838f' d='M0 0l5 6 5-6H0z'/%3E%3C/svg%3E");
+}
+
 /* Form Group Default */
 .form-group-default {
     background-color: #fff;
@@ -227,6 +242,10 @@ ul.checkbox label {
     border-color: #62a8ea;
     -webkit-box-shadow: none;
     box-shadow: none;
+}
+
+.voyager select.voyager-select{
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%2376838f' d='M0 0l5 6 5-6H0z'/%3E%3C/svg%3E");
 }
 
 .select2-container--open {

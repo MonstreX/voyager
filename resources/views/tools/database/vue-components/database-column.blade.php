@@ -31,7 +31,7 @@
     <td>
         <select :value="index.type" @change="onIndexTypeChange"
                 :disabled="column.type.notSupportIndex"
-                class="form-control">
+                class="form-control voyager-select">
             <option value=""></option>
             <option value="INDEX">{{ __('voyager::database.index') }}</option>
             <option value="UNIQUE">{{ __('voyager::database.unique') }}</option>
