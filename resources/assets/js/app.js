@@ -41,6 +41,43 @@ const buildAssetUrl = (relativePath = '') => {
     return normalizedBase + normalizedPath;
 };
 
+const loadedStylesheets = new Map();
+
+const ensureStylesheet = (relativePath, key) => {
+    if (typeof document === 'undefined') {
+        return Promise.resolve();
+    }
+    const cacheKey = key || relativePath;
+    if (loadedStylesheets.has(cacheKey)) {
+        return loadedStylesheets.get(cacheKey);
+    }
+    const href = buildAssetUrl(relativePath);
+    const existing = document.head.querySelector(`link[data-voyager-style="${cacheKey}"]`) ||
+        document.head.querySelector(`link[href="${href}"]`);
+    if (existing) {
+        const promise = Promise.resolve(existing);
+        loadedStylesheets.set(cacheKey, promise);
+        return promise;
+    }
+
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = href;
+    link.setAttribute('data-voyager-style', cacheKey);
+
+    const promise = new Promise((resolve, reject) => {
+        link.onload = () => resolve(link);
+        link.onerror = (event) => {
+            console.error(`[Voyager] Failed to load stylesheet ${relativePath}`, event);
+            reject(event);
+        };
+    });
+
+    document.head.appendChild(link);
+    loadedStylesheets.set(cacheKey, promise);
+    return promise;
+};
+
 const memoizeDynamicImport = (relativePath, { label, reject }) => {
     let promise = null;
     return () => {
@@ -68,6 +105,15 @@ const loadEditorsBundle = memoizeDynamicImport('js/editors.js', {
     label: 'Editors bundle',
     reject: rejectEditorsReady
 });
+
+const loadEditorsAssets = () => {
+    const cssPromise = ensureStylesheet('css/editors.css', 'voyager-editors-css')
+        .catch((error) => {
+            // Continue even if CSS failed to load, error already logged
+            return error;
+        });
+    return Promise.all([cssPromise, loadEditorsBundle()]).then(([, module]) => module);
+};
 
 const resolveVueApi = (module) => {
     const voyagerVue = (window.Voyager && window.Voyager.vue) || {};
@@ -146,7 +192,7 @@ window.Voyager.emitDomUpdated = (container = document) => {
     voyagerEvents.emit('dom:updated', container || document);
 };
 window.Voyager.loadVue = () => loadVueBundle();
-window.Voyager.loadEditors = () => loadEditorsBundle();
+window.Voyager.loadEditors = () => loadEditorsAssets();
 window.Voyager.withVue = (callback) => {
     if (!callback || typeof callback !== 'function') {
         return Promise.resolve();
