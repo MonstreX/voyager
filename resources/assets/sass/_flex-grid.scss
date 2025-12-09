@@ -63,6 +63,11 @@
   @include make-grid-columns('lg');
 }
 
+// XLG (Extra Large Screens) - >= 1600px
+@media (min-width: 1600px) {
+  @include make-grid-columns('xlg');
+}
+
 // Utility: Vertical Alignment in rows
 .align-items-center {
     align-items: center;

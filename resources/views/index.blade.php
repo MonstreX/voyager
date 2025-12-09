@@ -1,5 +1,10 @@
 @extends('voyager::master')
 
+@section('css')
+    @parent
+    <link rel="stylesheet" href="{{ voyager_asset('css/ga.css') }}">
+@stop
+
 @section('content')
     <div class="page-content">
         @include('voyager::alerts')

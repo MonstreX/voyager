@@ -125,9 +125,22 @@
 .panel-title {
     display: block;
     padding: 20px 30px;
-    padding-left:15px;
+    padding-left: 15px;
     font-size: 18px;
-    text-align:left;
+    text-align: left;
+
+    &.panel-icon {
+        position: relative;
+        padding-left: 50px;
+
+        i {
+            margin-right: 5px;
+            font-size: 22px;
+            position: absolute;
+            top: 18px;
+            left: 20px;
+        }
+    }
 }
 
 .panel-footer{

@@ -17,12 +17,13 @@ export default defineConfig({
   build: {
     outDir: 'publishable/assets',
     emptyOutDir: false,
-    cssCodeSplit: false,
+    cssCodeSplit: true,
     rollupOptions: {
       input: {
         app: 'resources/assets/js/app.js',
         'vue-bundle': 'resources/assets/js/vue-bundle.js',
-        editors: 'resources/assets/js/editors.js'
+        editors: 'resources/assets/js/editors.js',
+        ga: 'resources/assets/js/ga.js'
       },
       output: {
         entryFileNames: 'js/[name].js',
@@ -31,7 +32,8 @@ export default defineConfig({
         manualChunks: undefined,
         assetFileNames: (assetInfo) => {
           if (assetInfo.name.endsWith('.css')) {
-            return 'css/app.css';
+            const baseName = assetInfo.name.replace(/\.css$/, '');
+            return `css/${baseName}.css`;
           }
           return 'assets/[name].[ext]';
         }
