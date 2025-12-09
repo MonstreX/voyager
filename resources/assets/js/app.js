@@ -25,15 +25,9 @@ import * as helpers from './helpers.js';
 import Cropper from 'cropperjs';
 import Sortable from 'sortablejs';
 
-// Create main Voyager namespace with organized API
-window.Voyager = window.Voyager || {};
-
-// Create Promise-based readiness system
-let resolveAppReady;
-window.Voyager.ready = window.Voyager.ready || {};
-window.Voyager.ready.app = new Promise((resolve) => {
-    resolveAppReady = resolve;
-});
+// Voyager namespace and ready.app Promise already initialized in master.blade.php <head>
+// Just get the resolver that was created there
+const resolveAppReady = window.__resolveAppReady;
 
 // Event system
 window.Voyager.events = voyagerEvents;

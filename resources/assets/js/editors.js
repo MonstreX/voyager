@@ -25,13 +25,9 @@ import 'ace-builds/src-noconflict/theme-github';
 // Make Ace available globally (required by Jodit source mode)
 window.ace = ace;
 
-// Create Promise for editors bundle readiness
-let resolveEditorsReady;
-window.Voyager = window.Voyager || {};
-window.Voyager.ready = window.Voyager.ready || {};
-window.Voyager.ready.editors = new Promise((resolve) => {
-    resolveEditorsReady = resolve;
-});
+// Voyager.ready.editors Promise already initialized in master.blade.php <head>
+// Just get the resolver
+const resolveEditorsReady = window.__resolveEditorsReady;
 
 /**
  * Initialize Jodit editor

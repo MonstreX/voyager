@@ -9,36 +9,37 @@
     <script>
         window.voyagerAceBase = "{{ voyager_asset('js/ace/libs') }}";
 
+        // Pre-initialize Voyager namespace and readiness Promises
+        // This MUST run BEFORE any inline scripts or ES module loads
+        window.Voyager = window.Voyager || {};
+        window.Voyager.ready = window.Voyager.ready || {};
+
+        // Create Promises with external resolvers (modules will call these)
+        window.Voyager.ready.app = new Promise(function(resolve) {
+            window.__resolveAppReady = resolve;
+        });
+        window.Voyager.ready.vue = new Promise(function(resolve) {
+            window.__resolveVueReady = resolve;
+        });
+        window.Voyager.ready.editors = new Promise(function(resolve) {
+            window.__resolveEditorsReady = resolve;
+        });
+
         // Legacy helpers to wait for bundles to load
         // DEPRECATED: Use Voyager.ready.app/vue/editors promises instead
         window.whenAppReady = function(callback) {
             console.warn('[Voyager] whenAppReady() is deprecated. Use: Voyager.ready.app.then(callback)');
-            if (window.Voyager && window.Voyager.ready && window.Voyager.ready.app) {
-                window.Voyager.ready.app.then(callback);
-            } else {
-                // Fallback to old method if Voyager.ready not available yet
-                document.addEventListener('voyager:app-ready', callback, { once: true });
-            }
+            window.Voyager.ready.app.then(callback);
         };
 
         window.whenVueReady = function(callback) {
             console.warn('[Voyager] whenVueReady() is deprecated. Use: Voyager.ready.vue.then(callback)');
-            if (window.Voyager && window.Voyager.ready && window.Voyager.ready.vue) {
-                window.Voyager.ready.vue.then(callback);
-            } else {
-                // Fallback to old method if Voyager.ready not available yet
-                document.addEventListener('voyager:vue-ready', callback, { once: true });
-            }
+            window.Voyager.ready.vue.then(callback);
         };
 
         window.whenEditorsReady = function(callback) {
             console.warn('[Voyager] whenEditorsReady() is deprecated. Use: Voyager.ready.editors.then(callback)');
-            if (window.Voyager && window.Voyager.ready && window.Voyager.ready.editors) {
-                window.Voyager.ready.editors.then(callback);
-            } else {
-                // Fallback to old method if Voyager.ready not available yet
-                document.addEventListener('voyager:editors-ready', callback, { once: true });
-            }
+            window.Voyager.ready.editors.then(callback);
         };
     </script>
 
@@ -159,22 +160,23 @@ if (\Illuminate\Support\Str::startsWith(Auth::user()->avatar, 'http://') || \Ill
 
 <script>
     // Display Laravel session alerts and messages
-    Voyager.ready.app.then(function() {
+    // Use whenAppReady for inline scripts (Voyager object not yet available)
+    window.whenAppReady(function() {
         @if(Session::has('alerts'))
             let alerts = {!! json_encode(Session::get('alerts')) !!};
-            Voyager.helpers.displayAlerts(alerts, Voyager.toastr);
+            helpers.displayAlerts(alerts, toastr);
         @endif
 
         @if(Session::has('message'))
         // TODO: change Controllers to use AlertsMessages trait... then remove this
         var alertType = {!! json_encode(Session::get('alert-type', 'info')) !!};
         var alertMessage = {!! json_encode(Session::get('message')) !!};
-        var alerter = Voyager.toastr[alertType];
+        var alerter = toastr[alertType];
 
         if (alerter) {
             alerter(alertMessage);
         } else {
-            Voyager.toastr.error("toastr alert-type " + alertType + " is unknown");
+            toastr.error("toastr alert-type " + alertType + " is unknown");
         }
         @endif
     });
