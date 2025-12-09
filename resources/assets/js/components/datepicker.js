@@ -3,6 +3,51 @@ import 'flatpickr/dist/flatpickr.css';
 
 // Store flatpickr instances for cleanup
 const voyagerDatepickerInstances = new WeakMap();
+const DATEPICKER_SELECTOR = 'input[data-flatpickr], input[data-flatpickr-type], input[data-datepicker]';
+
+const normalizeScopeToRoots = (scope) => {
+    if (!scope || scope === document) {
+        return [document];
+    }
+    if (typeof scope === 'string') {
+        return Array.from(document.querySelectorAll(scope));
+    }
+    if (scope instanceof Element || scope instanceof DocumentFragment) {
+        return [scope];
+    }
+    if (scope instanceof NodeList || Array.isArray(scope)) {
+        return Array.from(scope).filter((node) => node instanceof Element || node instanceof DocumentFragment);
+    }
+    return [];
+};
+
+const resolveDatepickerInputs = (scope) => {
+    const targets = new Set();
+    const roots = normalizeScopeToRoots(scope);
+
+    if (!roots.length) {
+        document.querySelectorAll(DATEPICKER_SELECTOR).forEach((input) => targets.add(input));
+        return Array.from(targets);
+    }
+
+    roots.forEach((root) => {
+        if (root === document) {
+            document.querySelectorAll(DATEPICKER_SELECTOR).forEach((input) => targets.add(input));
+            return;
+        }
+        if (!(root instanceof Element || root instanceof DocumentFragment)) {
+            return;
+        }
+        if (root instanceof Element && root.matches(DATEPICKER_SELECTOR)) {
+            targets.add(root);
+        }
+        if (typeof root.querySelectorAll === 'function') {
+            root.querySelectorAll(DATEPICKER_SELECTOR).forEach((input) => targets.add(input));
+        }
+    });
+
+    return Array.from(targets);
+};
 
 const getDefaultFlatpickrConfig = (type) => {
     switch (type) {
@@ -50,9 +95,8 @@ export const initDatePickers = (scope = document) => {
         return;
     }
 
-    const selector = 'input[data-flatpickr], input[data-flatpickr-type], input[data-datepicker]';
-    const container = scope === document ? document : (scope instanceof Element ? scope : document);
-    container.querySelectorAll(selector).forEach((input) => {
+    const inputs = resolveDatepickerInputs(scope);
+    inputs.forEach((input) => {
         if (input.dataset.flatpickrInitialized === 'true') {
             return;
         }

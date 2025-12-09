@@ -12,22 +12,19 @@
         const voyagerAssetsMeta = document.head.querySelector('meta[name="assets-path"]');
         const voyagerAssetsBase = voyagerAssetsMeta ? voyagerAssetsMeta.getAttribute('content').replace(/\/?$/, '/') : '{{ rtrim(voyager_asset(''), '/') }}/';
 
-        function voyagerLoadScript(relativePath, cacheKey) {
+        function voyagerLoadModule(relativePath, cacheKey, rejectHandler) {
             const normalizedPath = (relativePath || '').replace(/^\//, '');
-            const key = '__voyagerScript_' + cacheKey;
+            const key = '__voyagerModule_' + cacheKey;
             if (window[key]) {
                 return window[key];
             }
-            window[key] = new Promise(function(resolve, reject) {
-                const script = document.createElement('script');
-                script.type = 'module';
-                script.src = voyagerAssetsBase + normalizedPath;
-                script.onload = resolve;
-                script.onerror = function(error) {
-                    console.error('[Voyager] Failed to load ' + normalizedPath, error);
-                    reject(error);
-                };
-                document.head.appendChild(script);
+            const moduleUrl = voyagerAssetsBase + normalizedPath;
+            window[key] = import(moduleUrl).catch(function(error) {
+                console.error('[Voyager] Failed to load ' + normalizedPath, error);
+                if (typeof rejectHandler === 'function') {
+                    rejectHandler(error);
+                }
+                throw error;
             });
             return window[key];
         }
@@ -53,13 +50,13 @@
 
         if (typeof window.Voyager.loadVue !== 'function') {
             window.Voyager.loadVue = function() {
-                return voyagerLoadScript('js/vue-bundle.js', 'vue');
+                return voyagerLoadModule('js/vue-bundle.js', 'vue', window.__rejectVueReady);
             };
         }
 
         if (typeof window.Voyager.loadEditors !== 'function') {
             window.Voyager.loadEditors = function() {
-                return voyagerLoadScript('js/editors.js', 'editors');
+                return voyagerLoadModule('js/editors.js', 'editors', window.__rejectEditorsReady);
             };
         }
 
@@ -80,6 +77,9 @@
                         callback(result);
                     }
                     return result;
+                }).catch(function(error) {
+                    console.error('[Voyager] Failed to prepare Vue helpers', error);
+                    throw error;
                 });
             };
         }

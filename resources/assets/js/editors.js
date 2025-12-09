@@ -110,8 +110,18 @@ export function initJodit(selector, options = {}) {
 /**
  * Initialize Ace editors
  */
-export function initAceEditors(container = document) {
-    const elements = container.getElementsByClassName("ace_editor");
+export function initAceEditors(scope = document) {
+    if (scope instanceof NodeList || Array.isArray(scope)) {
+        Array.from(scope).forEach((node) => initAceEditors(node));
+        return;
+    }
+    const root = (!scope || scope === document) ? document : scope;
+    if (!root || typeof root.querySelectorAll !== 'function') {
+        return;
+    }
+    const elements = root === document
+        ? document.getElementsByClassName('ace_editor')
+        : root.querySelectorAll('.ace_editor');
 
     // Setup base config once
     const assetsMeta = document.querySelector('meta[name="assets-path"]');

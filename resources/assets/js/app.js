@@ -25,8 +25,8 @@ import * as helpers from './helpers.js';
 import Cropper from 'cropperjs';
 import Sortable from 'sortablejs';
 
-// Voyager namespace and ready.app Promise already initialized in master.blade.php <head>
-// Just get the resolver that was created there
+// Voyager namespace and ready Promises are initialized in master.blade.php <head>
+// Get the resolvers that were created there
 const resolveAppReady = window.__resolveAppReady;
 const rejectVueReady = window.__rejectVueReady || (() => {});
 const rejectEditorsReady = window.__rejectEditorsReady || (() => {});
@@ -46,7 +46,7 @@ const memoizeDynamicImport = (relativePath, { label, reject }) => {
     return () => {
         if (!promise) {
             const url = buildAssetUrl(relativePath);
-            promise = import(/* @vite-ignore */ url).catch((error) => {
+            promise = import(url).catch((error) => {
                 const message = `[Voyager] Failed to load ${label || relativePath}`;
                 console.error(message, error);
                 if (typeof reject === 'function') {
@@ -95,25 +95,43 @@ const startDomObserver = () => {
     }
 
     let scheduled = false;
+    const pendingNodes = new Set();
+    const flush = () => {
+        scheduled = false;
+        const targets = Array.from(pendingNodes);
+        pendingNodes.clear();
+        if (!targets.length) {
+            voyagerEvents.emit('dom:updated', document);
+            return;
+        }
+        voyagerEvents.emit('dom:updated', targets.length === 1 ? targets[0] : targets);
+    };
     const scheduleEmit = () => {
         if (scheduled) {
             return;
         }
         scheduled = true;
-        const runner = () => {
-            scheduled = false;
-            voyagerEvents.emit('dom:updated', document);
-        };
         if (typeof window.requestAnimationFrame === 'function') {
-            window.requestAnimationFrame(runner);
+            window.requestAnimationFrame(flush);
         } else {
-            setTimeout(runner, 60);
+            setTimeout(flush, 60);
         }
     };
 
     const observer = new MutationObserver((mutationList) => {
-        const hasAdditions = mutationList.some((mutation) => mutation.addedNodes && mutation.addedNodes.length);
-        if (hasAdditions) {
+        let added = false;
+        mutationList.forEach((mutation) => {
+            if (!mutation.addedNodes || !mutation.addedNodes.length) {
+                return;
+            }
+            mutation.addedNodes.forEach((node) => {
+                if (node && node.nodeType === Node.ELEMENT_NODE) {
+                    pendingNodes.add(node);
+                    added = true;
+                }
+            });
+        });
+        if (added) {
             scheduleEmit();
         }
     });
@@ -125,7 +143,7 @@ const startDomObserver = () => {
 // Event system
 window.Voyager.events = voyagerEvents;
 window.Voyager.emitDomUpdated = (container = document) => {
-    voyagerEvents.emit('dom:updated', container);
+    voyagerEvents.emit('dom:updated', container || document);
 };
 window.Voyager.loadVue = () => loadVueBundle();
 window.Voyager.loadEditors = () => loadEditorsBundle();
@@ -143,6 +161,7 @@ window.Voyager.withVue = (callback) => {
         })
         .catch((error) => {
             console.error('[Voyager] Failed to load Vue bundle', error);
+            throw error;
         });
 };
 

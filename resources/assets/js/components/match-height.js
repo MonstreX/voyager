@@ -47,27 +47,38 @@ const applyMatchHeight = () => {
 };
 
 let matchHeightScheduled = false;
+let matchHeightResizeBound = false;
+
+const scheduleMatchHeightUpdate = () => {
+    if (matchHeightScheduled) {
+        return;
+    }
+    matchHeightScheduled = true;
+    const runner = () => {
+        matchHeightScheduled = false;
+        applyMatchHeight();
+    };
+    if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
+        window.requestAnimationFrame(runner);
+    } else {
+        setTimeout(runner, 60);
+    }
+};
+
+const ensureResizeListener = () => {
+    if (matchHeightResizeBound || typeof window === 'undefined') {
+        return;
+    }
+    matchHeightResizeBound = true;
+    window.addEventListener('resize', scheduleMatchHeightUpdate);
+};
+
 export const initMatchHeight = () => {
     if (typeof window === 'undefined' || typeof document === 'undefined') {
         return;
     }
-    const scheduleUpdate = () => {
-        if (matchHeightScheduled) {
-            return;
-        }
-        matchHeightScheduled = true;
-        const runner = () => {
-            matchHeightScheduled = false;
-            applyMatchHeight();
-        };
-        if (typeof window.requestAnimationFrame === 'function') {
-            window.requestAnimationFrame(runner);
-        } else {
-            setTimeout(runner, 60);
-        }
-    };
+    ensureResizeListener();
     applyMatchHeight();
-    window.addEventListener('resize', scheduleUpdate);
 };
 
 /**
