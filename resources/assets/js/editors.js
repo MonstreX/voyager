@@ -25,6 +25,14 @@ import 'ace-builds/src-noconflict/theme-github';
 // Make Ace available globally (required by Jodit source mode)
 window.ace = ace;
 
+// Create Promise for editors bundle readiness
+let resolveEditorsReady;
+window.Voyager = window.Voyager || {};
+window.Voyager.ready = window.Voyager.ready || {};
+window.Voyager.ready.editors = new Promise((resolve) => {
+    resolveEditorsReady = resolve;
+});
+
 /**
  * Initialize Jodit editor
  */
@@ -168,4 +176,5 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Signal that editors bundle is ready
+resolveEditorsReady();
 document.dispatchEvent(new CustomEvent('voyager:editors-ready'));

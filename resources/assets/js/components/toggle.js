@@ -1,3 +1,6 @@
+// Store toggle instances for cleanup
+const voyagerToggleInstances = new WeakMap();
+
 const resolveToggleElements = (target) => {
     if (!target || target === document) {
         return Array.from(document.querySelectorAll('.toggleswitch, input[data-toggle^="toggle"]'));
@@ -193,20 +196,27 @@ export const initToggleSwitches = (target) => {
             }
         };
 
-        wrapper.addEventListener('click', (event) => {
-            if (event.target === input) {
-                return;
-            }
-            event.preventDefault();
-            setChecked();
-        });
-        wrapper.addEventListener('keydown', (event) => {
-            if (event.key === ' ' || event.key === 'Enter') {
+        // Store handlers for cleanup
+        const handlers = {
+            wrapperClick: (event) => {
+                if (event.target === input) {
+                    return;
+                }
                 event.preventDefault();
                 setChecked();
-            }
-        });
-        input.addEventListener('change', () => updateState());
+            },
+            wrapperKeydown: (event) => {
+                if (event.key === ' ' || event.key === 'Enter') {
+                    event.preventDefault();
+                    setChecked();
+                }
+            },
+            inputChange: () => updateState()
+        };
+
+        wrapper.addEventListener('click', handlers.wrapperClick);
+        wrapper.addEventListener('keydown', handlers.wrapperKeydown);
+        input.addEventListener('change', handlers.inputChange);
 
         const observer = new MutationObserver((mutations) => {
             const shouldUpdate = mutations.some((mutation) => mutation.attributeName === 'disabled');
@@ -216,7 +226,83 @@ export const initToggleSwitches = (target) => {
         });
         observer.observe(input, { attributes: true, attributeFilter: ['disabled'] });
 
+        // Store instance data for cleanup
+        voyagerToggleInstances.set(input, {
+            wrapper,
+            handlers,
+            observer,
+            parent
+        });
+
         requestAnimationFrame(adjustDimensions);
         updateState();
+    });
+};
+
+/**
+ * Destroy a toggle switch and restore the original input
+ * @param {HTMLInputElement|string} target - Input element or selector
+ */
+export const destroyToggleSwitch = (target) => {
+    const elements = resolveToggleElements(target);
+
+    elements.forEach((input) => {
+        if (!(input instanceof HTMLInputElement) || input.type !== 'checkbox') {
+            return;
+        }
+
+        const instance = voyagerToggleInstances.get(input);
+        if (!instance) {
+            return; // Not initialized
+        }
+
+        const { wrapper, handlers, observer, parent } = instance;
+
+        // Disconnect observer
+        if (observer) {
+            observer.disconnect();
+        }
+
+        // Remove event listeners
+        if (handlers) {
+            wrapper.removeEventListener('click', handlers.wrapperClick);
+            wrapper.removeEventListener('keydown', handlers.wrapperKeydown);
+            input.removeEventListener('change', handlers.inputChange);
+        }
+
+        // Restore original input
+        input.style.display = '';
+        if (parent && wrapper.parentNode === parent) {
+            parent.insertBefore(input, wrapper);
+            parent.removeChild(wrapper);
+        } else if (wrapper.parentNode) {
+            wrapper.parentNode.insertBefore(input, wrapper);
+            wrapper.parentNode.removeChild(wrapper);
+        }
+
+        // Clear initialization flag
+        delete input.dataset.voyagerToggleInitialized;
+
+        // Remove from instances map
+        voyagerToggleInstances.delete(input);
+    });
+};
+
+/**
+ * Refresh (destroy + reinitialize) a toggle switch
+ * @param {HTMLInputElement|string} target - Input element or selector
+ */
+export const refreshToggleSwitch = (target) => {
+    destroyToggleSwitch(target);
+    initToggleSwitches(target);
+};
+
+/**
+ * Subscribe to dom:updated event for automatic reinitialization
+ * @param {Object} voyagerEvents - Event bus instance
+ */
+export const subscribeToEvents = (voyagerEvents) => {
+    voyagerEvents.on('dom:updated', (container) => {
+        initToggleSwitches(container);
     });
 };

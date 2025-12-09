@@ -12,6 +12,14 @@
 import AdminMenu from './components/admin_menu.vue';
 import { createApp } from 'vue';
 
+// Create Promise for Vue bundle readiness
+let resolveVueReady;
+window.Voyager = window.Voyager || {};
+window.Voyager.ready = window.Voyager.ready || {};
+window.Voyager.ready.vue = new Promise((resolve) => {
+    resolveVueReady = resolve;
+});
+
 // Registry to keep compatibility with legacy Vue component registration
 const voyagerComponentRegistry = {};
 const voyagerActiveApps = [];
@@ -92,4 +100,5 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Signal that Vue bundle is ready
+resolveVueReady();
 document.dispatchEvent(new CustomEvent('voyager:vue-ready'));

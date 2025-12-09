@@ -723,3 +723,13 @@ document.addEventListener('keydown', (event) => {
         voyagerSelectOpenInstance.closeDropdown();
     }
 });
+
+/**
+ * Subscribe to dom:updated event for automatic reinitialization
+ * @param {Object} voyagerEvents - Event bus instance
+ */
+export const subscribeToEvents = (voyagerEvents) => {
+    voyagerEvents.on('dom:updated', (container) => {
+        initVoyagerSelects(container);
+    });
+};

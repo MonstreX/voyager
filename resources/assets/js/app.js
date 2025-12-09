@@ -4,14 +4,15 @@ import '../sass/app.scss';
 // Core
 import { initBootstrapCompat, showModal, hideModal, initTooltips } from './core/bootstrap-compat';
 import { initGlobalEvents } from './core/events';
+import { voyagerEvents } from './core/event-bus';
 
 // Components
-import { initDatePickers } from './components/datepicker';
-import { initToggleSwitches } from './components/toggle';
-import { initVoyagerSelects, refreshVoyagerSelect, setVoyagerSelectOptions } from './components/select';
+import { initDatePickers, destroyDatePicker, refreshDatePicker, subscribeToEvents as subscribeDatePickers } from './components/datepicker';
+import { initToggleSwitches, destroyToggleSwitch, refreshToggleSwitch, subscribeToEvents as subscribeToggles } from './components/toggle';
+import { initVoyagerSelects, refreshVoyagerSelect, setVoyagerSelectOptions, subscribeToEvents as subscribeSelects } from './components/select';
 import { initNestable, serializeNestable } from './components/nestable';
-import { initMatchHeight } from './components/match-height';
-import { initMarkdownEditor } from './components/editor-markdown';
+import { initMatchHeight, subscribeToEvents as subscribeMatchHeight } from './components/match-height';
+import { initMarkdownEditor, subscribeToEvents as subscribeMarkdown } from './components/editor-markdown';
 
 // Modules
 import VoyagerToaster from './modules/toaster';
@@ -24,11 +25,82 @@ import * as helpers from './helpers.js';
 import Cropper from 'cropperjs';
 import Sortable from 'sortablejs';
 
-// Global Exports
+// Create main Voyager namespace with organized API
+window.Voyager = window.Voyager || {};
+
+// Create Promise-based readiness system
+let resolveAppReady;
+window.Voyager.ready = window.Voyager.ready || {};
+window.Voyager.ready.app = new Promise((resolve) => {
+    resolveAppReady = resolve;
+});
+
+// Event system
+window.Voyager.events = voyagerEvents;
+window.Voyager.emitDomUpdated = (container = document) => {
+    voyagerEvents.emit('dom:updated', container);
+};
+
+// Core utilities
+window.Voyager.helpers = helpers;
+window.Voyager.toastr = new VoyagerToaster();
+window.Voyager.Cropper = Cropper;
+window.Voyager.Sortable = Sortable;
+
+// Component initialization functions
+window.Voyager.init = {
+    bootstrap: initBootstrapCompat,
+    tooltips: initTooltips,
+    datepickers: initDatePickers,
+    toggles: initToggleSwitches,
+    selects: initVoyagerSelects,
+    matchHeight: initMatchHeight,
+    nestable: initNestable,
+    markdown: initMarkdownEditor,
+    simpleTables: initSimpleTables,
+    slugify: initSlugifyFields
+};
+
+// Component destroy/refresh functions
+window.Voyager.destroy = {
+    datepicker: destroyDatePicker,
+    toggle: destroyToggleSwitch
+};
+
+window.Voyager.refresh = {
+    datepicker: refreshDatePicker,
+    toggle: refreshToggleSwitch,
+    select: refreshVoyagerSelect
+};
+
+// Bootstrap utilities
+window.Voyager.bootstrap = {
+    init: initBootstrapCompat,
+    showModal,
+    hideModal
+};
+
+// Other utilities
+window.Voyager.serializeNestable = serializeNestable;
+window.Voyager.setSelectOptions = setVoyagerSelectOptions;
+window.Voyager.SimpleTable = SimpleTable;
+
+// Subscribe components to dom:updated event
+subscribeToggles(voyagerEvents);
+subscribeDatePickers(voyagerEvents);
+subscribeSelects(voyagerEvents);
+subscribeMatchHeight(voyagerEvents);
+subscribeMarkdown(voyagerEvents);
+
+// Legacy Global Exports (keep for backward compatibility)
 window.VoyagerBootstrapCompat = { init: initBootstrapCompat, showModal, hideModal };
 window.VoyagerInitTooltips = initTooltips;
 window.VoyagerInitDatePickers = initDatePickers;
+window.VoyagerDestroyDatePicker = destroyDatePicker;
+window.VoyagerRefreshDatePicker = refreshDatePicker;
 window.VoyagerInitToggles = initToggleSwitches;
+window.VoyagerDestroyToggle = destroyToggleSwitch;
+window.VoyagerRefreshToggle = refreshToggleSwitch;
 window.VoyagerInitSelects = initVoyagerSelects;
 window.VoyagerSelectRefresh = refreshVoyagerSelect;
 window.VoyagerSelectSetOptions = setVoyagerSelectOptions;
@@ -61,7 +133,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.VoyagerInitSlugify) {
         window.VoyagerInitSlugify('.side-body input[data-slug-origin]');
     }
+
+    // Emit dom:updated event for initial page load
+    // Components can subscribe to this for dynamic reinitialization
+    voyagerEvents.emit('dom:updated', document);
 });
 
 // Signal that app bundle is ready
+resolveAppReady();
 document.dispatchEvent(new CustomEvent('voyager:app-ready'));

@@ -69,3 +69,13 @@ export const initMatchHeight = () => {
     applyMatchHeight();
     window.addEventListener('resize', scheduleUpdate);
 };
+
+/**
+ * Subscribe to dom:updated event for automatic reinitialization
+ * @param {Object} voyagerEvents - Event bus instance
+ */
+export const subscribeToEvents = (voyagerEvents) => {
+    voyagerEvents.on('dom:updated', () => {
+        initMatchHeight();
+    });
+};
