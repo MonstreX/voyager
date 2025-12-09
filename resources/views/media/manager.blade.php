@@ -374,8 +374,8 @@
 
     let croppedData = {};
 
-    window.whenVueReady(function() {
-        window.VueRegisterComponent('media-manager', {
+    window.Voyager.withVue(function(Vue) {
+        Vue.registerComponent('media-manager', {
         template: `@yield('media-manager')`,
         props: {
             basePath: {
@@ -1312,8 +1312,8 @@
                 }
             });
         },
+        });
     });
-    }); // end whenVueReady
 </script>
 <style>
 .dd-placeholder {

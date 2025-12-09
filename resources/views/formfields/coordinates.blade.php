@@ -238,8 +238,8 @@
                 }
             };
 
-            window.whenVueReady(function() {
-                const app = window.createVueApp({});
+            window.Voyager.withVue(function(Vue) {
+                const app = Vue.createApp({});
                 app.component('coordinates', coordinatesComponent);
                 app.mount('#coordinates-formfield-{{ $row->field }}');
             });

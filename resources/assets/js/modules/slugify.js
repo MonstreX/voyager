@@ -145,3 +145,19 @@ export const initSlugifyFields = (scope) => {
 
 export const slugifyString = (value, separator = '-') =>
     slugifyValue(value, separator);
+
+/**
+ * Subscribe slugify module to Voyager EventBus so dynamically inserted
+ * inputs with `data-slug-origin` automatically wire themselves up.
+ *
+ * @param {Object} voyagerEvents
+ */
+export const subscribeToEvents = (voyagerEvents) => {
+    if (!voyagerEvents || typeof voyagerEvents.on !== 'function') {
+        return;
+    }
+
+    voyagerEvents.on('dom:updated', (container) => {
+        initSlugifyFields(container || document);
+    });
+};

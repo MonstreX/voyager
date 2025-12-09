@@ -135,14 +135,15 @@
             rows: []
         };
 
-        window.whenVueReady(function() {
-            window.createVueApp({
+        window.Voyager.withVue(function(Vue) {
+            const app = Vue.createApp({
                 data() {
                     return {
                         table: table,
                     };
                 },
             }).mount('#table_info');
+            table = app.table;
         });
 
         document.addEventListener('DOMContentLoaded', function () {

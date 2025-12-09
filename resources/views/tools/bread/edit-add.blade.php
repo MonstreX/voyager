@@ -446,9 +446,15 @@
             initBreadItemsSortable();
 
             // Init Ace editors when editors bundle is ready
-            window.whenEditorsReady(function() {
-                initBreadAceEditors();
-            });
+            if (window.Voyager && typeof window.Voyager.loadEditors === 'function') {
+                window.Voyager.loadEditors()
+                    .then(function() {
+                        initBreadAceEditors();
+                    })
+                    .catch(function(error) {
+                        console.error('[Voyager] Failed to initialize BREAD ACE editors', error);
+                    });
+            }
 
             initRelationshipControls();
 

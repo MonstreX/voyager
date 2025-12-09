@@ -16,7 +16,7 @@ import { initMarkdownEditor, subscribeToEvents as subscribeMarkdown } from './co
 
 // Modules
 import VoyagerToaster from './modules/toaster';
-import { initSlugifyFields } from './modules/slugify';
+import { initSlugifyFields, subscribeToEvents as subscribeSlugify } from './modules/slugify';
 import SimpleTable, { initSimpleTables } from './modules/simple-table';
 
 // Legacy / Vendor
@@ -28,11 +28,122 @@ import Sortable from 'sortablejs';
 // Voyager namespace and ready.app Promise already initialized in master.blade.php <head>
 // Just get the resolver that was created there
 const resolveAppReady = window.__resolveAppReady;
+const rejectVueReady = window.__rejectVueReady || (() => {});
+const rejectEditorsReady = window.__rejectEditorsReady || (() => {});
+
+const assetsMeta = typeof document !== 'undefined'
+    ? document.head.querySelector('meta[name="assets-path"]')
+    : null;
+const assetsBase = assetsMeta ? assetsMeta.getAttribute('content') : '/vendor/voyager/';
+const buildAssetUrl = (relativePath = '') => {
+    const normalizedBase = assetsBase.replace(/\/?$/, '/');
+    const normalizedPath = (relativePath || '').replace(/^\//, '');
+    return normalizedBase + normalizedPath;
+};
+
+const memoizeDynamicImport = (relativePath, { label, reject }) => {
+    let promise = null;
+    return () => {
+        if (!promise) {
+            const url = buildAssetUrl(relativePath);
+            promise = import(/* @vite-ignore */ url).catch((error) => {
+                const message = `[Voyager] Failed to load ${label || relativePath}`;
+                console.error(message, error);
+                if (typeof reject === 'function') {
+                    reject(error);
+                }
+                throw error;
+            });
+        }
+        return promise;
+    };
+};
+
+const loadVueBundle = memoizeDynamicImport('js/vue-bundle.js', {
+    label: 'Vue bundle',
+    reject: rejectVueReady
+});
+
+const loadEditorsBundle = memoizeDynamicImport('js/editors.js', {
+    label: 'Editors bundle',
+    reject: rejectEditorsReady
+});
+
+const resolveVueApi = (module) => {
+    const voyagerVue = (window.Voyager && window.Voyager.vue) || {};
+    const fallback = {
+        createApp: typeof window.createVueApp === 'function' ? window.createVueApp : undefined,
+        registerComponent: typeof window.VueRegisterComponent === 'function' ? window.VueRegisterComponent : undefined,
+        mountApp: typeof window.VueMountApp === 'function' ? window.VueMountApp : undefined
+    };
+
+    return {
+        createApp: module && module.createVueApp ? module.createVueApp : voyagerVue.createApp || fallback.createApp,
+        registerComponent: module && module.registerComponent ? module.registerComponent : voyagerVue.registerComponent || fallback.registerComponent,
+        mountApp: module && module.mountApp ? module.mountApp : voyagerVue.mountApp || fallback.mountApp
+    };
+};
+
+const startDomObserver = () => {
+    if (typeof window === 'undefined' || typeof MutationObserver === 'undefined') {
+        return null;
+    }
+
+    const root = document.querySelector('.app-container') || document.body;
+    if (!root) {
+        return null;
+    }
+
+    let scheduled = false;
+    const scheduleEmit = () => {
+        if (scheduled) {
+            return;
+        }
+        scheduled = true;
+        const runner = () => {
+            scheduled = false;
+            voyagerEvents.emit('dom:updated', document);
+        };
+        if (typeof window.requestAnimationFrame === 'function') {
+            window.requestAnimationFrame(runner);
+        } else {
+            setTimeout(runner, 60);
+        }
+    };
+
+    const observer = new MutationObserver((mutationList) => {
+        const hasAdditions = mutationList.some((mutation) => mutation.addedNodes && mutation.addedNodes.length);
+        if (hasAdditions) {
+            scheduleEmit();
+        }
+    });
+
+    observer.observe(root, { childList: true, subtree: true });
+    return observer;
+};
 
 // Event system
 window.Voyager.events = voyagerEvents;
 window.Voyager.emitDomUpdated = (container = document) => {
     voyagerEvents.emit('dom:updated', container);
+};
+window.Voyager.loadVue = () => loadVueBundle();
+window.Voyager.loadEditors = () => loadEditorsBundle();
+window.Voyager.withVue = (callback) => {
+    if (!callback || typeof callback !== 'function') {
+        return Promise.resolve();
+    }
+    return window.Voyager.loadVue()
+        .then((module) => {
+            const api = resolveVueApi(module);
+            if (!api.createApp) {
+                throw new Error('[Voyager] Vue API unavailable.');
+            }
+            return callback(api);
+        })
+        .catch((error) => {
+            console.error('[Voyager] Failed to load Vue bundle', error);
+        });
 };
 
 // Core utilities
@@ -85,6 +196,7 @@ subscribeDatePickers(voyagerEvents);
 subscribeSelects(voyagerEvents);
 subscribeMatchHeight(voyagerEvents);
 subscribeMarkdown(voyagerEvents);
+subscribeSlugify(voyagerEvents);
 
 // Legacy Global Exports (keep for backward compatibility)
 window.VoyagerBootstrapCompat = { init: initBootstrapCompat, showModal, hideModal };
@@ -128,9 +240,16 @@ document.addEventListener('DOMContentLoaded', () => {
         window.VoyagerInitSlugify('.side-body input[data-slug-origin]');
     }
 
+    // Autoload Vue bundle when admin Vue hooks are present
+    if (document.querySelector('#adminmenu, [data-voyager-vue-root]')) {
+        window.Voyager.loadVue().catch(() => {});
+    }
+
     // Emit dom:updated event for initial page load
     // Components can subscribe to this for dynamic reinitialization
     voyagerEvents.emit('dom:updated', document);
+
+    startDomObserver();
 });
 
 // Signal that app bundle is ready

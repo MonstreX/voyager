@@ -22,12 +22,12 @@ import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/theme-monokai';
 import 'ace-builds/src-noconflict/theme-github';
 
-// Make Ace available globally (required by Jodit source mode)
-window.ace = ace;
+import { voyagerEvents } from './core/event-bus';
 
-// Voyager.ready.editors Promise already initialized in master.blade.php <head>
-// Just get the resolver
-const resolveEditorsReady = window.__resolveEditorsReady;
+// Make Ace available globally (required by Jodit source mode)
+if (typeof window !== 'undefined') {
+    window.ace = ace;
+}
 
 /**
  * Initialize Jodit editor
@@ -162,15 +162,37 @@ export function initAceEditors(container = document) {
     });
 }
 
-// Expose globally for Blade templates
-window.VoyagerInitJodit = initJodit;
-window.VoyagerInitAceEditors = initAceEditors;
+const registerEditorsApi = () => {
+    if (typeof window === 'undefined') {
+        return;
+    }
 
-// Auto-initialize Ace editors on DOM ready (for code_editor fields)
-document.addEventListener('DOMContentLoaded', () => {
+    window.Voyager = window.Voyager || {};
+    window.Voyager.editors = Object.assign({}, window.Voyager.editors, {
+        initJodit,
+        initAceEditors
+    });
+
+    window.VoyagerInitJodit = initJodit;
+    window.VoyagerInitAceEditors = initAceEditors;
+};
+
+registerEditorsApi();
+
+// Auto-initialize Ace editors immediately and on dom:updated
+if (typeof document !== 'undefined') {
     initAceEditors();
+}
+
+voyagerEvents.on('dom:updated', (container) => {
+    initAceEditors(container || document);
 });
 
 // Signal that editors bundle is ready
-resolveEditorsReady();
-document.dispatchEvent(new CustomEvent('voyager:editors-ready'));
+if (typeof window !== 'undefined' && typeof window.__resolveEditorsReady === 'function') {
+    window.__resolveEditorsReady();
+}
+
+if (typeof document !== 'undefined') {
+    document.dispatchEvent(new CustomEvent('voyager:editors-ready'));
+}

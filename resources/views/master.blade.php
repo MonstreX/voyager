@@ -9,37 +9,115 @@
     <script>
         window.voyagerAceBase = "{{ voyager_asset('js/ace/libs') }}";
 
+        const voyagerAssetsMeta = document.head.querySelector('meta[name="assets-path"]');
+        const voyagerAssetsBase = voyagerAssetsMeta ? voyagerAssetsMeta.getAttribute('content').replace(/\/?$/, '/') : '{{ rtrim(voyager_asset(''), '/') }}/';
+
+        function voyagerLoadScript(relativePath, cacheKey) {
+            const normalizedPath = (relativePath || '').replace(/^\//, '');
+            const key = '__voyagerScript_' + cacheKey;
+            if (window[key]) {
+                return window[key];
+            }
+            window[key] = new Promise(function(resolve, reject) {
+                const script = document.createElement('script');
+                script.type = 'module';
+                script.src = voyagerAssetsBase + normalizedPath;
+                script.onload = resolve;
+                script.onerror = function(error) {
+                    console.error('[Voyager] Failed to load ' + normalizedPath, error);
+                    reject(error);
+                };
+                document.head.appendChild(script);
+            });
+            return window[key];
+        }
+
         // Pre-initialize Voyager namespace and readiness Promises
         // This MUST run BEFORE any inline scripts or ES module loads
         window.Voyager = window.Voyager || {};
         window.Voyager.ready = window.Voyager.ready || {};
 
         // Create Promises with external resolvers (modules will call these)
-        window.Voyager.ready.app = new Promise(function(resolve) {
+        window.Voyager.ready.app = new Promise(function(resolve, reject) {
             window.__resolveAppReady = resolve;
+            window.__rejectAppReady = reject;
         });
-        window.Voyager.ready.vue = new Promise(function(resolve) {
+        window.Voyager.ready.vue = new Promise(function(resolve, reject) {
             window.__resolveVueReady = resolve;
+            window.__rejectVueReady = reject;
         });
-        window.Voyager.ready.editors = new Promise(function(resolve) {
+        window.Voyager.ready.editors = new Promise(function(resolve, reject) {
             window.__resolveEditorsReady = resolve;
+            window.__rejectEditorsReady = reject;
         });
 
-        // Legacy helpers to wait for bundles to load
-        // DEPRECATED: Use Voyager.ready.app/vue/editors promises instead
+        if (typeof window.Voyager.loadVue !== 'function') {
+            window.Voyager.loadVue = function() {
+                return voyagerLoadScript('js/vue-bundle.js', 'vue');
+            };
+        }
+
+        if (typeof window.Voyager.loadEditors !== 'function') {
+            window.Voyager.loadEditors = function() {
+                return voyagerLoadScript('js/editors.js', 'editors');
+            };
+        }
+
+        if (typeof window.Voyager.withVue !== 'function') {
+            window.Voyager.withVue = function(callback) {
+                return window.Voyager.loadVue().then(function() {
+                    var api = (window.Voyager && window.Voyager.vue) ? window.Voyager.vue : {
+                        createApp: window.createVueApp,
+                        registerComponent: window.VueRegisterComponent,
+                        mountApp: window.VueMountApp
+                    };
+                    var result = {
+                        createApp: api.createApp || window.createVueApp || function() {},
+                        registerComponent: api.registerComponent || window.VueRegisterComponent || function() {},
+                        mountApp: api.mountApp || window.VueMountApp || function() {}
+                    };
+                    if (typeof callback === 'function') {
+                        callback(result);
+                    }
+                    return result;
+                });
+            };
+        }
+
+        window.__voyagerDeprecationWarned = {};
+        function warnDeprecated(api, replacement) {
+            if (window.__voyagerDeprecationWarned[api]) {
+                return;
+            }
+            window.__voyagerDeprecationWarned[api] = true;
+            if (window.console && typeof window.console.warn === 'function') {
+                window.console.warn('[Voyager] ' + api + ' is deprecated. Use ' + replacement + ' instead.');
+            }
+        }
+
+        // Helpers to wait for bundles to load (deprecated)
         window.whenAppReady = function(callback) {
-            console.warn('[Voyager] whenAppReady() is deprecated. Use: Voyager.ready.app.then(callback)');
+            warnDeprecated('whenAppReady()', 'Voyager.ready.app.then');
             window.Voyager.ready.app.then(callback);
         };
 
         window.whenVueReady = function(callback) {
-            console.warn('[Voyager] whenVueReady() is deprecated. Use: Voyager.ready.vue.then(callback)');
-            window.Voyager.ready.vue.then(callback);
+            warnDeprecated('whenVueReady()', 'Voyager.loadVue().then');
+            window.Voyager.withVue(function() {
+                if (typeof callback === 'function') {
+                    callback();
+                }
+            });
         };
 
         window.whenEditorsReady = function(callback) {
-            console.warn('[Voyager] whenEditorsReady() is deprecated. Use: Voyager.ready.editors.then(callback)');
-            window.Voyager.ready.editors.then(callback);
+            warnDeprecated('whenEditorsReady()', 'Voyager.loadEditors().then');
+            var loader = window.Voyager && typeof window.Voyager.loadEditors === 'function'
+                ? window.Voyager.loadEditors()
+                : Promise.resolve();
+            loader.then(function() {
+                return window.Voyager.ready.editors;
+            }).then(callback);
         };
     </script>
 
@@ -153,15 +231,12 @@ if (\Illuminate\Support\Str::startsWith(Auth::user()->avatar, 'http://') || \Ill
 
 <!-- Javascript Libs -->
 
-<!-- Load Vue bundle first (provides global helpers) -->
-<script type="module" src="{{ voyager_asset('js/vue-bundle.js') }}"></script>
 <!-- Load app bundle (core functionality) -->
 <script type="module" src="{{ voyager_asset('js/app.js') }}"></script>
 
 <script>
     // Display Laravel session alerts and messages
-    // Use whenAppReady for inline scripts (Voyager object not yet available)
-    window.whenAppReady(function() {
+    window.Voyager.ready.app.then(function() {
         @if(Session::has('alerts'))
             let alerts = {!! json_encode(Session::get('alerts')) !!};
             helpers.displayAlerts(alerts, toastr);
@@ -184,11 +259,13 @@ if (\Illuminate\Support\Str::startsWith(Auth::user()->avatar, 'http://') || \Ill
 @include('voyager::media.manager')
 <script>
 // Mount any declarative Vue roots (if present)
-if (window.VueMountApp) {
-    const autoVueRoots = document.querySelectorAll('[data-voyager-vue-root]');
-    if (autoVueRoots.length) {
-        window.VueMountApp(autoVueRoots);
-    }
+const autoVueRoots = document.querySelectorAll('[data-voyager-vue-root]');
+if (autoVueRoots.length && window.Voyager && typeof window.Voyager.loadVue === 'function') {
+    window.Voyager.loadVue().then(() => {
+        if (window.VueMountApp) {
+            window.VueMountApp(autoVueRoots);
+        }
+    }).catch(() => {});
 }
 </script>
 @yield('javascript')

@@ -1,6 +1,10 @@
 {{-- Editors assets: loaded once per page --}}
 @once
 @push('javascript')
-<script type="module" src="{{ voyager_asset('js/editors.js') }}"></script>
+<script>
+    if (window.Voyager && typeof window.Voyager.loadEditors === 'function') {
+        window.Voyager.loadEditors().catch(function () {});
+    }
+</script>
 @endpush
 @endonce

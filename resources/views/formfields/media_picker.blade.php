@@ -28,8 +28,8 @@
 </div>
 @push('javascript')
 <script>
-window.whenVueReady(function() {
-    window.createVueApp({}).mount('#media_picker_{{ $row->field }}');
+window.Voyager.withVue(function(Vue) {
+    Vue.createApp({}).mount('#media_picker_{{ $row->field }}');
 });
 </script>
 @endpush

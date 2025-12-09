@@ -11,10 +11,20 @@
             joditOptions.type_slug = '{{ $dataType->slug }}';
             joditOptions.upload_url = '{{ route('voyager.upload') }}';
 
-            // Wait for editors bundle to load before initializing
-            window.whenEditorsReady(function() {
-                window.VoyagerInitJodit('textarea.richTextBox[name="{{ $row->field }}"]', joditOptions);
-            });
+            if (window.Voyager && typeof window.Voyager.loadEditors === 'function') {
+                window.Voyager.loadEditors()
+                    .then(function(module) {
+                        var initJodit = module && module.initJodit
+                            ? module.initJodit
+                            : window.VoyagerInitJodit;
+                        if (typeof initJodit === 'function') {
+                            initJodit('textarea.richTextBox[name="{{ $row->field }}"]', joditOptions);
+                        }
+                    })
+                    .catch(function(error) {
+                        console.error('[Voyager] Failed to initialize rich text editor', error);
+                    });
+            }
         });
     </script>
 @endpush

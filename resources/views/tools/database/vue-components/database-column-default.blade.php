@@ -23,8 +23,8 @@
         disabled: false
     };
 
-    window.whenVueReady(function() {
-        window.VueRegisterComponent('database-column-default', {
+    window.Voyager.withVue(function(Vue) {
+        Vue.registerComponent('database-column-default', {
         props: {
             column: {
                 type: Object,
@@ -74,7 +74,7 @@
                     disabled: this.getOption('disabled')
                 };
             }
-        }
+            }
+        });
     });
-    }); // end whenVueReady
 </script>

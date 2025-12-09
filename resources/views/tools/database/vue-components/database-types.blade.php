@@ -39,11 +39,11 @@
         return databaseTypes.Numbers[0];
     }
 
-    window.whenVueReady(function() {
-        window.VueRegisterComponent('database-types', {
-            props: {
-                column: {
-                    type: Object,
+    window.Voyager.withVue(function(Vue) {
+        Vue.registerComponent('database-types', {
+        props: {
+            column: {
+                type: Object,
                     required: true
                 }
             },
@@ -62,5 +62,5 @@
                 }
             }
         });
-    }); // end whenVueReady
+    });
 </script>

@@ -60,8 +60,8 @@
     @include('voyager::tools.database.vue-components.database-table-editor')
 
     <script>
-        window.whenVueReady(function() {
-            window.createVueApp({
+        window.Voyager.withVue(function(Vue) {
+            Vue.createApp({
                 data() {
                     return {
                         table: {},

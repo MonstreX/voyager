@@ -38,8 +38,8 @@
 
 @section('javascript')
 <script>
-window.whenVueReady(function() {
-    window.createVueApp({
+window.Voyager.withVue(function(Vue) {
+    Vue.createApp({
         data: () => ({})
     }).mount('#filemanager');
 });

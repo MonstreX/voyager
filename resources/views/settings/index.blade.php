@@ -463,6 +463,42 @@
             const toggleOptions = document.getElementById('toggle_options');
             const optionsSections = document.querySelectorAll('.new-settings-options');
             const bootstrapCompat = window.VoyagerBootstrapCompat;
+            let optionsEditorInstance = null;
+
+            const ensureOptionsEditor = () => {
+                const editorContainer = document.getElementById('options_editor');
+                const optionsTextarea = document.getElementById('options_textarea');
+                if (!editorContainer || !optionsTextarea) {
+                    return;
+                }
+                if (!window.Voyager || typeof window.Voyager.loadEditors !== 'function') {
+                    return;
+                }
+
+                window.Voyager.loadEditors()
+                    .then((module) => {
+                        const initAceEditors = module && typeof module.initAceEditors === 'function'
+                            ? module.initAceEditors
+                            : (window.Voyager.editors && window.Voyager.editors.initAceEditors);
+
+                        if (!optionsEditorInstance && typeof initAceEditors === 'function') {
+                            initAceEditors(editorContainer.parentElement || document);
+                            optionsEditorInstance = ace.edit('options_editor');
+                            optionsEditorInstance.getSession().setMode('ace/mode/json');
+                            optionsEditorInstance.getSession().on('change', function () {
+                                optionsTextarea.value = optionsEditorInstance.getValue();
+                            });
+                        }
+
+                        if (optionsEditorInstance) {
+                            // Ensure Ace redraws when the options panel toggles visibility
+                            optionsEditorInstance.resize(true);
+                        }
+                    })
+                    .catch(function (error) {
+                        console.error('[Voyager] Failed to initialize settings editor', error);
+                    });
+            };
 
             const showModal = (modal) => {
                 if (!modal) {
@@ -493,8 +529,10 @@
                         icon.classList.toggle('voyager-double-down');
                         icon.classList.toggle('voyager-double-up');
                     }
+                    ensureOptionsEditor();
                 });
             }
+            ensureOptionsEditor();
 
             @can('delete', Voyager::model('Setting'))
             (function registerDeleteHandlers() {
@@ -564,16 +602,4 @@
         <input type="hidden" id="upload_type_slug" value="settings">
     </div>
 
-    <script>
-        window.whenEditorsReady(function() {
-            var options_editor = ace.edit('options_editor');
-            options_editor.getSession().setMode("ace/mode/json");
-
-            var options_textarea = document.getElementById('options_textarea');
-            options_editor.getSession().on('change', function() {
-                console.log(options_editor.getValue());
-                options_textarea.value = options_editor.getValue();
-            });
-        });
-    </script>
 @stop
