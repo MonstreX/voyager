@@ -6,10 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}"/>
     <meta name="assets-path" content="{{ voyager_asset() }}"/>
     <meta name="voyager-ace-base" content="{{ voyager_asset('js/ace/libs') }}"/>
-    <meta name="voyager-tinymce-base" content="{{ voyager_asset('js') }}"/>
     <script>
         window.voyagerAceBase = "{{ voyager_asset('js/ace/libs') }}";
-        window.voyagerTinyMCEBase = "{{ voyager_asset('js') }}";
 
         // Helper to wait for App bundle to load
         window.whenAppReady = function(callback) {

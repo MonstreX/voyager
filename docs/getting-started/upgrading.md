@@ -10,10 +10,11 @@ To update to the latest version inside of your composer.json file make sure to u
 
 And then run `composer update`
 
-### Check your TinyMCE configuration
+### Check your rich text configuration
 
-TinyMCE was updated to version 6 and with that, a lot of configurations have changed.  
-If there are any errors in the console and you changed the TinyMCE configuration, make sure you are using the latest options and values from their docs.
+Voyager no longer ships TinyMCE. The `rich_text_box` field now mounts [Jodit Editor](https://xdsoft.net/jodit/), so any legacy `window.voyagerTinyMCE...` customizations will stop working.
+
+If you previously injected custom TinyMCE scripts/options, remove them and use the new `window.VoyagerInitJodit` hook instead (documented in the Rich Text form field guide).
 
 ### Troubleshooting
 

@@ -22,7 +22,7 @@
   * [Images](bread/formfields/images.md)
   * [Media Picker](bread/formfields/media-picker.md)
   * [Number](bread/formfields/number.md)
-  * [TinyMCE](bread/formfields/tinymce.md)
+  * [Rich Text (Jodit)](bread/formfields/rich-text.md)
 
 ## Core concepts
 

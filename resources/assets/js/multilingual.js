@@ -91,6 +91,38 @@ const findCodeMirrorInstance = (element) => {
     return null;
 };
 
+const getJoditInstance = (element) => {
+    if (!element || typeof element !== 'object') {
+        return null;
+    }
+
+    return element.jodit || null;
+};
+
+const readJoditValue = (editor) => {
+    if (!editor) {
+        return '';
+    }
+
+    if (typeof editor.value === 'function') {
+        return editor.value();
+    }
+
+    return editor.value;
+};
+
+const writeJoditValue = (editor, content) => {
+    if (!editor) {
+        return;
+    }
+
+    if (typeof editor.value === 'function') {
+        editor.value(content);
+    } else {
+        editor.value = content;
+    }
+};
+
 class VoyagerMultilingual {
     constructor(element, options = {}) {
         if (!element) {
@@ -276,11 +308,10 @@ class VoyagerMultilingual {
             return userInput.textContent || '';
         }
 
-        if (userInput.classList.contains('richTextBox') && typeof window !== 'undefined' && window.tinymce) {
-            const instance = window.tinymce.get(`richtext${userInput.name}`);
-            if (instance && typeof instance.getContent === 'function') {
-                value = instance.getContent();
-                return value;
+        if (userInput.classList.contains('richTextBox')) {
+            const joditInstance = getJoditInstance(userInput);
+            if (joditInstance) {
+                return readJoditValue(joditInstance);
             }
         }
 
@@ -314,10 +345,11 @@ class VoyagerMultilingual {
             return;
         }
 
-        if (userInput.classList.contains('richTextBox') && typeof window !== 'undefined' && window.tinymce) {
-            const instance = window.tinymce.get(`richtext${userInput.name}`);
-            if (instance && instance.initialized) {
-                instance.setContent(value || '');
+        if (userInput.classList.contains('richTextBox')) {
+            const joditInstance = getJoditInstance(userInput);
+            if (joditInstance) {
+                writeJoditValue(joditInstance, value || '');
+                userInput.value = readJoditValue(joditInstance);
                 return;
             }
         }
