@@ -4,6 +4,16 @@
     $stickyPanelConfig = config('voyager.bread.sticky_action_panel', []);
     $stickyPanelEnabled = (bool) ($stickyPanelConfig['enabled'] ?? false);
     $stickyPanelAutohide = (bool) ($stickyPanelConfig['autohide'] ?? false);
+
+    // Init Tabs Subsystem
+    $dataTypeRows = $dataType->{(isset($dataTypeContent->id) ? 'editRows' : 'addRows' )};
+    $tabs = [];
+    $tabs[] = __('voyager::generic.general'); // Default tab
+    foreach($dataTypeRows as $row) {
+        if(isset($row->details->tab_title) && !in_array($row->details->tab_title, $tabs)) {
+            $tabs[] = $row->details->tab_title;
+        }
+    }
 @endphp
 
 @extends('voyager::master')
@@ -66,7 +76,29 @@
                                 $dataTypeRows = $dataType->{($edit ? 'editRows' : 'addRows' )};
                             @endphp
 
+                            @if(count($tabs) > 1)
+                                <ul class="nav nav-tabs bread-nav-tabs">
+                                    @foreach($tabs as $key => $tab)
+                                        <li @if($key == 0) class="active" @endif>
+                                            <a data-toggle="tab" href="#{{ 'tab-id-'.\Illuminate\Support\Str::slug($tab) }}">{{$tab}}</a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                                <div class="tab-content bread-tab-content">
+                            @endif
+
                             @foreach($dataTypeRows as $row)
+                                @if(count($tabs) > 1)
+                                    @if($loop->first)
+                                        <div id="{{ 'tab-id-'.\Illuminate\Support\Str::slug($tabs[0]) }}" class="tab-pane active">
+                                        @php $cur_tab = $tabs[0]; @endphp
+                                    @elseif(isset($row->details->tab_title) && $row->details->tab_title !== $cur_tab)
+                                        </div>
+                                        <div id="{{ 'tab-id-'.\Illuminate\Support\Str::slug($row->details->tab_title) }}" class="tab-pane">
+                                        @php $cur_tab = $row->details->tab_title; @endphp
+                                    @endif
+                                @endif
+
                                 <!-- GET THE DISPLAY OPTIONS -->
                                 @php
                                     $display_options = $row->details->display ?? NULL;
@@ -104,6 +136,11 @@
                                     @endif
                                 </div>
                             @endforeach
+
+                            @if(count($tabs) > 1)
+                                </div> <!-- .tab-pane -->
+                                </div> <!-- .tab-content -->
+                            @endif
 
                         </div><!-- panel-body -->
 

@@ -1,0 +1,41 @@
+// Bread Tabs Styles
+.bread-nav-tabs {
+  margin-top: 15px;
+  border-bottom: 1px solid #ddd;
+
+  > li {
+    > a {
+      margin-right: 2px;
+      line-height: 1.42857143;
+      border: 1px solid transparent;
+      border-radius: 4px 4px 0 0;
+      color: #555;
+      font-weight: 500;
+
+      &:hover {
+        background-color: #f8f8f8;
+        border-color: #eee #eee #ddd;
+      }
+    }
+
+    &.active > a {
+      &,
+      &:hover,
+      &:focus {
+        color: #333;
+        cursor: default;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-bottom-color: transparent;
+      }
+    }
+  }
+}
+
+.bread-tab-content {
+  padding: 20px 0 0; // Add top padding to separate content from tabs
+  
+  > .tab-pane {
+    // Animation for tab switching can be added here if needed
+  }
+}
