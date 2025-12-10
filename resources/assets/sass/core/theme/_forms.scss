@@ -17,3 +17,19 @@
     font-size: 12px;
     line-height: 1.5;
   }
+
+.form-control[disabled],
+.form-control[readonly],
+fieldset[disabled] .form-control {
+    background-color: #eee;
+    opacity: 1;
+}
+
+.btn-link,
+.checkbox-inline,
+.checkbox label,
+.radio-inline,
+.radio label,
+label {
+    font-weight: 300;
+}

@@ -1,16 +1,19 @@
 .voyager .panel.panel-warning .panel-heading {
     background-color: #F2A654;
-    border-bottom:0px;
+    border-bottom:0;
 }
 
 .voyager .panel.panel-primary .panel-heading{
+  display: flex;
+  justify-content: space-between;
   background-color:#62A8EA;
-  border-bottom:0px;
+  border-bottom:0;
 }
 
-.voyager .panel.panel-primary .panel-info, .voyager .panel.panel-info .panel-heading{
+.voyager .panel.panel-primary .panel-info,
+.voyager .panel.panel-info .panel-heading{
   background-color:#57C7D4;
-  border-bottom:0px;
+  border-bottom:0;
 }
 
 .panel-title {

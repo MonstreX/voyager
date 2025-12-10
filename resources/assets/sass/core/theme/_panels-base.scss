@@ -1,3 +1,32 @@
+.voyager .panel-heading {
+    position: relative;
+    padding: 0;
+}
+
+.panel-danger .panel-action,
+.panel-danger .panel-title,
+.panel-dark .panel-action,
+.panel-dark .panel-title,
+.panel-info .panel-action,
+.panel-info .panel-title,
+.panel-primary .panel-action,
+.panel-primary .panel-title,
+.panel-success .panel-action,
+.panel-success .panel-title,
+.panel-warning .panel-action,
+.panel-warning .panel-title {
+    color: #fff;
+}
+
+.voyager .panel-actions {
+    position: absolute;
+    top: 50%;
+    right: 30px;
+    z-index: 1;
+    margin: auto;
+    transform: translateY(-50%);
+}
+
 .voyager .panel.panel-default {
     border: 1px solid #EAEAEA;
 }

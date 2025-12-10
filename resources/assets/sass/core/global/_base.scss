@@ -2,11 +2,15 @@ html {
   height: 100%;
 }
 
-body {
-  padding-top: 0;
+body, html {
+  padding: 0;
+  margin: 0;
   height: 100%;
-  position: relative;
-  font-size: 13px;
+  font-family: Open Sans,sans-serif;
+  font-size: 14px;
+  line-height: 1.57142857;
+  color: #76838f;
+  background-color: #fff;
 }
 
 * {
