@@ -84,3 +84,20 @@ input[type=radio]:checked ~ .check::before {
 input[type=radio]:checked ~ label {
   color: #535b65;
 }
+
+ul.radio.radio-inline li {
+  width: auto;
+  float: none;
+  display: inline-block;
+  border-bottom: none;
+  margin-right: 20px;
+}
+
+ul.radio.radio-inline li label {
+  margin: 0;
+  height: auto;
+}
+
+ul.radio.radio-inline li .check {
+  top: 0;
+}

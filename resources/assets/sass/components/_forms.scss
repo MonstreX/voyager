@@ -206,6 +206,23 @@ input[type=radio]:checked ~ label{
   color: #535B65;
 }
 
+ul.radio.radio-inline li{
+  width: auto;
+  float: none;
+  display: inline-block;
+  border-bottom: none;
+  margin-right: 20px;
+}
+
+ul.radio.radio-inline li label{
+  margin: 0 0 0 35px;
+  height: auto;
+}
+
+ul.radio.radio-inline li .check{
+  top: 4px;
+}
+
 /* Custom Checkbox Button Styles */
 ul.checkbox {
   padding-left: 20px;

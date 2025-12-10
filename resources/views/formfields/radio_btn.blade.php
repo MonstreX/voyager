@@ -1,5 +1,9 @@
-<?php $selected_value = old($row->field, $dataTypeContent->{$row->field} ?? $options->default ?? NULL) ?>
-<ul class="radio">
+<?php
+$selected_value = old($row->field, $dataTypeContent->{$row->field} ?? $options->default ?? null);
+$inline = property_exists($options, 'inline') ? (bool) $options->inline : true;
+$radioClass = $inline ? 'radio radio-inline' : 'radio';
+?>
+<ul class="{{ $radioClass }}">
     @if(isset($options->options))
         @foreach($options->options as $key => $option)
             <li>
