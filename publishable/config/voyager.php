@@ -170,6 +170,12 @@ return [
 
         // which role add premissions to
         'default_role' => 'admin',
+
+        // Sticky action panel for edit/add screens
+        'sticky_action_panel' => [
+            'enabled' => true,
+            'autohide' => false,
+        ],
     ],
 
     /*

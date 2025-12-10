@@ -367,11 +367,12 @@ class VoyagerBaseController extends Controller
 
         event(new BreadDataUpdated($dataType, $data));
 
-        if (auth()->user()->can('browse', app($dataType->model_name))) {
-            $redirect = redirect()->route("voyager.{$dataType->slug}.index");
-        } else {
-            $redirect = redirect()->back();
-        }
+        $redirect = $this->resolveRedirectAfterSave(
+            $request,
+            $request->input('redirect_to'),
+            $dataType,
+            auth()->user()->can('browse', app($dataType->model_name))
+        );
 
         return $redirect->with([
             'message'    => __('voyager::generic.successfully_updated')." {$dataType->getTranslatedAttribute('display_name_singular')}",
@@ -450,11 +451,12 @@ class VoyagerBaseController extends Controller
         event(new BreadDataAdded($dataType, $data));
 
         if (!$request->has('_tagging')) {
-            if (auth()->user()->can('browse', $data)) {
-                $redirect = redirect()->route("voyager.{$dataType->slug}.index");
-            } else {
-                $redirect = redirect()->back();
-            }
+            $redirect = $this->resolveRedirectAfterSave(
+                $request,
+                $request->input('redirect_to'),
+                $dataType,
+                auth()->user()->can('browse', $data)
+            );
 
             return $redirect->with([
                 'message'    => __('voyager::generic.successfully_added_new')." {$dataType->getTranslatedAttribute('display_name_singular')}",
@@ -565,6 +567,42 @@ class VoyagerBaseController extends Controller
         }
 
         return redirect()->route("voyager.{$dataType->slug}.index")->with($data);
+    }
+
+    protected function resolveRedirectAfterSave(Request $request, ?string $redirectUrl, $dataType, bool $canBrowse)
+    {
+        if ($this->isSafeRedirectUrl($request, $redirectUrl)) {
+            return redirect()->to($redirectUrl);
+        }
+
+        if ($canBrowse) {
+            return redirect()->route("voyager.{$dataType->slug}.index");
+        }
+
+        return redirect()->back();
+    }
+
+    protected function isSafeRedirectUrl(Request $request, ?string $redirectUrl): bool
+    {
+        if (!$redirectUrl || !is_string($redirectUrl)) {
+            return false;
+        }
+
+        $parts = @parse_url($redirectUrl);
+
+        if ($parts === false) {
+            return false;
+        }
+
+        if (isset($parts['scheme']) && !in_array(strtolower($parts['scheme']), ['http', 'https'], true)) {
+            return false;
+        }
+
+        if (isset($parts['host']) && $parts['host'] !== $request->getHost()) {
+            return false;
+        }
+
+        return true;
     }
 
     //***************************************

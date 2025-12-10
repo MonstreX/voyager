@@ -103,7 +103,7 @@ class VoyagerBreadController extends Controller
                 event(new BreadAdded($dataType, $data));
             }
 
-            return redirect()->route('voyager.bread.index')->with($data);
+            return $this->redirectBread($request, $request->input('redirect_to'))->with($data);
         } catch (Exception $e) {
             return redirect()->route('voyager.bread.index')->with($this->alertException($e, 'Saving Failed'));
         }
@@ -171,7 +171,7 @@ class VoyagerBreadController extends Controller
             // Save translations if applied
             $dataType->saveTranslations($translations);
 
-            return redirect()->route('voyager.bread.index')->with($data);
+            return $this->redirectBread($request, $request->input('redirect_to'))->with($data);
         } catch (Exception $e) {
             return back()->with($this->alertException($e, __('voyager::generic.update_failed')));
         }
@@ -353,5 +353,37 @@ class VoyagerBreadController extends Controller
             'message'    => 'Successfully deleted relationship.',
             'alert-type' => 'success',
         ]);
+    }
+
+    protected function redirectBread(Request $request, ?string $redirectUrl)
+    {
+        if ($this->isSafeRedirectUrl($request, $redirectUrl)) {
+            return redirect()->to($redirectUrl);
+        }
+
+        return redirect()->route('voyager.bread.index');
+    }
+
+    protected function isSafeRedirectUrl(Request $request, ?string $redirectUrl): bool
+    {
+        if (!$redirectUrl || !is_string($redirectUrl)) {
+            return false;
+        }
+
+        $parts = @parse_url($redirectUrl);
+
+        if ($parts === false) {
+            return false;
+        }
+
+        if (isset($parts['scheme']) && !in_array(strtolower($parts['scheme']), ['http', 'https'], true)) {
+            return false;
+        }
+
+        if (isset($parts['host']) && $parts['host'] !== $request->getHost()) {
+            return false;
+        }
+
+        return true;
     }
 }

@@ -1,0 +1,40 @@
+.float-action-panel {
+    position: fixed;
+    right: 0;
+    bottom: -48px;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 0 14px rgba(0, 0, 0, 0.18);
+    z-index: 50;
+    transition: bottom 0.2s ease;
+
+    &.locked {
+        bottom: 0;
+    }
+
+    .btn {
+        margin: 0;
+    }
+
+    .btn-new-relationship {
+        display: inline-flex;
+        align-items: center;
+        margin-right: auto;
+        i {
+            margin-right: 6px;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .float-action-panel {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+    }
+}

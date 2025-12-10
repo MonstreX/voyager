@@ -18,6 +18,7 @@ import { initMarkdownEditor, subscribeToEvents as subscribeMarkdown } from './co
 import VoyagerToaster from './modules/toaster';
 import { initSlugifyFields, subscribeToEvents as subscribeSlugify } from './modules/slugify';
 import SimpleTable, { initSimpleTables } from './modules/simple-table';
+import { initStickyActionPanels, subscribeToEvents as subscribeStickyPanel } from './modules/sticky-action-panel';
 
 // Legacy / Vendor
 import './multilingual';
@@ -262,6 +263,7 @@ subscribeSelects(voyagerEvents);
 subscribeMatchHeight(voyagerEvents);
 subscribeMarkdown(voyagerEvents);
 subscribeSlugify(voyagerEvents);
+subscribeStickyPanel(voyagerEvents);
 
 // Legacy Global Exports (keep for backward compatibility)
 window.VoyagerBootstrapCompat = { init: initBootstrapCompat, showModal, hideModal };
@@ -299,6 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initVoyagerSelects();
     initMatchHeight();
     initMarkdownEditor();
+    initStickyActionPanels();
 
     // Init Modules
     if (window.VoyagerInitSlugify) {

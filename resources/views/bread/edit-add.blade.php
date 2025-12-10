@@ -1,6 +1,9 @@
 @php
     $edit = !is_null($dataTypeContent->getKey());
     $add  = is_null($dataTypeContent->getKey());
+    $stickyPanelConfig = config('voyager.bread.sticky_action_panel', []);
+    $stickyPanelEnabled = (bool) ($stickyPanelConfig['enabled'] ?? false);
+    $stickyPanelAutohide = (bool) ($stickyPanelConfig['autohide'] ?? false);
 @endphp
 
 @extends('voyager::master')
@@ -27,7 +30,11 @@
                 <div class="panel panel-bordered">
                     <!-- form start -->
                     <form role="form"
+                            id="form-edit-add"
                             class="form-edit-add"
+                            data-edit="{{ $edit ? 'true' : 'false' }}"
+                            data-url="{{ url()->current() }}"
+                            data-url-create="{{ route('voyager.'.$dataType->slug.'.create') }}"
                             action="{{ $edit ? route('voyager.'.$dataType->slug.'.update', $dataTypeContent->getKey()) : route('voyager.'.$dataType->slug.'.store') }}"
                             method="POST" enctype="multipart/form-data">
                         <!-- PUT Method if we are editing -->
@@ -37,6 +44,10 @@
 
                         <!-- CSRF TOKEN -->
                         {{ csrf_field() }}
+
+                        <input id="redirect-to" type="hidden" name="redirect_to" value="">
+                        <input type="hidden" name="model_name" value="{{ $dataType->model_name }}">
+                        <input type="hidden" name="model_id" value="{{ optional($dataTypeContent)->id }}">
 
                         <div class="panel-body">
 
@@ -96,12 +107,23 @@
 
                         </div><!-- panel-body -->
 
-                        <div class="panel-footer">
-                            @section('submit-buttons')
-                                <button type="submit" class="btn btn-primary save">{{ __('voyager::generic.save') }}</button>
-                            @stop
-                            @yield('submit-buttons')
-                        </div>
+                        @section('submit-buttons')
+                            <button type="submit" class="btn btn-primary save">{{ __('voyager::generic.save') }}</button>
+                        @stop
+
+                        @if(!$stickyPanelEnabled)
+                            <div class="panel-footer">
+                                @yield('submit-buttons')
+                            </div>
+                        @else
+                            <div class="float-action-panel float-action-edit{{ $stickyPanelAutohide ? '' : ' locked' }}" data-autohide="{{ $stickyPanelAutohide ? 'true' : 'false' }}">
+                                @yield('submit-buttons')
+                                @if ($edit)
+                                    <button type="button" class="btn btn-success btn-save-and-continue">{{ __('voyager::generic.save_and_continue') }}</button>
+                                @endif
+                                <button type="button" class="btn btn-warning btn-save-and-create">{{ __('voyager::generic.save_and_create') }}</button>
+                            </div>
+                        @endif
                     </form>
 
                     <div style="display:none">
