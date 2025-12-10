@@ -54,3 +54,23 @@
 .voyager .table.table-striped > tbody > tr:nth-of-type(odd) {
     background-color: #FDFDFD;
 }
+
+.voyager .table>thead>tr>th {
+    border-bottom: 1px solid #ddd;
+}
+
+.voyager .table>tfoot>tr>th,
+.voyager .table>thead>tr>th {
+    font-weight: 400;
+    color: #526069;
+}
+
+.voyager .table-footer-actions div {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+}
+
+.voyager #bread-items h4 {
+    margin-top: 0;
+}

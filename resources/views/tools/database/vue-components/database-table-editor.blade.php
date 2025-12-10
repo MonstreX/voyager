@@ -2,7 +2,7 @@
 
 <div class="panel panel-bordered">
     <div class="panel-body">
-        <div class="row">
+        <div class="row mb-30">
         @if($db->action == 'update')
             <div class="col-md-12">
         @else
@@ -72,7 +72,7 @@
           <p>{{ __('voyager::database.table_no_columns') }}</p>
         </div>
 
-        <div style="text-align:center">
+        <div class="table-footer-actions">
             <database-table-helper-buttons
                 @columnAdded="addColumn"
             ></database-table-helper-buttons>
