@@ -132,14 +132,17 @@
 }
 
 .select2-search--dropdown {
+  display: block;
   padding: 8px 8px 0;
 
   .select2-search__field {
     width: 100%;
     padding: 6px 10px;
+    box-sizing: border-box;
     border: 1px solid #e4eaec;
     border-radius: 2px;
     outline: 0;
+    margin-bottom: 10px;
     font-size: 14px;
     transition: border-color .2s ease;
 
