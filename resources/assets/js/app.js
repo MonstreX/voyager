@@ -19,7 +19,6 @@ import VoyagerToaster from './modules/toaster';
 import { initSlugifyFields, subscribeToEvents as subscribeSlugify } from './modules/slugify';
 import SimpleTable, { initSimpleTables } from './modules/simple-table';
 import { initStickyActionPanels, subscribeToEvents as subscribeStickyPanel } from './modules/sticky-action-panel';
-import { initTabs, subscribeToEvents as subscribeTabs } from './modules/tabs';
 
 // Legacy / Vendor
 import './multilingual';
@@ -230,8 +229,7 @@ window.Voyager.init = {
     nestable: initNestable,
     markdown: initMarkdownEditor,
     simpleTables: initSimpleTables,
-    slugify: initSlugifyFields,
-    tabs: initTabs
+    slugify: initSlugifyFields
 };
 
 // Component destroy/refresh functions
@@ -266,7 +264,6 @@ subscribeMatchHeight(voyagerEvents);
 subscribeMarkdown(voyagerEvents);
 subscribeSlugify(voyagerEvents);
 subscribeStickyPanel(voyagerEvents);
-subscribeTabs(voyagerEvents);
 
 // Legacy Global Exports (keep for backward compatibility)
 window.VoyagerBootstrapCompat = { init: initBootstrapCompat, showModal, hideModal };
@@ -305,11 +302,22 @@ document.addEventListener('DOMContentLoaded', () => {
     initMatchHeight();
     initMarkdownEditor();
     initStickyActionPanels();
-    initTabs();
 
     // Init Modules
     if (window.VoyagerInitSlugify) {
         window.VoyagerInitSlugify('.side-body input[data-slug-origin]');
+    }
+
+    // Auto-switch to tab with error
+    const firstError = document.querySelector('.form-group.has-error');
+    if (firstError) {
+        const tabPane = firstError.closest('.tab-pane');
+        if (tabPane && tabPane.id) {
+            const tabLink = document.querySelector(`.nav-tabs a[href="#${tabPane.id}"]`);
+            if (tabLink) {
+                tabLink.click();
+            }
+        }
     }
 
     // Autoload Vue bundle when admin Vue hooks are present
