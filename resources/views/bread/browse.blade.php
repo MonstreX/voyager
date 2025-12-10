@@ -148,8 +148,22 @@
                                                         @endforeach
 
                                                     @elseif(property_exists($row->details, 'options'))
-                                                        @if (!empty(json_decode($data->{$row->field})))
-                                                            @foreach(json_decode($data->{$row->field}) as $item)
+                                                        @php
+                                                            $fieldValue = $data->{$row->field};
+                                                            if (!is_array($fieldValue)) {
+                                                                $decoded = is_string($fieldValue) ? json_decode($fieldValue, true) : null;
+                                                                if (is_array($decoded)) {
+                                                                    $fieldValue = $decoded;
+                                                                }
+                                                            }
+                                                            if (!is_array($fieldValue)) {
+                                                                $fieldValue = array_filter([$fieldValue], static function ($value) {
+                                                                    return $value !== null && $value !== '';
+                                                                });
+                                                            }
+                                                        @endphp
+                                                        @if (!empty($fieldValue))
+                                                            @foreach($fieldValue as $item)
                                                                 @if (@$row->details->options->{$item})
                                                                     {{ $row->details->options->{$item} . (!$loop->last ? ', ' : '') }}
                                                                 @endif
@@ -160,8 +174,22 @@
                                                     @endif
 
                                                     @elseif($row->type == 'multiple_checkbox' && property_exists($row->details, 'options'))
-                                                        @if (@count(json_decode($data->{$row->field}, true)) > 0)
-                                                            @foreach(json_decode($data->{$row->field}) as $item)
+                                                        @php
+                                                            $fieldValue = $data->{$row->field};
+                                                            if (!is_array($fieldValue)) {
+                                                                $decoded = is_string($fieldValue) ? json_decode($fieldValue, true) : null;
+                                                                if (is_array($decoded)) {
+                                                                    $fieldValue = $decoded;
+                                                                }
+                                                            }
+                                                            if (!is_array($fieldValue)) {
+                                                                $fieldValue = array_filter([$fieldValue], static function ($value) {
+                                                                    return $value !== null && $value !== '';
+                                                                });
+                                                            }
+                                                        @endphp
+                                                        @if (!empty($fieldValue))
+                                                            @foreach($fieldValue as $item)
                                                                 @if (@$row->details->options->{$item})
                                                                     {{ $row->details->options->{$item} . (!$loop->last ? ', ' : '') }}
                                                                 @endif
