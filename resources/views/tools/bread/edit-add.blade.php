@@ -583,6 +583,13 @@
                 animation: 150,
                 ghostClass: 'bread-sortable-ghost',
                 dragClass: 'bread-sortable-drag',
+                forceFallback: true,
+                fallbackOnBody: true,
+                scroll: true,
+                scrollSensitivity: 140,
+                scrollSpeed: 18,
+                bubbleScroll: true,
+                forceAutoScrollFallback: true,
                 onEnd: function () {
                     updateRowOrders();
                 }

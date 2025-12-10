@@ -170,7 +170,13 @@ const initSortableList = (list, state) => {
         handle: state.handleSelector,
         draggable: state.draggableSelector,
         animation: state.animation,
+        forceFallback: state.forceFallback,
         fallbackOnBody: true,
+        scroll: true,
+        scrollSensitivity: state.scrollSensitivity,
+        scrollSpeed: state.scrollSpeed,
+        bubbleScroll: true,
+        forceAutoScrollFallback: true,
         swapThreshold: 0.65,
         dragClass: 'dd-dragging',
         ghostClass: 'dd-ghost',
@@ -227,7 +233,14 @@ const initNestableContainer = (container, options = {}) => {
         draggableSelector: options.draggable || '.dd-item',
         animation: typeof options.animation === 'number' ? options.animation : 150,
         sortables: new Map(),
-        pendingLists: new Set()
+        pendingLists: new Set(),
+        forceFallback: options.forceFallback !== false,
+        scrollSensitivity:
+            typeof options.scrollSensitivity === 'number' && options.scrollSensitivity > 0
+                ? options.scrollSensitivity
+                : 140,
+        scrollSpeed:
+            typeof options.scrollSpeed === 'number' && options.scrollSpeed > 0 ? options.scrollSpeed : 18
     };
     voyagerNestableInstances.set(container, state);
     refreshNestableLists(state);
