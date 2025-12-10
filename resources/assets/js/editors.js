@@ -160,6 +160,14 @@ export function initAceEditors(scope = document) {
         // Disable worker for this session too
         editor.getSession().setUseWorker(false);
 
+        // Auto height by default
+        editor.setOptions({
+            maxLines: Infinity,
+            minLines: Number(element.getAttribute('data-min-lines') || 8),
+            autoScrollEditorIntoView: true
+        });
+        element.style.minHeight = `${editor.getOption('minLines') * 18}px`;
+
         // Sync with textarea
         editor.on('change', function() {
             if (textarea) {
