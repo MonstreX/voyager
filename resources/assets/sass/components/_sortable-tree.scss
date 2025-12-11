@@ -163,8 +163,7 @@
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    width: calc(100% - 200px); /* Leave space for actions */
-    padding-left: 10px;
+    width: calc(100% - 150px); /* Leave space for actions */
 }
 
 /* Placeholder */
@@ -200,12 +199,20 @@
     margin-right: auto;
 }
 
+.browse-tree .tree-extra-fields a span {
+    color: #333;
+}
+
 .browse-tree .tree-id {
     display: inline-block;
     min-width: 30px;
-    padding: 5px;
+    padding: 5px 10px 5px 5px;
     font-size: 12px;
     font-weight: 300;
+}
+
+.browse-tree .tree-status {
+    padding: 0 7px;
 }
 
 .browse-tree .tree-title {
@@ -296,12 +303,11 @@
 /* Inline Checkbox Toggle */
 .voyager-status-toggle {
     display: inline-block;
-    width: 12px;
-    height: 12px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
     cursor: pointer;
     transition: background-color 0.2s;
-    vertical-align: middle;
 }
 
 .voyager-status-toggle.active {
@@ -309,5 +315,5 @@
 }
 
 .voyager-status-toggle.inactive {
-    background-color: #eee;
+    background-color: #ddd;
 }
