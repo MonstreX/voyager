@@ -406,6 +406,25 @@
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
+
+    {{-- Clone record modal --}}
+    <div class="modal modal-warning fade" tabindex="-1" id="clone_modal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><i class="voyager-documentation"></i> {{ __('voyager::generic.clone_confirm') }}</h4>
+                </div>
+                <div class="modal-footer">
+                    <form action="#" id="clone_form" method="POST">
+                        {{ csrf_field() }}
+                        <input type="submit" class="btn btn-warning pull-right clone-confirm" value="{{ __('voyager::generic.yes_please') }}">
+                    </form>
+                    <button type="button" class="btn btn-default pull-right" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 @stop
 
 @section('css')
@@ -650,27 +669,27 @@
                     });
 
             // Clone Record Handler
-            var cloneButtons = document.querySelectorAll('td .clone');
-            cloneButtons.forEach(function(button) {
-                button.addEventListener('click', function(event) {
+            var cloneModal = document.getElementById('clone_modal');
+            var cloneForm = document.getElementById('clone_form');
+            var cloneActionTemplate = cloneForm ? cloneForm.getAttribute('action') : '';
+            var bootstrapCompat = window.VoyagerBootstrapCompat;
+
+            function openCloneModal(button) {
+                if (!cloneModal || !cloneForm) {
+                    return;
+                }
+                var id = button.dataset.id;
+                if (id) {
+                    var cloneUrl = '{{ route("voyager.".$dataType->slug.".clone", ["id" => "__id"]) }}'.replace('__id', id);
+                    cloneForm.setAttribute('action', cloneUrl);
+                }
+                showModal(cloneModal);
+            }
+
+            document.querySelectorAll('td .clone').forEach(function (button) {
+                button.addEventListener('click', function (event) {
                     event.preventDefault();
-                    var recordId = this.dataset.id;
-                    var cloneUrl = '{{ route("voyager.".$dataType->slug.".clone", ["id" => "__id"]) }}'.replace('__id', recordId);
-
-                    if (confirm('{{ __("voyager::generic.clone_confirm") }}')) {
-                        var form = document.createElement('form');
-                        form.method = 'POST';
-                        form.action = cloneUrl;
-
-                        var csrfInput = document.createElement('input');
-                        csrfInput.type = 'hidden';
-                        csrfInput.name = '_token';
-                        csrfInput.value = '{{ csrf_token() }}';
-
-                        form.appendChild(csrfInput);
-                        document.body.appendChild(form);
-                        form.submit();
-                    }
+                    openCloneModal(event.currentTarget);
                 });
             });
 
