@@ -97,11 +97,16 @@
                                             </th>
                                         @endif
                                         @foreach($dataType->browseRows as $row)
-                                        <th>
+                                        <th class="@if(isset($row->details->browse_align)){{ $row->details->browse_align }}@endif"
+                                            @if(isset($row->details->browse_width)) style="width:{{ $row->details->browse_width }}"@endif>
                                             @if ($isServerSide && in_array($row->field, $sortableColumns))
                                                 <a href="{{ $row->sortByUrl($orderBy, $sortOrder) }}">
                                             @endif
-                                            {{ $row->getTranslatedAttribute('display_name') }}
+                                            @if(isset($row->details->browse_title))
+                                                {{ $row->details->browse_title }}
+                                            @else
+                                                {{ $row->getTranslatedAttribute('display_name') }}
+                                            @endif
                                             @if ($isServerSide)
                                                 @if ($row->isCurrentSortField($orderBy))
                                                     @if ($sortOrder == 'asc')
@@ -110,7 +115,9 @@
                                                         <i class="voyager-angle-down pull-right"></i>
                                                     @endif
                                                 @endif
-                                                </a>
+                                                @if ($isServerSide && in_array($row->field, $sortableColumns))
+                                                    </a>
+                                                @endif
                                             @endif
                                         </th>
                                         @endforeach
@@ -131,7 +138,8 @@
                                                 $data->{$row->field} = $data->{$row->field.'_browse'};
                                             }
                                             @endphp
-                                            <td>
+                                            <td class="@if(isset($row->details->browse_align)){{ $row->details->browse_align }}@endif"
+                                                @if(isset($row->details->browse_font_size)) style="font-size:{{ $row->details->browse_font_size }}"@endif>
                                                 @if (isset($row->details->view_browse))
                                                     @include($row->details->view_browse, ['row' => $row, 'dataType' => $dataType, 'dataTypeContent' => $dataTypeContent, 'content' => $data->{$row->field}, 'view' => 'browse', 'options' => $row->details])
                                                 @elseif (isset($row->details->view))
