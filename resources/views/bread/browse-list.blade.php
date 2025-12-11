@@ -399,9 +399,9 @@
                     <form action="#" id="delete_form" method="POST">
                         {{ method_field('DELETE') }}
                         {{ csrf_field() }}
-                        <input type="submit" class="btn btn-danger pull-right delete-confirm" value="{{ __('voyager::generic.delete_confirm') }}">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
+                        <input type="submit" class="btn btn-danger delete-confirm" value="{{ __('voyager::generic.delete_confirm') }}">
                     </form>
-                    <button type="button" class="btn btn-default pull-right" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
@@ -418,9 +418,9 @@
                 <div class="modal-footer">
                     <form action="#" id="clone_form" method="POST">
                         {{ csrf_field() }}
-                        <input type="submit" class="btn btn-warning pull-right clone-confirm" value="{{ __('voyager::generic.yes_please') }}">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
+                        <input type="submit" class="btn btn-warning clone-confirm" value="{{ __('voyager::generic.yes_please') }}">
                     </form>
-                    <button type="button" class="btn btn-default pull-right" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
