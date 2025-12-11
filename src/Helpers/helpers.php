@@ -51,3 +51,27 @@ if (!function_exists('get_file_name')) {
         }
     }
 }
+
+if (!function_exists('voyager_tree_build')) {
+    function voyager_tree_build(array $elements, $parentId = null)
+    {
+        $branch = [];
+
+        foreach ($elements as $element) {
+            if ($element['parent_id'] == $parentId) {
+                $children = voyager_tree_build($elements, $element['id']);
+                if ($children) {
+                    $element['children'] = $children;
+                }
+                $branch[] = $element;
+            }
+        }
+
+        // Sort strictly by 'order'
+        usort($branch, function ($a, $b) {
+            return ((int)($a['order'] ?? 0)) <=> ((int)($b['order'] ?? 0));
+        });
+
+        return $branch;
+    }
+}

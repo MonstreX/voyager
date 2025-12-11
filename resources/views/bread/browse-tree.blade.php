@@ -26,26 +26,6 @@
                 <div class="panel-body tree-items-list" style="padding:30px;">
                     <div class="dd">
                         @php
-                            if (!function_exists('build_tree_local')) {
-                                function build_tree_local(array $elements, $parentId = null) {
-                                    $branch = array();
-                                    foreach ($elements as $element) {
-                                        if ($element['parent_id'] == $parentId) {
-                                            $children = build_tree_local($elements, $element['id']);
-                                            if ($children) {
-                                                $element['children'] = $children;
-                                            }
-                                            $branch[] = $element;
-                                        }
-                                    }
-                                    // Sort strictly by 'order'
-                                    usort($branch, function ($a, $b) {
-                                        return ((int)($a['order'] ?? 0)) <=> ((int)($b['order'] ?? 0));
-                                    });
-                                    return $branch;
-                                }
-                            }
-
                             $treeItems = [];
                             // Handle Paginator
                             if ($dataTypeContent instanceof \Illuminate\Pagination\LengthAwarePaginator || $dataTypeContent instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator) {
@@ -62,7 +42,7 @@
                             }
 
                             if (count($flatArray) > 0) {
-                                $treeItems = build_tree_local($flatArray);
+                                $treeItems = voyager_tree_build($flatArray);
                             }
                         @endphp
                         

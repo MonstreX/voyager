@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use TCG\Voyager\Facades\Voyager;
 use Illuminate\Support\Facades\Log;
 
-class VoyagerExtensionController extends Controller
+class VoyagerModelController extends Controller
 {
     /**
      * Update Tree Order (Nestable).
