@@ -37,6 +37,11 @@
 @php
     // Set edit rights
     $canEdit = isset($dataTypeContent[0])? request()->user()->can('edit', $dataTypeContent[0]) : false;
+
+    // Sort columns by browse_order (per-field option)
+    $dataType->browseRows = $dataType->browseRows->sortBy(function ($row, $key) {
+        return isset($row->details->browse_order) ? $row->details->browse_order : PHP_INT_MAX;
+    });
 @endphp
 @section('content')
     <div class="page-content browse container-fluid">
@@ -149,7 +154,14 @@
                                                 @elseif (isset($row->details->view))
                                                     @include($row->details->view, ['row' => $row, 'dataType' => $dataType, 'dataTypeContent' => $dataTypeContent, 'content' => $data->{$row->field}, 'action' => 'browse', 'view' => 'browse', 'options' => $row->details])
                                                 @elseif($row->type == 'image')
-                                                    <img src="@if( !filter_var($data->{$row->field}, FILTER_VALIDATE_URL)){{ Voyager::image( $data->{$row->field} ) }}@else{{ $data->{$row->field} }}@endif" style="width:100px">
+                                                    @php
+                                                        if (isset($row->details->browse_image_max_height)) {
+                                                            $imageStyle = 'width:auto;max-height:' . $row->details->browse_image_max_height;
+                                                        } else {
+                                                            $imageStyle = 'width:100px';
+                                                        }
+                                                    @endphp
+                                                    <img src="@if( !filter_var($data->{$row->field}, FILTER_VALIDATE_URL)){{ Voyager::image( $data->{$row->field} ) }}@else{{ $data->{$row->field} }}@endif" style="{{ $imageStyle }}">
                                                 @elseif($row->type == 'relationship')
                                                     @include('voyager::formfields.relationship', ['view' => 'browse','options' => $row->details])
                                                 @elseif($row->type == 'select_multiple')
