@@ -177,6 +177,8 @@ document.addEventListener('DOMContentLoaded', function () {
     var deleteFormAction;
     var deleteModal = document.getElementById('delete_modal');
     var deleteForm = document.getElementById('delete_form');
+    var cloneModal = document.getElementById('clone_modal');
+    var cloneForm = document.getElementById('clone_form');
 
     // Vanilla JS delegation for .delete buttons
     document.addEventListener('click', function(e) {
@@ -184,16 +186,16 @@ document.addEventListener('DOMContentLoaded', function () {
         if (target && document.querySelector('.dd').contains(target)) {
             e.preventDefault();
             deleteFormAction = target.getAttribute('data-action') || target.getAttribute('href');
-            
+
             // If the button is a link (href), use that as action, otherwise construct standard route
             if (!deleteFormAction || deleteFormAction === 'javascript:;') {
                  var id = target.getAttribute('data-id');
                  // Default Voyager route: /admin/slug/id
                  deleteFormAction = '{{ route('voyager.'.$dataType->slug.'.destroy', ['id' => '__id']) }}'.replace('__id', id);
             }
-            
+
             deleteForm.action = deleteFormAction;
-            
+
             // Show modal using Voyager's bootstrap compatibility or standard jQuery
             if (window.Voyager && window.Voyager.bootstrap && window.Voyager.bootstrap.showModal) {
                  window.Voyager.bootstrap.showModal(deleteModal);
@@ -203,6 +205,33 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Vanilla fallback if no helpers
                 deleteModal.classList.add('in');
                 deleteModal.style.display = 'block';
+                var backdrop = document.createElement('div');
+                backdrop.className = 'modal-backdrop fade in';
+                document.body.appendChild(backdrop);
+            }
+        }
+    });
+
+    // Vanilla JS delegation for .clone buttons
+    document.addEventListener('click', function(e) {
+        var cloneBtn = e.target.closest('.clone');
+        if (cloneBtn && document.querySelector('.dd').contains(cloneBtn)) {
+            e.preventDefault();
+            var id = cloneBtn.dataset.id;
+            if (id) {
+                var cloneUrl = '{{ route("voyager.".$dataType->slug.".clone", ["id" => "__id"]) }}'.replace('__id', id);
+                cloneForm.setAttribute('action', cloneUrl);
+            }
+
+            // Show modal using Voyager's bootstrap compatibility or standard jQuery
+            if (window.Voyager && window.Voyager.bootstrap && window.Voyager.bootstrap.showModal) {
+                 window.Voyager.bootstrap.showModal(cloneModal);
+            } else if (typeof $ !== 'undefined') {
+                $('#clone_modal').modal('show');
+            } else {
+                // Vanilla fallback if no helpers
+                cloneModal.classList.add('in');
+                cloneModal.style.display = 'block';
                 var backdrop = document.createElement('div');
                 backdrop.className = 'modal-backdrop fade in';
                 document.body.appendChild(backdrop);
@@ -259,29 +288,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Clone Record Handler
-    var cloneModal = document.getElementById('clone_modal');
-    var cloneForm = document.getElementById('clone_form');
-
-    function openCloneModal(button) {
-        if (!cloneModal || !cloneForm) {
-            return;
-        }
-        var id = button.dataset.id;
-        if (id) {
-            var cloneUrl = '{{ route("voyager.".$dataType->slug.".clone", ["id" => "__id"]) }}'.replace('__id', id);
-            cloneForm.setAttribute('action', cloneUrl);
-        }
-        showModal(cloneModal);
-    }
-
-    document.addEventListener('click', function(e) {
-        var cloneBtn = e.target.closest('.clone');
-        if (cloneBtn && document.querySelector('.dd').contains(cloneBtn)) {
-            e.preventDefault();
-            openCloneModal(cloneBtn);
-        }
-    });
 });
 </script>
 @stop

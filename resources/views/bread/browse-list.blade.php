@@ -491,6 +491,29 @@
                 document.body.classList.add('modal-open');
             }
 
+            // Clone Record Handler - defined before delete to ensure showModal is accessible
+            var cloneModal = document.getElementById('clone_modal');
+            var cloneForm = document.getElementById('clone_form');
+
+            function openCloneModal(button) {
+                if (!cloneModal || !cloneForm) {
+                    return;
+                }
+                var id = button.dataset.id;
+                if (id) {
+                    var cloneUrl = '{{ route("voyager.".$dataType->slug.".clone", ["id" => "__id"]) }}'.replace('__id', id);
+                    cloneForm.setAttribute('action', cloneUrl);
+                }
+                showModal(cloneModal);
+            }
+
+            document.querySelectorAll('td .clone').forEach(function (button) {
+                button.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    openCloneModal(event.currentTarget);
+                });
+            });
+
             document.querySelectorAll('td .delete').forEach(function (button) {
                 button.addEventListener('click', function (event) {
                     event.preventDefault();
@@ -667,31 +690,6 @@
                             }
                         });
                     });
-
-            // Clone Record Handler
-            var cloneModal = document.getElementById('clone_modal');
-            var cloneForm = document.getElementById('clone_form');
-            var cloneActionTemplate = cloneForm ? cloneForm.getAttribute('action') : '';
-            var bootstrapCompat = window.VoyagerBootstrapCompat;
-
-            function openCloneModal(button) {
-                if (!cloneModal || !cloneForm) {
-                    return;
-                }
-                var id = button.dataset.id;
-                if (id) {
-                    var cloneUrl = '{{ route("voyager.".$dataType->slug.".clone", ["id" => "__id"]) }}'.replace('__id', id);
-                    cloneForm.setAttribute('action', cloneUrl);
-                }
-                showModal(cloneModal);
-            }
-
-            document.querySelectorAll('td .clone').forEach(function (button) {
-                button.addEventListener('click', function (event) {
-                    event.preventDefault();
-                    openCloneModal(event.currentTarget);
-                });
-            });
 
     </script>
 @stop
