@@ -593,101 +593,101 @@
                         console.error('Error:', error);
                         toastr.error("Error updating field");
                     });
-                            }
-                        });
+                }
+            });
 
-                        // Inline Edit button
-                        document.addEventListener('click', (e) => {
-                            if (e.target.closest('.text-inline-edit')) {
-                                const editButton = e.target.closest('.text-inline-edit');
-                                const textHolder = editButton.closest('.browse-text-holder');
-                                const fieldHolder = editButton.closest('.text-field-holder');
-                                const editorHolder = fieldHolder.querySelector('.browse-inline-editor');
+            // Inline Edit button
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.text-inline-edit')) {
+                    const editButton = e.target.closest('.text-inline-edit');
+                    const textHolder = editButton.closest('.browse-text-holder');
+                    const fieldHolder = editButton.closest('.text-field-holder');
+                    const editorHolder = fieldHolder.querySelector('.browse-inline-editor');
 
-                                if (textHolder) textHolder.style.display = 'none';
-                                if (editorHolder) {
-                                    editorHolder.style.display = 'flex';
-                                    const input = editorHolder.querySelector('.browse-inline-input');
-                                    if (input) input.focus();
-                                }
-                            }
-                        });
+                    if (textHolder) textHolder.style.display = 'none';
+                    if (editorHolder) {
+                        editorHolder.style.display = 'flex';
+                        const input = editorHolder.querySelector('.browse-inline-input');
+                        if (input) input.focus();
+                    }
+                }
+            });
 
-                        // Inline Cancel button
-                        document.addEventListener('click', (e) => {
-                            if (e.target.closest('.text-inline-cancel')) {
-                                const cancelButton = e.target.closest('.text-inline-cancel');
-                                const editorHolder = cancelButton.closest('.browse-inline-editor');
-                                const fieldHolder = cancelButton.closest('.text-field-holder');
-                                const textHolder = fieldHolder.querySelector('.browse-text-holder');
+            // Inline Cancel button
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.text-inline-cancel')) {
+                    const cancelButton = e.target.closest('.text-inline-cancel');
+                    const editorHolder = cancelButton.closest('.browse-inline-editor');
+                    const fieldHolder = cancelButton.closest('.text-field-holder');
+                    const textHolder = fieldHolder.querySelector('.browse-text-holder');
 
-                                if (editorHolder) editorHolder.style.display = 'none';
-                                if (textHolder) textHolder.style.display = 'flex';
-                            }
-                        });
+                    if (editorHolder) editorHolder.style.display = 'none';
+                    if (textHolder) textHolder.style.display = 'flex';
+                }
+            });
 
-                        // Inline press Enter
-                        document.addEventListener('keypress', (e) => {
-                            if (e.key === 'Enter' && e.target.classList.contains('browse-inline-input')) {
-                                e.target.closest('.browse-inline-editor').querySelector('.text-inline-save').click();
-                            }
-                        });
+            // Inline press Enter
+            document.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && e.target.classList.contains('browse-inline-input')) {
+                    e.target.closest('.browse-inline-editor').querySelector('.text-inline-save').click();
+                }
+            });
 
-                        // Inline Save button
-                        document.addEventListener('click', (e) => {
-                            if (e.target.closest('.text-inline-save')) {
-                                const saveButton = e.target.closest('.text-inline-save');
-                                const editorHolder = saveButton.closest('.browse-inline-editor');
-                                const input = editorHolder.querySelector('.browse-inline-input');
-                                const fieldHolder = editorHolder.closest('.text-field-holder');
-                                const textHolder = fieldHolder.querySelector('.browse-text-holder');
+            // Inline Save button
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.text-inline-save')) {
+                    const saveButton = e.target.closest('.text-inline-save');
+                    const editorHolder = saveButton.closest('.browse-inline-editor');
+                    const input = editorHolder.querySelector('.browse-inline-input');
+                    const fieldHolder = editorHolder.closest('.text-field-holder');
+                    const textHolder = fieldHolder.querySelector('.browse-text-holder');
 
-                                const parentRow = saveButton.closest('tr');
-                                const dataTypeSlug = parentRow ? parentRow.dataset.slug : '';
-                                const recordId = input.dataset.id;
-                                const fieldName = input.name;
-                                const newValue = input.value;
+                    const parentRow = saveButton.closest('tr');
+                    const dataTypeSlug = parentRow ? parentRow.dataset.slug : '';
+                    const recordId = input.dataset.id;
+                    const fieldName = input.name;
+                    const newValue = input.value;
 
-                                // Hide editor, show text holder, update displayed text
-                                if (editorHolder) editorHolder.style.display = 'none';
-                                if (textHolder) {
-                                    textHolder.style.display = 'flex';
-                                    const displayedText = textHolder.querySelector('div');
-                                    if (displayedText) displayedText.textContent = newValue;
-                                }
+                    // Hide editor, show text holder, update displayed text
+                    if (editorHolder) editorHolder.style.display = 'none';
+                    if (textHolder) {
+                        textHolder.style.display = 'flex';
+                        const displayedText = textHolder.querySelector('div');
+                        if (displayedText) displayedText.textContent = newValue;
+                    }
 
-                                // Send AJAX request
-                                const updateUrl = '{{ route("voyager.".$dataType->slug.".update-field", ["id" => "__id"]) }}'.replace('__id', recordId);
+                    // Send AJAX request
+                    const updateUrl = '{{ route("voyager.".$dataType->slug.".update-field", ["id" => "__id"]) }}'.replace('__id', recordId);
 
-                                const params = new URLSearchParams();
-                                params.append('field', fieldName);
-                                params.append('value', newValue);
-                                params.append('slug', dataTypeSlug);
-                                params.append('_token', '{{ csrf_token() }}');
+                    const params = new URLSearchParams();
+                    params.append('field', fieldName);
+                    params.append('value', newValue);
+                    params.append('slug', dataTypeSlug);
+                    params.append('_token', '{{ csrf_token() }}');
 
-                                fetch(updateUrl, {
-                                    method: 'POST',
-                                    body: params,
-                                    headers: {
-                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                        'Accept': 'application/json'
-                                    }
-                                })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.status === 'success') {
-                                        toastr.success(data.message);
-                                    } else {
-                                        toastr.error(data.message || "Error updating field");
-                                    }
-                                })
-                                .catch(error => {
-                                    console.error('Error:', error);
-                                    toastr.error("Error updating field");
-                                });
-                            }
-                        });
+                    fetch(updateUrl, {
+                        method: 'POST',
+                        body: params,
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            toastr.success(data.message);
+                        } else {
+                            toastr.error(data.message || "Error updating field");
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        toastr.error("Error updating field");
                     });
+                }
+            });
+        });
 
     </script>
 @stop
