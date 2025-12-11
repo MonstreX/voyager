@@ -24,8 +24,10 @@
 @import "components/perfect-scrollbar";
 @import "components/cropper";
 @import "components/simplemde";
+@import "components/inline-editor"; // New import
 
 // Voyager Components (New/Refactored)
+@import "components/browse";
 @import "components/simple-table";
 @import "components/cards";
 @import "components/buttons";

@@ -34,6 +34,10 @@
     </div>
 @stop
 
+@php
+    // Set edit rights
+    $canEdit = isset($dataTypeContent[0])? request()->user()->can('edit', $dataTypeContent[0]) : false;
+@endphp
 @section('content')
     <div class="page-content browse container-fluid">
         @include('voyager::alerts')
@@ -124,7 +128,9 @@
                                 </thead>
                                 <tbody>
                                     @foreach($dataTypeContent as $data)
-                                    <tr>
+                                    <tr data-record-id="{{$data->getKey()}}"
+                                        data-slug="{{$dataType->slug}}"
+                                        class="{{ isset($data->status) && (int)$data->status === 0? 'unpublished-record' : '' }} @if($dataType->server_side){{ $loop->index % 2 === 0? 'odd' : 'even' }}@endif">
                                         @if($showCheckboxColumn)
                                             <td>
                                                 <input type="checkbox" name="row_id" id="checkbox_{{ $data->getKey() }}" value="{{ $data->getKey() }}">
@@ -136,7 +142,7 @@
                                                 $data->{$row->field} = $data->{$row->field.'_browse'};
                                             }
                                             @endphp
-                                            <td class="@if(isset($row->details->browse_align)){{ $row->details->browse_align }}@endif"
+                                            <td class="field-{{ $row->type  }} @if(isset($row->details->browse_align)){{ $row->details->browse_align }}@endif"
                                                 @if(isset($row->details->browse_font_size)) style="font-size:{{ $row->details->browse_font_size }}"@endif>
                                                 @if (isset($row->details->view_browse))
                                                     @include($row->details->view_browse, ['row' => $row, 'dataType' => $dataType, 'dataTypeContent' => $dataTypeContent, 'content' => $data->{$row->field}, 'view' => 'browse', 'options' => $row->details])
@@ -240,17 +246,27 @@
                                                 @elseif($row->type == 'text' || $row->type == 'number')
                                                     @include('voyager::multilingual.input-hidden-bread-browse')
                                                     <div class="text-field-holder">
-                                                        @if(isset($row->details->url))
-                                                            <a href="{{ route('voyager.'.$dataType->slug.'.'.$row->details->url, $data->getKey()) }}">
-                                                        @elseif(isset($row->details->route) && isset($row->details->route->name) && isset($row->details->route->param_field))
-                                                            <a href="{{ route($row->details->route->name, $data->{$row->details->route->param_field}) }}">
+                                                        @if(isset($row->details->browse_inline_editor) && $canEdit)
+                                                        <div class="browse-inline-editor">
+                                                            <input class="browse-inline-input" data-id="{{ $data->getKey() }}" @if($row->type == 'number') type="number" @else type="text" @endif name="{{$row->field}}" value="{{ $data->{$row->field} }}">
+                                                            <button class="text-inline-save" type="button" title="{{ __('voyager::generic.save') }}"><i class="voyager-check"></i></button>
+                                                            <button class="text-inline-cancel" type="button" title="{{ __('voyager::generic.cancel') }}"><i class="voyager-x"></i></button>
+                                                        </div>
                                                         @endif
-                                                        
-                                                        <div>{{ mb_strlen( $data->{$row->field} ) > 200 ? mb_substr($data->{$row->field}, 0, 200) . ' ...' : $data->{$row->field} }}</div>
-
-                                                        @if(isset($row->details->url) || (isset($row->details->route) && isset($row->details->route->name) && isset($row->details->route->param_field)))
-                                                            </a>
-                                                        @endif
+                                                        <div class="browse-text-holder">
+                                                            @if(isset($row->details->url))
+                                                                <a href="{{ route('voyager.'.$dataType->slug.'.'.$row->details->url, $data->getKey()) }}">
+                                                            @elseif(isset($row->details->route) && isset($row->details->route->name) && isset($row->details->route->param_field))
+                                                                <a href="{{ route($row->details->route->name, $data->{$row->details->route->param_field}) }}">
+                                                            @endif
+                                                                <div>{{ mb_strlen( ($data->{$row->field})?? '' ) > 200 ? mb_substr($data->{$row->field}, 0, 200) . ' ...' : $data->{$row->field} }}</div>
+                                                            @if(isset($row->details->url) || (isset($row->details->route) && isset($row->details->route->name) && isset($row->details->route->param_field)))
+                                                                </a>
+                                                            @endif
+                                                            @if(isset($row->details->browse_inline_editor) && $canEdit)
+                                                                <button class="text-inline-edit" type="button" title="{{ __('voyager::generic.edit') }}"><i class="voyager-edit"></i></button>
+                                                            @endif
+                                                        </div>
                                                     </div>
                                                 @elseif($row->type == 'text_area')
                                                     @include('voyager::multilingual.input-hidden-bread-browse')
@@ -524,8 +540,103 @@
                         console.error('Error:', error);
                         toastr.error("Error updating field");
                     });
-                }
-            });
-        });
+                            }
+                        });
+                
+                        // Inline Edit button
+                        document.addEventListener('click', function(e) {
+                            if (e.target.closest('.text-inline-edit')) {
+                                var editButton = e.target.closest('.text-inline-edit');
+                                var textHolder = editButton.closest('.browse-text-holder');
+                                var fieldHolder = editButton.closest('.text-field-holder');
+                                var editorHolder = fieldHolder.querySelector('.browse-inline-editor');
+                
+                                if (textHolder) textHolder.style.display = 'none';
+                                if (editorHolder) {
+                                    editorHolder.style.display = 'flex';
+                                    var input = editorHolder.querySelector('.browse-inline-input');
+                                    if (input) input.focus();
+                                }
+                            }
+                        });
+                
+                        // Inline Cancel button
+                        document.addEventListener('click', function(e) {
+                            if (e.target.closest('.text-inline-cancel')) {
+                                var cancelButton = e.target.closest('.text-inline-cancel');
+                                var editorHolder = cancelButton.closest('.browse-inline-editor');
+                                var fieldHolder = cancelButton.closest('.text-field-holder');
+                                var textHolder = fieldHolder.querySelector('.browse-text-holder');
+                
+                                if (editorHolder) editorHolder.style.display = 'none';
+                                if (textHolder) textHolder.style.display = 'flex';
+                            }
+                        });
+                
+                        // Inline press Enter
+                        document.addEventListener('keypress', function(e) {
+                            if (e.key === 'Enter' && e.target.classList.contains('browse-inline-input')) {
+                                e.target.closest('.browse-inline-editor').querySelector('.text-inline-save').click();
+                            }
+                        });
+                
+                        // Inline Save button
+                        document.addEventListener('click', function(e) {
+                            if (e.target.closest('.text-inline-save')) {
+                                var saveButton = e.target.closest('.text-inline-save');
+                                var editorHolder = saveButton.closest('.browse-inline-editor');
+                                var input = editorHolder.querySelector('.browse-inline-input');
+                                var fieldHolder = editorHolder.closest('.text-field-holder');
+                                var textHolder = fieldHolder.querySelector('.browse-text-holder');
+                
+                                var parentRow = saveButton.closest('tr');
+                                var dataTypeSlug = parentRow ? parentRow.dataset.slug : ''; // Get slug from tr
+                                var recordId = input.dataset.id;
+                                var fieldName = input.name;
+                                var newValue = input.value;
+                
+                                // Hide editor, show text holder, update displayed text
+                                if (editorHolder) editorHolder.style.display = 'none';
+                                if (textHolder) {
+                                    textHolder.style.display = 'flex';
+                                    var displayedText = textHolder.querySelector('div');
+                                    if (displayedText) displayedText.textContent = newValue;
+                                }
+                
+                                // Send AJAX request
+                                var updateUrl = '{{ route("voyager.".$dataType->slug.".update-field", ["id" => "__id"]) }}'.replace('__id', recordId);
+                
+                                var params = new URLSearchParams();
+                                params.append('field', fieldName);
+                                params.append('value', newValue);
+                                params.append('slug', dataTypeSlug);
+                                params.append('_token', '{{ csrf_token() }}');
+                
+                                fetch(updateUrl, {
+                                    method: 'POST',
+                                    body: params,
+                                    headers: {
+                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                        'Accept': 'application/json'
+                                    }
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.status === 'success') {
+                                        toastr.success(data.message);
+                                    } else {
+                                        toastr.error(data.message || "Error updating field");
+                                        // Optionally revert text or re-show editor on error
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    toastr.error("Error updating field");
+                                    // Optionally revert text or re-show editor on error
+                                });
+                            }
+                        });
+                    });
+                
     </script>
 @stop

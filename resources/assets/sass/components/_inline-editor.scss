@@ -1,0 +1,58 @@
+// Inline Editor Styles
+.text-field-holder {
+    div {
+        width: 100%;
+    }
+}
+
+.browse-text-holder {
+    display: flex; /* Changed from inline-flex to flex for consistent behavior */
+    width: 100%;
+    min-height: 20px;
+    justify-content: space-between;
+    align-items: center;
+
+    button {
+        opacity: 0.2;
+        border: none;
+        padding: 0 3px;
+        background-color: transparent;
+    }
+}
+
+.text-field-holder i {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.browse-text-holder:hover button {
+    opacity: 1;
+}
+
+.browse-inline-editor {
+    display: none; /* Hidden by default */
+    width: 100%;
+    
+    button {
+        border: none;
+        background-color: transparent;
+        padding: 0 3px;
+    }
+}
+
+.text-inline-save i {
+    color: #00a142;
+}
+.text-inline-cancel i {
+    color: #f13024;
+}
+.text-inline-edit i {
+    margin: 3px 0 0 3px;
+    color: #3152b5;
+}
+
+.browse-inline-editor input {
+    width: 100%;
+    border: 1px solid #eee;
+}
