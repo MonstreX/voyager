@@ -1,3 +1,4 @@
+
 /* Tree View Container */
 
 .panel-body.tree-items-list {
@@ -227,6 +228,15 @@
     opacity: 0.5;
 }
 
+/* Links in Tree Fields (should assume text color) */
+.browse-tree .tree-field a {
+    color: inherit;
+    text-decoration: none;
+}
+.browse-tree .tree-field a:hover {
+    text-decoration: underline;
+}
+
 /* Actions Area */
 .browse-tree .dd-content-actions {
     display: flex;
@@ -282,4 +292,8 @@
 
 .browse-tree .dd-content-actions a span {
     display: none;
+}
+
+.tree-items-list a span {
+    color: #333;
 }

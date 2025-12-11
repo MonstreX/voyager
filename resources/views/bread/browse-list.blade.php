@@ -226,9 +226,21 @@
                                                     @endif
                                                 @elseif($row->type == 'color')
                                                     <span class="badge badge-lg" style="background-color: {{ $data->{$row->field} }}">{{ $data->{$row->field} }}</span>
-                                                @elseif($row->type == 'text')
+                                                @elseif($row->type == 'text' || $row->type == 'number')
                                                     @include('voyager::multilingual.input-hidden-bread-browse')
-                                                    <div>{{ mb_strlen( $data->{$row->field} ) > 200 ? mb_substr($data->{$row->field}, 0, 200) . ' ...' : $data->{$row->field} }}</div>
+                                                    <div class="text-field-holder">
+                                                        @if(isset($row->details->url))
+                                                            <a href="{{ route('voyager.'.$dataType->slug.'.'.$row->details->url, $data->getKey()) }}">
+                                                        @elseif(isset($row->details->route) && isset($row->details->route->name) && isset($row->details->route->param_field))
+                                                            <a href="{{ route($row->details->route->name, $data->{$row->details->route->param_field}) }}">
+                                                        @endif
+                                                        
+                                                        <div>{{ mb_strlen( $data->{$row->field} ) > 200 ? mb_substr($data->{$row->field}, 0, 200) . ' ...' : $data->{$row->field} }}</div>
+
+                                                        @if(isset($row->details->url) || (isset($row->details->route) && isset($row->details->route->name) && isset($row->details->route->param_field)))
+                                                            </a>
+                                                        @endif
+                                                    </div>
                                                 @elseif($row->type == 'text_area')
                                                     @include('voyager::multilingual.input-hidden-bread-browse')
                                                     <div>{{ mb_strlen( $data->{$row->field} ) > 200 ? mb_substr($data->{$row->field}, 0, 200) . ' ...' : $data->{$row->field} }}</div>
