@@ -32,4 +32,9 @@ class CloneAction extends AbstractAction
     {
         return 'javascript:;';
     }
+
+    public function getOrder()
+    {
+        return 3; // Leftmost position
+    }
 }

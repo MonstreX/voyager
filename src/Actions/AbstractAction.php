@@ -55,4 +55,9 @@ abstract class AbstractAction implements ActionInterface
     {
         return true;
     }
+
+    public function getOrder()
+    {
+        return 999; // Default order for custom actions
+    }
 }

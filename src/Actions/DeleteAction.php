@@ -32,4 +32,9 @@ class DeleteAction extends AbstractAction
     {
         return 'javascript:;';
     }
+
+    public function getOrder()
+    {
+        return 0; // Rightmost position
+    }
 }

@@ -32,4 +32,9 @@ class RestoreAction extends AbstractAction
     {
         return route('voyager.'.$this->dataType->slug.'.restore', $this->data->{$this->data->getKeyName()});
     }
+
+    public function getOrder()
+    {
+        return 0; // Same as Delete - appears in same position
+    }
 }

@@ -30,4 +30,9 @@ class ViewAction extends AbstractAction
     {
         return route('voyager.'.$this->dataType->slug.'.show', $this->data->{$this->data->getKeyName()});
     }
+
+    public function getOrder()
+    {
+        return 2;
+    }
 }

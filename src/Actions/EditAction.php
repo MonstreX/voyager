@@ -30,4 +30,9 @@ class EditAction extends AbstractAction
     {
         return route('voyager.'.$this->dataType->slug.'.edit', $this->data->{$this->data->getKeyName()});
     }
+
+    public function getOrder()
+    {
+        return 1;
+    }
 }

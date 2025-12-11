@@ -10,6 +10,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use TCG\Voyager\Actions\CloneAction;
 use TCG\Voyager\Actions\DeleteAction;
 use TCG\Voyager\Actions\EditAction;
 use TCG\Voyager\Actions\RestoreAction;
@@ -45,10 +46,10 @@ class Voyager
     protected $viewLoadingEvents = [];
 
     protected $actions = [
+        DeleteAction::class,
         EditAction::class,
         ViewAction::class,
         RestoreAction::class,
-        DeleteAction::class,
     ];
 
     protected $models = [
@@ -183,7 +184,14 @@ class Voyager
 
     public function actions()
     {
-        return $this->actions;
+        // Sort actions by order property (ascending)
+        $sortedActions = $this->actions;
+        usort($sortedActions, function ($actionA, $actionB) {
+            $objA = new $actionA(null, null);
+            $objB = new $actionB(null, null);
+            return $objA->getOrder() <=> $objB->getOrder();
+        });
+        return $sortedActions;
     }
 
     /**
