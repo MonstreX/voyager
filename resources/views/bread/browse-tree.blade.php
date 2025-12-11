@@ -190,6 +190,55 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     });
+
+    // Inline Status Toggle Logic
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('voyager-status-toggle')) {
+            var toggle = e.target;
+            var id = toggle.dataset.id;
+            var field = toggle.dataset.field;
+            var slug = toggle.dataset.slug;
+            var currentValue = parseInt(toggle.dataset.value);
+            var newValue = currentValue ? 0 : 1;
+            
+            var updateUrl = '{{ route("voyager.".$dataType->slug.".update-field", ["id" => "__id"]) }}'.replace('__id', id);
+
+            var params = new URLSearchParams();
+            params.append('field', field);
+            params.append('value', newValue);
+            params.append('slug', slug);
+            params.append('_token', '{{ csrf_token() }}');
+
+            fetch(updateUrl, {
+                method: 'POST',
+                body: params,
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                     'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    toastr.success(data.message);
+                    toggle.dataset.value = newValue;
+                    if (newValue) {
+                        toggle.classList.remove('inactive');
+                        toggle.classList.add('active');
+                    } else {
+                        toggle.classList.remove('active');
+                        toggle.classList.add('inactive');
+                    }
+                } else {
+                    toastr.error(data.message || "Error updating field");
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                toastr.error("Error updating field");
+            });
+        }
+    });
 });
 </script>
 @stop

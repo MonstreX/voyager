@@ -49,6 +49,7 @@ Route::group(['as' => 'voyager.'], function () {
                 Route::post($dataType->slug.'/remove', $breadController.'@remove_media')->name($dataType->slug.'.media.remove');
                 // Extension Routes
                 Route::post($dataType->slug.'/tree-order', '\TCG\Voyager\Http\Controllers\VoyagerModelController@order')->name($dataType->slug.'.tree-order');
+                Route::post($dataType->slug.'/{id}/update-field', '\TCG\Voyager\Http\Controllers\VoyagerModelController@update_field')->name($dataType->slug.'.update-field');
                 Route::resource($dataType->slug, $breadController, ['parameters' => [$dataType->slug => 'id']]);
             }
         } catch (\InvalidArgumentException $e) {

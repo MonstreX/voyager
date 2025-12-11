@@ -44,9 +44,13 @@
                         {{-- Handle Inline Checkbox (Status) --}}
                         @if(isset($row->details->browse_inline_checkbox))
                         <span class="{{ $class }}">
-                            <div class="tt">
-                                <input type="checkbox" data-id="{{ $item['id'] }}" name="{{ $row->field }}" @if($item[$row->field]) checked @endif class="tiny-toggle" data-tt-type="dot" data-tt-size="tiny">
-                            </div>
+                             <div 
+                                class="voyager-status-toggle {{ ($item[$row->field]) ? 'active' : 'inactive' }}"
+                                data-id="{{ $item['id'] }}"
+                                data-field="{{ $row->field }}"
+                                data-value="{{ ($item[$row->field]) ? 1 : 0 }}"
+                                data-slug="{{ $dataType->slug }}"
+                             ></div>
                         </span>
                         @else
                             {{-- Skip parent_id field in display --}}

@@ -68,4 +68,33 @@ class VoyagerModelController extends Controller
     }
 
     // Future methods for inline-edit, clone, etc. will go here.
+
+    public function update_field(Request $request, $id)
+    {
+        $field = $request->input('field');
+        $value = $request->input('value');
+        $slug = $request->input('slug');
+
+        $dataType = Voyager::model('DataType')->where('slug', '=', $slug)->first();
+        if (!$dataType) {
+            return response()->json(['status' => 'error', 'message' => 'DataType not found'], 404);
+        }
+
+        $modelClass = $dataType->model_name;
+        $model = app($modelClass)->findOrFail($id);
+
+        $this->authorize('edit', $model);
+
+        $model->$field = $value;
+        $model->save();
+
+        return response()->json([
+            'status' => 'success', // For consistency with frontend check
+            'message' => __('voyager::generic.successfully_updated') . " $field",
+            'data' => [
+                'status' => 200,
+                'message' => __('voyager::generic.successfully_updated')
+            ]
+        ]);
+    }
 }
