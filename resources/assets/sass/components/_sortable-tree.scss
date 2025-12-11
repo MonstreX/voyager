@@ -1,4 +1,3 @@
-
 /* Tree View Container */
 
 .panel-body.tree-items-list {
@@ -49,6 +48,10 @@
 
 .browse-tree .tree-items-list .dd-collapsed .dd-expand {
     display: block !important;
+}
+
+.browse-tree .dd-collapsed .dd-list {
+    display: none;
 }
 
 /* Tree Item Handle (Content Wrapper) */

@@ -9,6 +9,11 @@
 
     <li data-record-id="{{$item['id']}}" data-slug="{{$dataType->slug}}" class="dd-item @if(isset($item['status']) && $item['status'] === 0) unpublished-record @endif" data-id="{{ $item['id'] }}">
 
+        @if(isset($item['children']) && count($item['children']) > 0)
+            <button data-action="collapse" type="button">Collapse</button>
+            <button data-action="expand" type="button" style="display: none;">Expand</button>
+        @endif
+
         <div class="dd-tree-handle">
             <div class="dd-tree-move">
                 <span></span>
