@@ -137,4 +137,64 @@
     }
 }
 
+/* Tree View Flexbox Styles */
+.dd-handle {
+    height: auto;
+    min-height: 50px;
+    padding: 10px 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.dd-content-holder {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.dd-content-main {
+    display: flex;
+    flex-grow: 1;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px; /* Modern spacing */
+}
+
+.tree-field {
+    display: inline-flex;
+    align-items: center;
+}
+
+.tree-field img {
+    max-height: 30px;
+    border-radius: 3px;
+}
+
+.dd-content-actions {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    margin-left: 15px;
+}
+
+.dd-content-actions .bread-actions {
+    display: flex;
+    gap: 5px;
+}
+
+/* Helpers for alignment */
+.tree-field.ml-auto {
+    margin-left: auto;
+}
+
+.tree-field.text-right {
+    justify-content: flex-end;
+}
+
+.tree-field.text-center {
+    justify-content: center;
+}
+
 /********** END SortableJS Tree Styles **********/

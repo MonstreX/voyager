@@ -47,6 +47,8 @@ Route::group(['as' => 'voyager.'], function () {
                 Route::get($dataType->slug.'/{id}/restore', $breadController.'@restore')->name($dataType->slug.'.restore');
                 Route::get($dataType->slug.'/relation', $breadController.'@relation')->name($dataType->slug.'.relation');
                 Route::post($dataType->slug.'/remove', $breadController.'@remove_media')->name($dataType->slug.'.media.remove');
+                // Extension Routes
+                Route::post($dataType->slug.'/tree-order', '\TCG\Voyager\Http\Controllers\VoyagerExtensionController@order')->name($dataType->slug.'.tree-order');
                 Route::resource($dataType->slug, $breadController, ['parameters' => [$dataType->slug => 'id']]);
             }
         } catch (\InvalidArgumentException $e) {
