@@ -28,7 +28,8 @@
 
 .browse-tree .dd-item,
 .browse-tree .dd-empty,
-.browse-tree .dd-placeholder {
+.browse-tree .dd-placeholder,
+.dd-dragging {
     display: block;
     position: relative;
     margin: 0;
@@ -55,7 +56,8 @@
 }
 
 /* Tree Item Handle (Content Wrapper) */
-.browse-tree .tree-items-list .dd-handle {
+.browse-tree .tree-items-list .dd-handle,
+.dd-dragging .dd-handle {
     display: block;
     height: 42px;
     margin: 2px 0;
@@ -72,7 +74,8 @@
 }
 
 /* Drag Handle (Left Side) */
-.browse-tree .tree-items-list .dd-tree-handle {
+.browse-tree .tree-items-list .dd-tree-handle,
+.dd-dragging .dd-tree-handle {
     position: absolute;
     margin: 0;
     left: 0;
@@ -90,7 +93,8 @@
     z-index: 1;
 }
 
-.browse-tree .tree-items-list .dd-tree-move {
+.browse-tree .tree-items-list .dd-tree-move,
+.dd-dragging .dd-tree-move {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -105,7 +109,8 @@
     background: #ddd;
 }
 
-.browse-tree .tree-items-list .dd-tree-move span {
+.browse-tree .tree-items-list .dd-tree-move span,
+.dd-dragging .dd-tree-move span {
     background: #929292;
     width: 10px;
     height: 1px;
@@ -151,7 +156,8 @@
 }
 
 /* Content Layout */
-.browse-tree .tree-items-list .dd-content-holder {
+.browse-tree .tree-items-list .dd-content-holder,
+.dd-dragging  .dd-content-holder {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -159,7 +165,8 @@
     height: 100%;
 }
 
-.browse-tree .dd-content-main {
+.browse-tree .dd-content-main,
+.dd-dragging .dd-content-main {
     display: flex;
     justify-content: flex-start;
     align-items: center;
@@ -167,7 +174,8 @@
 }
 
 /* Placeholder */
-.browse-tree .tree-items-list .dd-tree-placeholder {
+.browse-tree .tree-items-list .dd-tree-placeholder,
+.dd-dragging .dd-tree-placeholder {
     border: 1px dotted #aaa;
     border-radius: 3px;
     background: transparent;
@@ -181,41 +189,28 @@
 }
 
 /* Dragging State */
-.dd-dragging {
-    opacity: 0.5;
-}
 .dd-dragging .bread-actions a {
     display: none !important;
 }
 
-/* Ghost Element (during drag) */
-.dd-ghost {
-    opacity: 0.5;
-    background: #f0f0f0;
-}
-.dd-ghost .dd-item,
-.dd-ghost .dd-content,
-.dd-ghost .dd-content-main {
-    display: block !important;
-}
-.dd-ghost .bread-actions a {
-    display: none !important;
-}
-
 /* Field Specific Styles */
-.browse-tree .dd-content-main .tree-extra-fields {
+.browse-tree .dd-content-main .tree-extra-fields,
+.dd-dragging .dd-content-main .tree-extra-fields {
     margin: 0 10px;
 }
 
-.browse-tree .dd-content-main .tree-extra-fields.right-auto {
+.browse-tree .dd-content-main .tree-extra-fields.right-auto,
+.dd-dragging .dd-content-main .tree-extra-fields.right-auto {
     margin-right: auto;
 }
 
-.browse-tree .tree-extra-fields a span {
+.browse-tree .tree-extra-fields a span,
+.dd-dragging .tree-extra-fields a span {
     color: #333;
 }
 
-.browse-tree .tree-id {
+.browse-tree .tree-id,
+.dd-dragging .tree-id {
     display: inline-block;
     min-width: 30px;
     padding: 5px 10px 5px 5px;
@@ -223,21 +218,25 @@
     font-weight: 300;
 }
 
-.browse-tree .tree-status {
+.browse-tree .tree-status,
+.dd-dragging .tree-status {
     padding: 0 7px;
 }
 
-.browse-tree .tree-title {
+.browse-tree .tree-title,
+.dd-dragging .tree-title {
     color: #616161;
 }
 
-.browse-tree .tree-slug {
+.browse-tree .tree-slug,
+.dd-dragging .tree-slug {
     font-size: 0.8em;
     font-weight: 400;
     color: #3152b5;
 }
 
-.browse-tree .tree-created_at {
+.browse-tree .tree-created_at,
+.dd-dragging .tree-created_at {
     font-size: 0.8em;
     color: #7b7b7b;
 }
@@ -268,7 +267,8 @@
     gap: 5px;
 }
 
-.browse-tree .bread-actions {
+.browse-tree .bread-actions,
+.dd-dragging .bread-actions {
     display: flex;
     gap: 4px;
     justify-content: flex-end;
@@ -341,3 +341,8 @@
 .voyager-status-toggle.inactive {
     background-color: #ddd;
 }
+
+.dd-dragging {
+    list-style: none;
+}
+
