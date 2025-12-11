@@ -67,7 +67,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // Init Nestable
     var nestableContainer = document.querySelector('.dd');
     if (nestableContainer && window.VoyagerInitNestable) {
-        window.VoyagerInitNestable(nestableContainer);
+        window.VoyagerInitNestable(nestableContainer, {
+            handle: '.dd-tree-handle'
+        });
         
         // Listen for custom event from our wrapper (if it emits one) 
         // or use native Nestable events if available via wrapper

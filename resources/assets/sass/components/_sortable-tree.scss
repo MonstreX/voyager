@@ -1,6 +1,11 @@
-/********** SortableJS Tree Styles **********/
 
-.dd {
+/* Tree View Container */
+
+.panel-body.tree-items-list {
+    padding: 30px ;
+}
+
+.browse-tree .dd {
     position: relative;
     display: block;
     margin: 0;
@@ -10,7 +15,7 @@
     line-height: 20px;
 }
 
-.dd-list {
+.browse-tree .dd-list {
     display: block;
     position: relative;
     margin: 0;
@@ -18,52 +23,102 @@
     list-style: none;
 }
 
-.dd-list .dd-list {
+.browse-tree .dd-list .dd-list {
     padding-left: 30px;
 }
 
-.dd-collapsed .dd-list {
-    display: none;
-}
-
-.dd-item,
-.dd-placeholder {
+.browse-tree .dd-item,
+.browse-tree .dd-empty,
+.browse-tree .dd-placeholder {
     display: block;
     position: relative;
     margin: 0;
     padding: 0;
-    min-height: 20px;
+    min-height: 0;
     font-size: 13px;
     line-height: 20px;
 }
 
-.dd-handle {
+.browse-tree .tree-items-list .dd-collapsed .dd-collapse {
+    display: none;
+}
+
+.browse-tree .tree-items-list .dd-expand {
+    display: none !important;
+}
+
+.browse-tree .tree-items-list .dd-collapsed .dd-expand {
+    display: block !important;
+}
+
+/* Tree Item Handle (Content Wrapper) */
+.browse-tree .tree-items-list .dd-handle {
     display: block;
-    height: 50px;
-    margin: 5px 0;
-    padding: 14px 25px;
+    height: 42px;
+    margin: 2px 0;
+    padding: 0;
+    padding-left: 50px; /* Space for the drag handle */
     color: #333;
     text-decoration: none;
-    font-weight: bold;
-    border: 1px solid #ccc;
-    background: #fafafa;
-    border-radius: 3px;
+    font-weight: 700;
+    border: 1px solid #dcdcdc;
+    background: #fbfbfb;
+    border-radius: 0;
     box-sizing: border-box;
+    -moz-box-sizing: border-box;
 }
 
-.dd-handle:hover {
-    color: #2ea8e5;
-    background: #fff;
+/* Drag Handle (Left Side) */
+.browse-tree .tree-items-list .dd-tree-handle {
+    position: absolute;
+    margin: 0;
+    left: 0;
+    top: 0;
+    height: 42px;
+    cursor: move;
+    width: 26px;
+    text-indent: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    border: 1px solid #d8d8d8;
+    background: #ddd;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    z-index: 1;
 }
 
-.dd-item > button {
+.browse-tree .tree-items-list .dd-tree-move {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background: #efefef;
+    transition: all .4s ease;
+}
+
+.browse-tree .tree-items-list .dd-tree-move:hover {
+    background: #ddd;
+}
+
+.browse-tree .tree-items-list .dd-tree-move span {
+    background: #929292;
+    width: 10px;
+    height: 1px;
+    margin: 2px 0;
+}
+
+/* Expand/Collapse Buttons */
+.browse-tree .tree-items-list .dd-item > button {
     display: block;
     position: relative;
     cursor: pointer;
     float: left;
-    width: 40px;
-    height: 37px;
+    width: 20px;
+    height: 30px;
     margin: 5px 0;
+    margin-left: 30px; /* Push button right of the drag handle */
     padding: 0;
     text-indent: 100%;
     white-space: nowrap;
@@ -74,127 +129,154 @@
     line-height: 1;
     text-align: center;
     font-weight: bold;
+    z-index: 2;
 }
 
-.dd-item > button:before {
+.browse-tree .tree-items-list .dd-item > button:before {
     content: '+';
     display: block;
     position: absolute;
     width: 100%;
     text-align: center;
     text-indent: 0;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
-.dd-item > button[data-action='collapse']:before {
+.browse-tree .tree-items-list .dd-item > button[data-action='collapse']:before {
     content: '-';
 }
 
-.dd-placeholder {
-    margin: 5px 0;
-    padding: 0;
-    min-height: 30px;
-    background: #f2fbff;
-    border: 1px dashed #b6bcbf;
-    box-sizing: border-box;
+/* Content Layout */
+.browse-tree .tree-items-list .dd-content-holder {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
 }
 
+.browse-tree .dd-content-main {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: calc(100% - 200px); /* Leave space for actions */
+    padding-left: 10px;
+}
+
+/* Placeholder */
+.browse-tree .tree-items-list .dd-tree-placeholder {
+    border: 1px dotted #aaa;
+    border-radius: 3px;
+    background: transparent;
+    display: block;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    min-height: 42px;
+    font-size: 13px;
+    line-height: 20px;
+}
+
+/* Dragging State */
 .dd-dragel {
     position: absolute;
     pointer-events: none;
     z-index: 9999;
 }
-
-.dd-dragel > .dd-item .dd-handle {
-    margin-top: 0;
+.dd-dragel .dd-content-actions {
+    display: none;
 }
 
-.dd-dragel .dd-handle {
-    box-shadow: 2px 4px 6px 0 rgba(0, 0, 0, 0.1);
+/* Field Specific Styles */
+.browse-tree .dd-content-main .tree-extra-fields {
+    margin: 0 10px;
 }
 
-.dd .dd-ghost {
-    opacity: 0.4;
+.browse-tree .dd-content-main .tree-extra-fields.right-auto {
+    margin-right: auto;
 }
 
-.dd-hover > .dd-handle {
-    background: #2ea8e5 !important;
+.browse-tree .tree-id {
+    display: inline-block;
+    min-width: 30px;
+    padding: 5px;
+    font-size: 12px;
+    font-weight: 300;
 }
 
-.dd-list[data-voyager-placeholder='true'] {
-    display: block;
-    padding-left: 2rem;
-    margin-top: 0.25rem;
+.browse-tree .tree-title {
+    color: #616161;
 }
 
-@media only screen and (min-width: 700px) {
-    .dd {
-        float: left;
-        width: 100%;
-    }
-
-    .dd + .dd {
-        margin-left: 2%;
-    }
+.browse-tree .tree-slug {
+    font-size: 0.8em;
+    font-weight: 400;
+    color: #3152b5;
 }
 
-/* Tree View Flexbox Styles */
-.dd-handle {
-    height: auto;
-    min-height: 50px;
-    padding: 10px 15px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+.browse-tree .tree-created_at {
+    font-size: 0.8em;
+    color: #7b7b7b;
 }
 
-.dd-content-holder {
+.browse-tree .tree-items-list .unpublished-record {
+    opacity: 0.5;
+}
+
+/* Actions Area */
+.browse-tree .dd-content-actions {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    width: 100%;
+    padding-right: 10px;
 }
 
-.dd-content-main {
-    display: flex;
-    flex-grow: 1;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 15px; /* Modern spacing */
-}
-
-.tree-field {
-    display: inline-flex;
-    align-items: center;
-}
-
-.tree-field img {
-    max-height: 30px;
-    border-radius: 3px;
-}
-
-.dd-content-actions {
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
-    margin-left: 15px;
-}
-
-.dd-content-actions .bread-actions {
+/* Use generic selector for action container to avoid ID duplication issues */
+.browse-tree .dd-content-actions > div { 
     display: flex;
     gap: 5px;
 }
 
-/* Helpers for alignment */
-.tree-field.ml-auto {
-    margin-left: auto;
-}
-
-.tree-field.text-right {
-    justify-content: flex-end;
-}
-
-.tree-field.text-center {
+.browse-tree .bread-actions a.btn-sm {
+    background: none;
+    padding: 0 5px;
+    display: flex;
     justify-content: center;
+    align-items: center;
+    color: #adadad;
+    transition: all .4s ease;
+    border: none;
+    box-shadow: none;
 }
 
-/********** END SortableJS Tree Styles **********/
+.browse-tree #bread-actions a.btn-sm i,
+.browse-tree .bread-actions a.btn-sm i {
+    font-size: 14px;
+}
+
+/* Action Button Colors on Hover */
+.browse-tree #bread-actions a.btn-sm.btn-danger:hover i,
+.browse-tree .bread-actions a.btn-sm.btn-danger:hover i {
+    color: #FF1100;
+}
+.browse-tree #bread-actions a.btn-sm.btn-primary:hover i,
+.browse-tree .bread-actions a.btn-sm.btn-primary:hover i {
+    color: #419eff;
+}
+.browse-tree #bread-actions a.btn-sm.btn-warning:hover i,
+.browse-tree .bread-actions a.btn-sm.btn-warning:hover i {
+    color: #dbae3a;
+}
+.browse-tree #bread-actions a.btn-sm.btn-success:hover i,
+.browse-tree .bread-actions a.btn-sm.btn-success:hover i {
+    color: #28b066;
+}
+
+/* Ensure no-sort no-click doesn't hide things accidentally */
+.browse-tree .no-sort, .browse-tree .no-click {
+    cursor: default;
+}
+
+.browse-tree .dd-content-actions a span {
+    display: none;
+}

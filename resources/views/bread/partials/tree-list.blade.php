@@ -9,6 +9,14 @@
 
     <li data-record-id="{{$item['id']}}" data-slug="{{$dataType->slug}}" class="dd-item @if(isset($item['status']) && $item['status'] === 0) unpublished-record @endif" data-id="{{ $item['id'] }}">
 
+        <div class="dd-tree-handle">
+            <div class="dd-tree-move">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+
         <div class="dd-handle">
             <div class="dd-content-holder">
                 <div class="dd-content-main">
@@ -16,18 +24,30 @@
                     @if($row->browse)
                         @php
                             $display_options = $row->details->display ?? NULL;
+                            $class = "tree-" . $row->field;
+                            if($row->field !== 'id' && $row->field !== 'parent_id' && $row->field !== 'status') {
+                                $class .= " tree-extra-fields";
+                            }
+                            if(isset($row->details->browse_tree_push_right)) {
+                                $class .= " right-auto";
+                            }
+                            if(isset($row->details->browse_align)) {
+                                $class .= " " . $row->details->browse_align;
+                            }
                         @endphp
-                        {{-- Handle Inline Checkbox --}}
+
+                        {{-- Handle Inline Checkbox (Status) --}}
                         @if(isset($row->details->browse_inline_checkbox))
-                        <span class="tree-field tree-{{ $row->field }}">
-                            <input type="checkbox" data-id="{{ $item['id'] }}" name="{{ $row->field }}" @if($item[$row->field]) checked @endif class="tiny-toggle" data-tt-type="dot" data-tt-size="tiny">
+                        <span class="{{ $class }}">
+                            <div class="tt">
+                                <input type="checkbox" data-id="{{ $item['id'] }}" name="{{ $row->field }}" @if($item[$row->field]) checked @endif class="tiny-toggle" data-tt-type="dot" data-tt-size="tiny">
+                            </div>
                         </span>
                         @else
                             {{-- Skip parent_id field in display --}}
                             @if($row->field !== 'parent_id')
-                                <span class="tree-field tree-{{$row->field}} @if(isset($row->details->browse_tree_push_right)) ml-auto @endif" 
-                                      @if(isset($row->details->browse_width)) style="width:{{ $row->details->browse_width }}; flex-shrink: 0;" @endif
-                                      @if(isset($row->details->browse_align)) class="{{ $row->details->browse_align }}" @endif>
+                                <span class="{{ $class }}"
+                                      @if(isset($row->details->browse_width)) style="width:{{ $row->details->browse_width }}; flex-shrink: 0;" @endif>
                                     
                                     @if(isset($row->details->url)) <a href="{{ route('voyager.'.$dataType->slug.'.'.$row->details->url, $item['id']) }}"> @endif
                                     
