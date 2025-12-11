@@ -12,7 +12,8 @@
 @if(isset($options->on) && isset($options->off))
     <input type="checkbox" name="{{ $row->field }}" class="{{ $class }}"
         data-on="{{ $options->on }}" {!! $checked ? 'checked="checked"' : '' !!}
-        data-off="{{ $options->off }}">
+        data-off="{{ $options->off }}"
+        @if(isset($options->width)) data-width="{{ $options->width }}" @endif>
 @else
     <input type="checkbox" name="{{ $row->field }}" class="{{ $class }}"
         @if($checked) checked @endif>

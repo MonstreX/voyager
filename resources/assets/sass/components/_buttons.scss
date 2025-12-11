@@ -118,3 +118,9 @@
     transition: border .2s linear,color .2s linear,width .2s linear,background-color .2s linear;
     -webkit-font-smoothing: subpixel-antialiased;
 }
+
+.voyager .btn:active,
+.voyager .btn.active {
+  -webkit-box-shadow:none;
+  box-shadow: none;
+}
