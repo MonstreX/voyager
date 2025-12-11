@@ -14,25 +14,6 @@
     </div>
 @stop
 
-{{-- Clone record modal --}}
-<div class="modal modal-warning fade" tabindex="-1" id="clone_modal" role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title"><i class="voyager-documentation"></i> {{ __('voyager::generic.clone_confirm') }}</h4>
-            </div>
-            <div class="modal-footer">
-                <form action="#" id="clone_form" method="POST">
-                    {{ csrf_field() }}
-                    <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
-                    <input type="submit" class="btn btn-warning clone-confirm" value="{{ __('voyager::generic.yes_please') }}">
-                </form>
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-
 @section('content')
 <div class="page-content container-fluid browse-tree">
     @include('voyager::alerts')
@@ -86,6 +67,25 @@
                         {{ csrf_field() }}
                         <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
                         <input type="submit" class="btn btn-danger delete-confirm" value="{{ __('voyager::generic.delete_confirm') }}">
+                    </form>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    {{-- Clone record modal --}}
+    <div class="modal modal-warning fade" tabindex="-1" id="clone_modal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><i class="voyager-documentation"></i> {{ __('voyager::generic.clone_confirm') }}</h4>
+                </div>
+                <div class="modal-footer">
+                    <form action="#" id="clone_form" method="POST">
+                        {{ csrf_field() }}
+                        <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
+                        <input type="submit" class="btn btn-warning clone-confirm" value="{{ __('voyager::generic.yes_please') }}">
                     </form>
                 </div>
             </div><!-- /.modal-content -->
