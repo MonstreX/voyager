@@ -181,13 +181,11 @@
 }
 
 /* Dragging State */
-.dd-dragel {
-    position: absolute;
-    pointer-events: none;
-    z-index: 9999;
+.dd-dragging {
+    opacity: 0.5;
 }
-.dd-dragel .dd-content-actions {
-    display: none;
+.dd-dragging .bread-actions a {
+    display: none !important;
 }
 
 /* Field Specific Styles */
