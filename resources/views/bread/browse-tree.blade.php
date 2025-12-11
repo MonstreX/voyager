@@ -95,7 +95,7 @@
 
 @section('javascript')
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', () => {
     @if ($isModelTranslatable)
         if (window.VoyagerInitMultilingual) {
             window.VoyagerInitMultilingual('.side-body');
@@ -103,70 +103,65 @@ document.addEventListener('DOMContentLoaded', function () {
     @endif
 
     // Init Nestable
-    var nestableContainer = document.querySelector('.dd');
+    const nestableContainer = document.querySelector('.dd');
     if (nestableContainer && window.VoyagerInitNestable) {
         window.VoyagerInitNestable(nestableContainer, {
             handle: '.dd-tree-handle'
         });
-        
-        // Listen for custom event from our wrapper (if it emits one) 
-        // or use native Nestable events if available via wrapper
-        // Assuming VoyagerInitNestable sets up the plugin.
-        // If the wrapper doesn't expose 'change', we might need to rely on DOM mutations or the wrapper implementation.
-        
+
         // Our 'nestable.js' component emits 'voyager.sortable.updated'
-        nestableContainer.addEventListener('voyager.sortable.updated', function (e) {
-             var structure = e.detail && e.detail.structure
+        nestableContainer.addEventListener('voyager.sortable.updated', (e) => {
+            const structure = e.detail && e.detail.structure
                 ? e.detail.structure
                 : (window.VoyagerSerializeNestable ? window.VoyagerSerializeNestable(nestableContainer) : []);
 
-             var params = new URLSearchParams();
-             params.append('slug', '{{ $dataType->slug }}');
-             params.append('order', JSON.stringify(structure));
-             params.append('_token', '{{ csrf_token() }}');
+            const params = new URLSearchParams();
+            params.append('slug', '{{ $dataType->slug }}');
+            params.append('order', JSON.stringify(structure));
+            params.append('_token', '{{ csrf_token() }}');
 
-             fetch('{{ route('voyager.'.$dataType->slug.'.tree-order') }}', {
-                 method: 'POST',
-                 body: params,
-                 headers: {
-                     'Content-Type': 'application/x-www-form-urlencoded',
-                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                     'Accept': 'application/json'
-                 }
-             })
-             .then(response => response.json())
-             .then(data => {
-                 if (data.status === 'success') {
-                     toastr.success(data.message);
-                 } else {
-                     toastr.error(data.message || "Error updating order");
-                 }
-             })
-             .catch(error => {
-                 console.error('Error:', error);
-                 toastr.error("Error updating order");
-             });
+            fetch('{{ route('voyager.'.$dataType->slug.'.tree-order') }}', {
+                method: 'POST',
+                body: params,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    toastr.success(data.message);
+                } else {
+                    toastr.error(data.message || "Error updating order");
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                toastr.error("Error updating order");
+            });
         });
     }
 
     // Collapse/Expand Logic
-    var nestableList = document.querySelector('.dd');
+    const nestableList = document.querySelector('.dd');
     if (nestableList) {
-        nestableList.addEventListener('click', function(e) {
-            var target = e.target;
+        nestableList.addEventListener('click', (e) => {
+            const target = e.target;
             if (target.tagName === 'BUTTON') {
-                var action = target.getAttribute('data-action');
-                var li = target.closest('.dd-item');
+                const action = target.getAttribute('data-action');
+                const li = target.closest('.dd-item');
                 if (action === 'collapse') {
                     li.classList.add('dd-collapsed');
                     target.style.display = 'none';
-                    var expandBtn = li.querySelector('[data-action="expand"]');
+                    const expandBtn = li.querySelector('[data-action="expand"]');
                     if (expandBtn) expandBtn.style.display = 'block';
                 }
                 if (action === 'expand') {
                     li.classList.remove('dd-collapsed');
                     target.style.display = 'none';
-                    var collapseBtn = li.querySelector('[data-action="collapse"]');
+                    const collapseBtn = li.querySelector('[data-action="collapse"]');
                     if (collapseBtn) collapseBtn.style.display = 'block';
                 }
             }
@@ -174,38 +169,38 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Delete Modal Logic
-    var deleteFormAction;
-    var deleteModal = document.getElementById('delete_modal');
-    var deleteForm = document.getElementById('delete_form');
-    var cloneModal = document.getElementById('clone_modal');
-    var cloneForm = document.getElementById('clone_form');
+    let deleteFormAction;
+    const deleteModal = document.getElementById('delete_modal');
+    const deleteForm = document.getElementById('delete_form');
+    const cloneModal = document.getElementById('clone_modal');
+    const cloneForm = document.getElementById('clone_form');
 
     // Vanilla JS delegation for .delete buttons
-    document.addEventListener('click', function(e) {
-        var target = e.target.closest('.delete'); // Handle click on icon inside button
+    document.addEventListener('click', (e) => {
+        const target = e.target.closest('.delete');
         if (target && document.querySelector('.dd').contains(target)) {
             e.preventDefault();
             deleteFormAction = target.getAttribute('data-action') || target.getAttribute('href');
 
             // If the button is a link (href), use that as action, otherwise construct standard route
             if (!deleteFormAction || deleteFormAction === 'javascript:;') {
-                 var id = target.getAttribute('data-id');
-                 // Default Voyager route: /admin/slug/id
-                 deleteFormAction = '{{ route('voyager.'.$dataType->slug.'.destroy', ['id' => '__id']) }}'.replace('__id', id);
+                const id = target.getAttribute('data-id');
+                // Default Voyager route: /admin/slug/id
+                deleteFormAction = '{{ route('voyager.'.$dataType->slug.'.destroy', ['id' => '__id']) }}'.replace('__id', id);
             }
 
             deleteForm.action = deleteFormAction;
 
             // Show modal using Voyager's bootstrap compatibility or standard jQuery
             if (window.Voyager && window.Voyager.bootstrap && window.Voyager.bootstrap.showModal) {
-                 window.Voyager.bootstrap.showModal(deleteModal);
+                window.Voyager.bootstrap.showModal(deleteModal);
             } else if (typeof $ !== 'undefined') {
                 $('#delete_modal').modal('show');
             } else {
                 // Vanilla fallback if no helpers
                 deleteModal.classList.add('in');
                 deleteModal.style.display = 'block';
-                var backdrop = document.createElement('div');
+                const backdrop = document.createElement('div');
                 backdrop.className = 'modal-backdrop fade in';
                 document.body.appendChild(backdrop);
             }
@@ -213,26 +208,26 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Vanilla JS delegation for .clone buttons
-    document.addEventListener('click', function(e) {
-        var cloneBtn = e.target.closest('.clone');
+    document.addEventListener('click', (e) => {
+        const cloneBtn = e.target.closest('.clone');
         if (cloneBtn && document.querySelector('.dd').contains(cloneBtn)) {
             e.preventDefault();
-            var id = cloneBtn.dataset.id;
+            const id = cloneBtn.dataset.id;
             if (id) {
-                var cloneUrl = '{{ route("voyager.".$dataType->slug.".clone", ["id" => "__id"]) }}'.replace('__id', id);
+                const cloneUrl = '{{ route("voyager.".$dataType->slug.".clone", ["id" => "__id"]) }}'.replace('__id', id);
                 cloneForm.setAttribute('action', cloneUrl);
             }
 
             // Show modal using Voyager's bootstrap compatibility or standard jQuery
             if (window.Voyager && window.Voyager.bootstrap && window.Voyager.bootstrap.showModal) {
-                 window.Voyager.bootstrap.showModal(cloneModal);
+                window.Voyager.bootstrap.showModal(cloneModal);
             } else if (typeof $ !== 'undefined') {
                 $('#clone_modal').modal('show');
             } else {
                 // Vanilla fallback if no helpers
                 cloneModal.classList.add('in');
                 cloneModal.style.display = 'block';
-                var backdrop = document.createElement('div');
+                const backdrop = document.createElement('div');
                 backdrop.className = 'modal-backdrop fade in';
                 document.body.appendChild(backdrop);
             }
@@ -240,18 +235,18 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Inline Status Toggle Logic
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', (e) => {
         if (e.target.classList.contains('voyager-status-toggle')) {
-            var toggle = e.target;
-            var id = toggle.dataset.id;
-            var field = toggle.dataset.field;
-            var slug = toggle.dataset.slug;
-            var currentValue = parseInt(toggle.dataset.value);
-            var newValue = currentValue ? 0 : 1;
-            
-            var updateUrl = '{{ route("voyager.".$dataType->slug.".update-field", ["id" => "__id"]) }}'.replace('__id', id);
+            const toggle = e.target;
+            const id = toggle.dataset.id;
+            const field = toggle.dataset.field;
+            const slug = toggle.dataset.slug;
+            const currentValue = parseInt(toggle.dataset.value);
+            const newValue = currentValue ? 0 : 1;
 
-            var params = new URLSearchParams();
+            const updateUrl = '{{ route("voyager.".$dataType->slug.".update-field", ["id" => "__id"]) }}'.replace('__id', id);
+
+            const params = new URLSearchParams();
             params.append('field', field);
             params.append('value', newValue);
             params.append('slug', slug);
@@ -262,7 +257,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 body: params,
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                     'Accept': 'application/json'
+                    'Accept': 'application/json'
                 }
             })
             .then(response => response.json())
@@ -287,7 +282,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
     });
-
 });
 </script>
 @stop

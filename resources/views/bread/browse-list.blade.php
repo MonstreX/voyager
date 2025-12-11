@@ -433,9 +433,9 @@
 
 @section('javascript')
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', () => {
             @if ($dataType->server_side)
-                document.querySelectorAll('#search-input select').forEach(function (select) {
+                document.querySelectorAll('#search-input select').forEach((select) => {
                     select.dataset.voyagerDisableSearch = 'true';
                     if (window.VoyagerSelectRefresh) {
                         window.VoyagerSelectRefresh(select);
@@ -449,34 +449,34 @@
                 }
             @endif
 
-            var selectAllToggle = document.querySelector('.select_all');
+            const selectAllToggle = document.querySelector('.select_all');
             if (selectAllToggle) {
-                selectAllToggle.addEventListener('click', function (event) {
-                    var checked = event.currentTarget.checked;
-                    document.querySelectorAll('input[name="row_id"]').forEach(function (checkbox) {
+                selectAllToggle.addEventListener('click', (event) => {
+                    const checked = event.currentTarget.checked;
+                    document.querySelectorAll('input[name="row_id"]').forEach((checkbox) => {
                         checkbox.checked = checked;
                         checkbox.dispatchEvent(new Event('change'));
                     });
                 });
             }
 
-            var deleteModal = document.getElementById('delete_modal');
-            var deleteForm = document.getElementById('delete_form');
-            var deleteActionTemplate = deleteForm ? deleteForm.getAttribute('action') : '';
-            var bootstrapCompat = window.VoyagerBootstrapCompat;
+            const deleteModal = document.getElementById('delete_modal');
+            const deleteForm = document.getElementById('delete_form');
+            const deleteActionTemplate = deleteForm ? deleteForm.getAttribute('action') : '';
+            const bootstrapCompat = window.VoyagerBootstrapCompat;
 
-            function openDeleteModal(button) {
+            const openDeleteModal = (button) => {
                 if (!deleteModal || !deleteForm || !deleteActionTemplate) {
                     return;
                 }
-                var id = button.dataset.id;
+                const id = button.dataset.id;
                 if (id) {
                     deleteForm.setAttribute('action', deleteActionTemplate.replace('__id', id));
                 }
                 showModal(deleteModal);
-            }
+            };
 
-            function showModal(modal) {
+            const showModal = (modal) => {
                 if (bootstrapCompat && typeof bootstrapCompat.showModal === 'function') {
                     bootstrapCompat.showModal(modal);
                     return;
@@ -484,49 +484,49 @@
                 modal.classList.add('in');
                 modal.style.display = 'block';
                 modal.setAttribute('aria-hidden', 'false');
-                var backdrop = document.createElement('div');
+                const backdrop = document.createElement('div');
                 backdrop.className = 'modal-backdrop fade in';
                 backdrop.dataset.modalTarget = modal.id;
                 document.body.appendChild(backdrop);
                 document.body.classList.add('modal-open');
-            }
+            };
 
             // Clone Record Handler - defined before delete to ensure showModal is accessible
-            var cloneModal = document.getElementById('clone_modal');
-            var cloneForm = document.getElementById('clone_form');
+            const cloneModal = document.getElementById('clone_modal');
+            const cloneForm = document.getElementById('clone_form');
 
-            function openCloneModal(button) {
+            const openCloneModal = (button) => {
                 if (!cloneModal || !cloneForm) {
                     return;
                 }
-                var id = button.dataset.id;
+                const id = button.dataset.id;
                 if (id) {
-                    var cloneUrl = '{{ route("voyager.".$dataType->slug.".clone", ["id" => "__id"]) }}'.replace('__id', id);
+                    const cloneUrl = '{{ route("voyager.".$dataType->slug.".clone", ["id" => "__id"]) }}'.replace('__id', id);
                     cloneForm.setAttribute('action', cloneUrl);
                 }
                 showModal(cloneModal);
-            }
+            };
 
-            document.querySelectorAll('td .clone').forEach(function (button) {
-                button.addEventListener('click', function (event) {
+            document.querySelectorAll('td .clone').forEach((button) => {
+                button.addEventListener('click', (event) => {
                     event.preventDefault();
                     openCloneModal(event.currentTarget);
                 });
             });
 
-            document.querySelectorAll('td .delete').forEach(function (button) {
-                button.addEventListener('click', function (event) {
+            document.querySelectorAll('td .delete').forEach((button) => {
+                button.addEventListener('click', (event) => {
                     event.preventDefault();
                     openDeleteModal(event.currentTarget);
                 });
             });
 
             @if($usesSoftDeletes)
-                var softDeleteToggle = document.getElementById('show_soft_deletes');
+                const softDeleteToggle = document.getElementById('show_soft_deletes');
                 if (softDeleteToggle) {
-                    softDeleteToggle.addEventListener('change', function (event) {
-                        var checked = event.currentTarget.checked;
-                        var targetUrl = checked
+                    softDeleteToggle.addEventListener('change', (event) => {
+                        const checked = event.currentTarget.checked;
+                        const targetUrl = checked
                             ? "{{ route('voyager.'.$dataType->slug.'.index', array_merge($params, ['showSoftDeleted' => 1]), true) }}"
                             : "{{ route('voyager.'.$dataType->slug.'.index', array_merge($params, ['showSoftDeleted' => 0]), true) }}";
                         window.location.href = targetUrl;
@@ -534,12 +534,12 @@
                 }
             @endif
 
-            var selectedInput = document.querySelector('.selected_ids');
+            const selectedInput = document.querySelector('.selected_ids');
             if (selectedInput) {
-                document.querySelectorAll('input[name="row_id"]').forEach(function (checkbox) {
-                    checkbox.addEventListener('change', function () {
-                        var ids = [];
-                        document.querySelectorAll('input[name="row_id"]:checked').forEach(function (checkedBox) {
+                document.querySelectorAll('input[name="row_id"]').forEach((checkbox) => {
+                    checkbox.addEventListener('change', () => {
+                        const ids = [];
+                        document.querySelectorAll('input[name="row_id"]:checked').forEach((checkedBox) => {
                             ids.push(checkedBox.value);
                         });
                         selectedInput.value = ids.join(',');
@@ -548,18 +548,18 @@
             }
 
             // Inline Status Toggle Logic
-            document.addEventListener('click', function(e) {
+            document.addEventListener('click', (e) => {
                 if (e.target.classList.contains('voyager-status-toggle')) {
-                    var toggle = e.target;
-                    var id = toggle.dataset.id;
-                    var field = toggle.dataset.field;
-                    var slug = toggle.dataset.slug;
-                    var currentValue = parseInt(toggle.dataset.value);
-                    var newValue = currentValue ? 0 : 1;
-                    
-                    var updateUrl = '{{ route("voyager.".$dataType->slug.".update-field", ["id" => "__id"]) }}'.replace('__id', id);
+                    const toggle = e.target;
+                    const id = toggle.dataset.id;
+                    const field = toggle.dataset.field;
+                    const slug = toggle.dataset.slug;
+                    const currentValue = parseInt(toggle.dataset.value);
+                    const newValue = currentValue ? 0 : 1;
 
-                    var params = new URLSearchParams();
+                    const updateUrl = '{{ route("voyager.".$dataType->slug.".update-field", ["id" => "__id"]) }}'.replace('__id', id);
+
+                    const params = new URLSearchParams();
                     params.append('field', field);
                     params.append('value', newValue);
                     params.append('slug', slug);
@@ -595,76 +595,76 @@
                     });
                             }
                         });
-                
+
                         // Inline Edit button
-                        document.addEventListener('click', function(e) {
+                        document.addEventListener('click', (e) => {
                             if (e.target.closest('.text-inline-edit')) {
-                                var editButton = e.target.closest('.text-inline-edit');
-                                var textHolder = editButton.closest('.browse-text-holder');
-                                var fieldHolder = editButton.closest('.text-field-holder');
-                                var editorHolder = fieldHolder.querySelector('.browse-inline-editor');
-                
+                                const editButton = e.target.closest('.text-inline-edit');
+                                const textHolder = editButton.closest('.browse-text-holder');
+                                const fieldHolder = editButton.closest('.text-field-holder');
+                                const editorHolder = fieldHolder.querySelector('.browse-inline-editor');
+
                                 if (textHolder) textHolder.style.display = 'none';
                                 if (editorHolder) {
                                     editorHolder.style.display = 'flex';
-                                    var input = editorHolder.querySelector('.browse-inline-input');
+                                    const input = editorHolder.querySelector('.browse-inline-input');
                                     if (input) input.focus();
                                 }
                             }
                         });
-                
+
                         // Inline Cancel button
-                        document.addEventListener('click', function(e) {
+                        document.addEventListener('click', (e) => {
                             if (e.target.closest('.text-inline-cancel')) {
-                                var cancelButton = e.target.closest('.text-inline-cancel');
-                                var editorHolder = cancelButton.closest('.browse-inline-editor');
-                                var fieldHolder = cancelButton.closest('.text-field-holder');
-                                var textHolder = fieldHolder.querySelector('.browse-text-holder');
-                
+                                const cancelButton = e.target.closest('.text-inline-cancel');
+                                const editorHolder = cancelButton.closest('.browse-inline-editor');
+                                const fieldHolder = cancelButton.closest('.text-field-holder');
+                                const textHolder = fieldHolder.querySelector('.browse-text-holder');
+
                                 if (editorHolder) editorHolder.style.display = 'none';
                                 if (textHolder) textHolder.style.display = 'flex';
                             }
                         });
-                
+
                         // Inline press Enter
-                        document.addEventListener('keypress', function(e) {
+                        document.addEventListener('keypress', (e) => {
                             if (e.key === 'Enter' && e.target.classList.contains('browse-inline-input')) {
                                 e.target.closest('.browse-inline-editor').querySelector('.text-inline-save').click();
                             }
                         });
-                
+
                         // Inline Save button
-                        document.addEventListener('click', function(e) {
+                        document.addEventListener('click', (e) => {
                             if (e.target.closest('.text-inline-save')) {
-                                var saveButton = e.target.closest('.text-inline-save');
-                                var editorHolder = saveButton.closest('.browse-inline-editor');
-                                var input = editorHolder.querySelector('.browse-inline-input');
-                                var fieldHolder = editorHolder.closest('.text-field-holder');
-                                var textHolder = fieldHolder.querySelector('.browse-text-holder');
-                
-                                var parentRow = saveButton.closest('tr');
-                                var dataTypeSlug = parentRow ? parentRow.dataset.slug : ''; // Get slug from tr
-                                var recordId = input.dataset.id;
-                                var fieldName = input.name;
-                                var newValue = input.value;
-                
+                                const saveButton = e.target.closest('.text-inline-save');
+                                const editorHolder = saveButton.closest('.browse-inline-editor');
+                                const input = editorHolder.querySelector('.browse-inline-input');
+                                const fieldHolder = editorHolder.closest('.text-field-holder');
+                                const textHolder = fieldHolder.querySelector('.browse-text-holder');
+
+                                const parentRow = saveButton.closest('tr');
+                                const dataTypeSlug = parentRow ? parentRow.dataset.slug : '';
+                                const recordId = input.dataset.id;
+                                const fieldName = input.name;
+                                const newValue = input.value;
+
                                 // Hide editor, show text holder, update displayed text
                                 if (editorHolder) editorHolder.style.display = 'none';
                                 if (textHolder) {
                                     textHolder.style.display = 'flex';
-                                    var displayedText = textHolder.querySelector('div');
+                                    const displayedText = textHolder.querySelector('div');
                                     if (displayedText) displayedText.textContent = newValue;
                                 }
-                
+
                                 // Send AJAX request
-                                var updateUrl = '{{ route("voyager.".$dataType->slug.".update-field", ["id" => "__id"]) }}'.replace('__id', recordId);
-                
-                                var params = new URLSearchParams();
+                                const updateUrl = '{{ route("voyager.".$dataType->slug.".update-field", ["id" => "__id"]) }}'.replace('__id', recordId);
+
+                                const params = new URLSearchParams();
                                 params.append('field', fieldName);
                                 params.append('value', newValue);
                                 params.append('slug', dataTypeSlug);
                                 params.append('_token', '{{ csrf_token() }}');
-                
+
                                 fetch(updateUrl, {
                                     method: 'POST',
                                     body: params,
@@ -679,13 +679,11 @@
                                         toastr.success(data.message);
                                     } else {
                                         toastr.error(data.message || "Error updating field");
-                                        // Optionally revert text or re-show editor on error
                                     }
                                 })
                                 .catch(error => {
                                     console.error('Error:', error);
                                     toastr.error("Error updating field");
-                                    // Optionally revert text or re-show editor on error
                                 });
                             }
                         });
