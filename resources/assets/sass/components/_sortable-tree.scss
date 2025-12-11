@@ -258,6 +258,7 @@
 
 .browse-tree .bread-actions {
     display: flex;
+    flex-direction: row-reverse;
     gap: 4px;
     justify-content: flex-end;
     flex-wrap: wrap;
