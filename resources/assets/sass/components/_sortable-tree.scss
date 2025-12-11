@@ -251,9 +251,21 @@
 }
 
 /* Use generic selector for action container to avoid ID duplication issues */
-.browse-tree .dd-content-actions > div { 
+.browse-tree .dd-content-actions > div {
     display: flex;
     gap: 5px;
+}
+
+.browse-tree .bread-actions {
+    display: flex;
+    gap: 4px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.browse-tree .bread-actions a {
+    float: none;
 }
 
 .browse-tree .bread-actions a.btn-sm {
