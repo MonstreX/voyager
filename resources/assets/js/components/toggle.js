@@ -181,7 +181,7 @@ export const initToggleSwitches = (target) => {
                 const offWidth = toggleOff.getBoundingClientRect().width;
                 const handleWidth = handle.getBoundingClientRect().width || 0;
                 const maxLabelWidth = Math.max(onWidth, offWidth);
-                const padding = 20;
+                const padding = 20; // Padding on each side
                 const width = maxLabelWidth + handleWidth + padding * 2;
                 wrapper.style.width = `${Math.ceil(width)}px`;
             }
