@@ -184,12 +184,12 @@ class Voyager
 
     public function actions()
     {
-        // Sort actions by order property (ascending)
+        // Sort actions by order property (descending - right to left)
         $sortedActions = $this->actions;
         usort($sortedActions, function ($actionA, $actionB) {
             $objA = new $actionA(null, null);
             $objB = new $actionB(null, null);
-            return $objA->getOrder() <=> $objB->getOrder();
+            return $objB->getOrder() <=> $objA->getOrder();
         });
         return $sortedActions;
     }
