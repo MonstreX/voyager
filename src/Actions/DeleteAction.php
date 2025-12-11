@@ -22,7 +22,7 @@ class DeleteAction extends AbstractAction
     public function getAttributes()
     {
         return [
-            'class'   => 'btn btn-sm btn-danger pull-right delete',
+            'class'   => 'btn btn-sm btn-danger delete',
             'data-id' => $this->data->{$this->data->getKeyName()},
             'id'      => 'delete-'.$this->data->{$this->data->getKeyName()},
         ];

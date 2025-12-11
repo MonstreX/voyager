@@ -22,7 +22,7 @@ class RestoreAction extends AbstractAction
     public function getAttributes()
     {
         return [
-            'class'   => 'btn btn-sm btn-success pull-right restore',
+            'class'   => 'btn btn-sm btn-success restore',
             'data-id' => $this->data->{$this->data->getKeyName()},
             'id'      => 'restore-'.$this->data->{$this->data->getKeyName()},
         ];

@@ -22,7 +22,7 @@ class CloneAction extends AbstractAction
     public function getAttributes()
     {
         return [
-            'class'   => 'btn btn-sm btn-success pull-right clone',
+            'class'   => 'btn btn-sm btn-success clone',
             'data-id' => $this->data->{$this->data->getKeyName()},
             'id'      => 'clone-'.$this->data->{$this->data->getKeyName()},
         ];
