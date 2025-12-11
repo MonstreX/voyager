@@ -261,4 +261,16 @@ return [
            ],
        ]*/
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Clone Record Action
+    |--------------------------------------------------------------------------
+    |
+    | Here you can enable/disable the clone record action.
+    | Configure cloning per-model using the $clone property on your model.
+    |
+    */
+
+    'clone_enabled' => env('VOYAGER_CLONE_ENABLED', true),
 ];

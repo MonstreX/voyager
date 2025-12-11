@@ -127,6 +127,11 @@ class VoyagerServiceProvider extends ServiceProvider
 
         $this->bootTranslatorCollectionMacros();
 
+        // Register Clone Action if enabled
+        if (config('voyager.clone_enabled', true)) {
+            VoyagerFacade::addAction(\TCG\Voyager\Actions\CloneAction::class);
+        }
+
         if (method_exists('Paginator', 'useBootstrap')) {
             Paginator::useBootstrap();
         }

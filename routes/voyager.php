@@ -50,6 +50,7 @@ Route::group(['as' => 'voyager.'], function () {
                 // Extension Routes
                 Route::post($dataType->slug.'/tree-order', '\TCG\Voyager\Http\Controllers\VoyagerModelController@order')->name($dataType->slug.'.tree-order');
                 Route::post($dataType->slug.'/{id}/update-field', '\TCG\Voyager\Http\Controllers\VoyagerModelController@update_field')->name($dataType->slug.'.update-field');
+                Route::post($dataType->slug.'/{id}/clone', '\TCG\Voyager\Http\Controllers\VoyagerModelController@clone')->name($dataType->slug.'.clone');
                 Route::resource($dataType->slug, $breadController, ['parameters' => [$dataType->slug => 'id']]);
             }
         } catch (\InvalidArgumentException $e) {

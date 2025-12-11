@@ -114,4 +114,9 @@ return [
     'yes'                    => 'Yes',
     'yes_please'             => 'Yes, Please',
     'contains'               => 'contains',
+    'clone'                  => 'Clone',
+    'clone_confirm'          => 'Are you sure you want to clone this record?',
+    'successfully_cloned'    => 'Successfully cloned :type',
+    'error_cloning'          => 'Error cloning :type',
+    'unauthorized_action'    => 'You are not authorized to perform this action',
 ];

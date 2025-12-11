@@ -239,6 +239,31 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
     });
+
+    // Clone Record Handler
+    document.addEventListener('click', function(e) {
+        var cloneBtn = e.target.closest('.clone');
+        if (cloneBtn && document.querySelector('.dd').contains(cloneBtn)) {
+            e.preventDefault();
+            var recordId = cloneBtn.dataset.id;
+            var cloneUrl = '{{ route("voyager.".$dataType->slug.".clone", ["id" => "__id"]) }}'.replace('__id', recordId);
+
+            if (confirm('{{ __("voyager::generic.clone_confirm") }}')) {
+                var form = document.createElement('form');
+                form.method = 'POST';
+                form.action = cloneUrl;
+
+                var csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = '_token';
+                csrfInput.value = '{{ csrf_token() }}';
+
+                form.appendChild(csrfInput);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+    });
 });
 </script>
 @stop

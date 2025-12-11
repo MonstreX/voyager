@@ -155,10 +155,9 @@
                                                     @include($row->details->view, ['row' => $row, 'dataType' => $dataType, 'dataTypeContent' => $dataTypeContent, 'content' => $data->{$row->field}, 'action' => 'browse', 'view' => 'browse', 'options' => $row->details])
                                                 @elseif($row->type == 'image')
                                                     @php
-                                                        if (isset($row->details->browse_image_max_height)) {
+                                                        $imageStyle = 'width:100px';
+                                                        if ($row->details && property_exists($row->details, 'browse_image_max_height') && $row->details->browse_image_max_height) {
                                                             $imageStyle = 'width:auto;max-height:' . $row->details->browse_image_max_height;
-                                                        } else {
-                                                            $imageStyle = 'width:100px';
                                                         }
                                                     @endphp
                                                     <img src="@if( !filter_var($data->{$row->field}, FILTER_VALIDATE_URL)){{ Voyager::image( $data->{$row->field} ) }}@else{{ $data->{$row->field} }}@endif" style="{{ $imageStyle }}">
@@ -649,6 +648,31 @@
                             }
                         });
                     });
-                
+
+            // Clone Record Handler
+            var cloneButtons = document.querySelectorAll('td .clone');
+            cloneButtons.forEach(function(button) {
+                button.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    var recordId = this.dataset.id;
+                    var cloneUrl = '{{ route("voyager.".$dataType->slug.".clone", ["id" => "__id"]) }}'.replace('__id', recordId);
+
+                    if (confirm('{{ __("voyager::generic.clone_confirm") }}')) {
+                        var form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = cloneUrl;
+
+                        var csrfInput = document.createElement('input');
+                        csrfInput.type = 'hidden';
+                        csrfInput.name = '_token';
+                        csrfInput.value = '{{ csrf_token() }}';
+
+                        form.appendChild(csrfInput);
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                });
+            });
+
     </script>
 @stop

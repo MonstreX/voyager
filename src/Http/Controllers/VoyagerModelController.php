@@ -97,4 +97,63 @@ class VoyagerModelController extends Controller
             ]
         ]);
     }
+
+    /**
+     * Clone a record
+     */
+    public function clone(Request $request, $id)
+    {
+        $slug = $this->getSlug($request);
+
+        $dataType = Voyager::model('DataType')->where('slug', '=', $slug)->first();
+        if (!$dataType) {
+            return redirect()->back()->with(['message' => __('voyager::generic.error_cloning', ['type' => 'Record']), 'alert-type' => 'error']);
+        }
+
+        // Check permission
+        try {
+            $this->authorize('add', app($dataType->model_name));
+        } catch (\Exception $e) {
+            return redirect()->back()->with(['message' => __('voyager::generic.unauthorized_action'), 'alert-type' => 'error']);
+        }
+
+        try {
+            // Load source and replicate
+            $source = app($dataType->model_name)->findOrFail($id);
+            $cloned = $source->replicate();
+
+            // Get clone config from model
+            $cloneConfig = property_exists($source, 'clone') ? $source->clone : [];
+
+            // Process each attribute
+            foreach ($cloned->getAttributes() as $field => $value) {
+                if (array_key_exists($field, $cloneConfig)) {
+                    $action = $cloneConfig[$field];
+
+                    if ($action === null) {
+                        // Reset field
+                        $cloned->{$field} = null;
+                    } elseif (is_string($action)) {
+                        // Append suffix
+                        $cloned->{$field} = $value . $action;
+                    }
+                }
+                // else: field not in config, keep cloned value as-is
+            }
+
+            // Save
+            $res = $cloned->save();
+
+            if ($res) {
+                return redirect()
+                    ->route("voyager.{$dataType->slug}.index")
+                    ->with(['message' => __('voyager::generic.successfully_cloned', ['type' => $dataType->display_name_singular]), 'alert-type' => 'success']);
+            } else {
+                return redirect()->back()->with(['message' => __('voyager::generic.error_cloning', ['type' => $dataType->display_name_singular]), 'alert-type' => 'error']);
+            }
+        } catch (\Exception $e) {
+            Log::error("Voyager Clone Error: " . $e->getMessage());
+            return redirect()->back()->with(['message' => __('voyager::generic.error_cloning', ['type' => 'Record']) . ' - ' . $e->getMessage(), 'alert-type' => 'error']);
+        }
+    }
 }
