@@ -188,6 +188,20 @@
     display: none !important;
 }
 
+/* Ghost Element (during drag) */
+.dd-ghost {
+    opacity: 0.5;
+    background: #f0f0f0;
+}
+.dd-ghost .dd-item,
+.dd-ghost .dd-content,
+.dd-ghost .dd-content-main {
+    display: block !important;
+}
+.dd-ghost .bread-actions a {
+    display: none !important;
+}
+
 /* Field Specific Styles */
 .browse-tree .dd-content-main .tree-extra-fields {
     margin: 0 10px;
