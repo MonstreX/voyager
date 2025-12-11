@@ -462,7 +462,7 @@
 
             const deleteModal = document.getElementById('delete_modal');
             const deleteForm = document.getElementById('delete_form');
-            const deleteActionTemplate = deleteForm ? deleteForm.getAttribute('action') : '';
+            const deleteActionTemplate = '{{ route("voyager.".$dataType->slug.".destroy", ["id" => "__id"]) }}';
             const bootstrapCompat = window.VoyagerBootstrapCompat;
 
             const openDeleteModal = (button) => {
