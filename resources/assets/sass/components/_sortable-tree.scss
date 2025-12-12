@@ -1,10 +1,10 @@
 /* Tree View Container */
 
 .panel-body.tree-items-list {
-    padding: 30px ;
+    padding: 30px;
 }
 
-.browse-tree .dd {
+.dd {
     position: relative;
     display: block;
     margin: 0;
@@ -14,7 +14,7 @@
     line-height: 20px;
 }
 
-.browse-tree .dd-list {
+.dd-list {
     display: block;
     position: relative;
     margin: 0;
@@ -22,13 +22,13 @@
     list-style: none;
 }
 
-.browse-tree .dd-list .dd-list {
+.dd-list .dd-list {
     padding-left: 30px;
 }
 
-.browse-tree .dd-item,
-.browse-tree .dd-empty,
-.browse-tree .dd-placeholder,
+.dd-item,
+.dd-empty,
+.dd-placeholder,
 .dd-dragging.dd-item {
     display: block;
     position: relative;
@@ -39,24 +39,24 @@
     line-height: 20px;
 }
 
-.browse-tree .tree-items-list .dd-collapsed .dd-collapse {
+.tree-items-list .dd-collapsed .dd-collapse {
     display: none;
 }
 
-.browse-tree .tree-items-list .dd-expand {
+.tree-items-list .dd-expand {
     display: none !important;
 }
 
-.browse-tree .tree-items-list .dd-collapsed .dd-expand {
+.tree-items-list .dd-collapsed .dd-expand {
     display: block !important;
 }
 
-.browse-tree .dd-collapsed .dd-list {
+.dd-collapsed .dd-list {
     display: none;
 }
 
 /* Tree Item Handle (Content Wrapper) */
-.browse-tree .tree-items-list .dd-handle,
+.tree-items-list .dd-handle,
 .dd-dragging .dd-handle {
     display: block;
     height: 42px;
@@ -74,7 +74,8 @@
 }
 
 /* Drag Handle (Left Side) */
-.browse-tree .tree-items-list .dd-tree-handle,
+
+.tree-items-list .dd-tree-handle,
 .dd-dragging .dd-tree-handle {
     position: absolute;
     margin: 0;
@@ -93,7 +94,7 @@
     z-index: 1;
 }
 
-.browse-tree .tree-items-list .dd-tree-move,
+.tree-items-list .dd-tree-move,
 .dd-dragging .dd-tree-move {
     display: flex;
     flex-direction: column;
@@ -105,11 +106,11 @@
     transition: all .4s ease;
 }
 
-.browse-tree .tree-items-list .dd-tree-move:hover {
+.tree-items-list .dd-tree-move:hover {
     background: #ddd;
 }
 
-.browse-tree .tree-items-list .dd-tree-move span,
+.tree-items-list .dd-tree-move span,
 .dd-dragging .dd-tree-move span {
     background: #929292;
     width: 10px;
@@ -118,7 +119,7 @@
 }
 
 /* Expand/Collapse Buttons */
-.browse-tree .tree-items-list .dd-item > button {
+.tree-items-list .dd-item > button {
     display: block;
     position: relative;
     cursor: pointer;
@@ -140,7 +141,7 @@
     z-index: 2;
 }
 
-.browse-tree .tree-items-list .dd-item > button:before {
+.tree-items-list .dd-item > button:before {
     content: '+';
     display: block;
     position: absolute;
@@ -151,12 +152,13 @@
     transform: translateY(-50%);
 }
 
-.browse-tree .tree-items-list .dd-item > button[data-action='collapse']:before {
+.tree-items-list .dd-item > button[data-action='collapse']:before {
     content: '-';
 }
 
 /* Content Layout */
-.browse-tree .tree-items-list .dd-content-holder,
+
+.tree-items-list .dd-content-holder,
 .dd-dragging  .dd-content-holder {
     display: flex;
     align-items: center;
@@ -165,7 +167,7 @@
     height: 100%;
 }
 
-.browse-tree .dd-content-main,
+.dd-content-main,
 .dd-dragging .dd-content-main {
     display: flex;
     justify-content: flex-start;
@@ -174,7 +176,8 @@
 }
 
 /* Placeholder */
-.browse-tree .tree-items-list .dd-tree-placeholder,
+
+.tree-items-list .dd-tree-placeholder,
 .dd-dragging .dd-tree-placeholder {
     border: 1px dotted #aaa;
     border-radius: 3px;
@@ -189,22 +192,22 @@
 }
 
 /* Field Specific Styles */
-.browse-tree .dd-content-main .tree-extra-fields,
+.dd-content-main .tree-extra-fields,
 .dd-dragging .dd-content-main .tree-extra-fields {
     margin: 0 10px;
 }
 
-.browse-tree .dd-content-main .tree-extra-fields.right-auto,
+.dd-content-main .tree-extra-fields.right-auto,
 .dd-dragging .dd-content-main .tree-extra-fields.right-auto {
     margin-right: auto;
 }
 
-.browse-tree .tree-extra-fields a span,
+.tree-extra-fields a span,
 .dd-dragging .tree-extra-fields a span {
     color: #333;
 }
 
-.browse-tree .tree-id,
+.tree-id,
 .dd-dragging .tree-id {
     display: inline-block;
     min-width: 30px;
@@ -213,56 +216,60 @@
     font-weight: 300;
 }
 
-.browse-tree .tree-status,
+.tree-status,
 .dd-dragging .tree-status {
     padding: 0 7px;
 }
 
-.browse-tree .tree-title,
+.tree-title,
 .dd-dragging .tree-title {
     color: #616161;
 }
 
-.browse-tree .tree-slug,
+.tree-slug,
 .dd-dragging .tree-slug {
     font-size: 0.8em;
     font-weight: 400;
     color: #3152b5;
 }
 
-.browse-tree .tree-created_at,
+.tree-created_at,
 .dd-dragging .tree-created_at {
     font-size: 0.8em;
     color: #7b7b7b;
 }
 
-.browse-tree .tree-items-list .unpublished-record {
+.tree-items-list .unpublished-record {
     opacity: 0.5;
 }
 
 /* Links in Tree Fields (should assume text color) */
-.browse-tree .tree-field a {
+
+.tree-field a {
     color: inherit;
     text-decoration: none;
 }
-.browse-tree .tree-field a:hover {
+
+.tree-field a:hover {
     text-decoration: underline;
 }
 
 /* Actions Area */
-.browse-tree .dd-content-actions {
+
+.dd-content-actions {
     display: flex;
     align-items: center;
     padding-right: 10px;
 }
 
 /* Use generic selector for action container to avoid ID duplication issues */
-.browse-tree .dd-content-actions > div {
+
+.dd-content-actions > div {
     display: flex;
     gap: 5px;
 }
 
-.browse-tree .bread-actions,
+.bread-actions,
 .dd-dragging .bread-actions {
     display: flex;
     gap: 4px;
@@ -271,57 +278,39 @@
     align-items: center;
 }
 
-.browse-tree .bread-actions a {
+.bread-actions a {
     float: none;
 }
 
-.browse-tree .bread-actions a.btn-sm,
+.bread-actions a.btn-sm,
 .dd-dragging .bread-actions a.btn-sm {
     background: none;
-    padding: 0 5px;
+    width: 28px;
+    height: 26px;
+    padding: 3px 3px;
     display: flex;
     justify-content: center;
     align-items: center;
+    border-radius: 4px !important;
     color: #adadad;
     transition: all .4s ease;
     border: none;
     box-shadow: none;
 }
 
-.browse-tree #bread-actions a.btn-sm i,
-.browse-tree .bread-actions a.btn-sm i {
-    font-size: 14px;
-}
-
-/* Action Button Colors on Hover */
-.browse-tree #bread-actions a.btn-sm.btn-danger:hover i,
-.browse-tree .bread-actions a.btn-sm.btn-danger:hover i {
-    color: #FF1100;
-}
-.browse-tree #bread-actions a.btn-sm.btn-primary:hover i,
-.browse-tree .bread-actions a.btn-sm.btn-primary:hover i {
-    color: #419eff;
-}
-.browse-tree #bread-actions a.btn-sm.btn-warning:hover i,
-.browse-tree .bread-actions a.btn-sm.btn-warning:hover i {
-    color: #dbae3a;
-}
-.browse-tree #bread-actions a.btn-sm.btn-success:hover i,
-.browse-tree .bread-actions a.btn-sm.btn-success:hover i {
-    color: #28b066;
+#bread-actions a.btn-sm i,
+.bread-actions a.btn-sm i {
+    font-size: 12px;
 }
 
 /* Ensure no-sort no-click doesn't hide things accidentally */
-.browse-tree .no-sort, .browse-tree .no-click {
+
+.no-sort, .no-click {
     cursor: default;
 }
 
-.browse-tree .dd-content-actions a span,
-.dd-dragging .dd-content-actions a span {
-    display: none;
-}
-
 /* Inline Checkbox Toggle */
+
 .voyager-status-toggle {
     display: inline-block;
     width: 10px;

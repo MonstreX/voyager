@@ -349,12 +349,14 @@
                                                 @endif
                                             </td>
                                         @endforeach
-                                        <td class="no-sort no-click bread-actions">
-                                            @foreach($actions as $action)
-                                                @if (!method_exists($action, 'massAction'))
-                                                    @include('voyager::bread.partials.actions', ['action' => $action])
-                                                @endif
-                                            @endforeach
+                                        <td class="no-sort no-click">
+                                            <div class="bread-actions">
+                                                @foreach($actions as $action)
+                                                    @if (!method_exists($action, 'massAction'))
+                                                        @include('voyager::bread.partials.actions', ['action' => $action])
+                                                    @endif
+                                                @endforeach
+                                            </div>
                                         </td>
                                     </tr>
                                     @endforeach

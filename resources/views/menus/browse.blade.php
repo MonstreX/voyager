@@ -54,22 +54,24 @@
                                         @endif
                                     </td>
                                     @endforeach
-                                    <td class="no-sort no-click bread-actions">
-                                        @can('delete', $data)
-                                            <div class="btn btn-sm btn-danger pull-right delete" data-id="{{ $data->{$data->getKeyName()} }}">
-                                                <i class="voyager-trash"></i> {{ __('voyager::generic.delete') }}
-                                            </div>
-                                        @endcan
-                                        @can('edit', $data)
-                                            <a href="{{ route('voyager.'.$dataType->slug.'.edit', $data->{$data->getKeyName()}) }}" class="btn btn-sm btn-primary pull-right edit">
-                                                <i class="voyager-edit"></i> {{ __('voyager::generic.edit') }}
-                                            </a>
-                                        @endcan
-                                        @can('edit', $data)
-                                            <a href="{{ route('voyager.'.$dataType->slug.'.builder', $data->{$data->getKeyName()}) }}" class="btn btn-sm btn-success pull-right">
-                                                <i class="voyager-list"></i> {{ __('voyager::generic.builder') }}
-                                            </a>
-                                        @endcan
+                                    <td class="no-sort no-click">
+                                        <div class="bread-actions">
+                                            @can('edit', $data)
+                                                <a href="{{ route('voyager.'.$dataType->slug.'.builder', $data->{$data->getKeyName()}) }}" class="btn btn-sm btn-success pull-right" title="{{ __('voyager::generic.builder') }}">
+                                                    <i class="voyager-list"></i>
+                                                </a>
+                                            @endcan
+                                            @can('edit', $data)
+                                                <a href="{{ route('voyager.'.$dataType->slug.'.edit', $data->{$data->getKeyName()}) }}" class="btn btn-sm btn-primary pull-right edit" title="{{ __('voyager::generic.edit') }}">
+                                                    <i class="voyager-edit"></i>
+                                                </a>
+                                            @endcan
+                                            @can('delete', $data)
+                                                <a href="javascript:;" class="btn btn-sm btn-danger delete" data-id="{{ $data->{$data->getKeyName()} }}" title="{{ __('voyager::generic.delete') }}">
+                                                    <i class="voyager-trash"></i>
+                                                </a>
+                                            @endcan
+                                        </div>
                                     </td>
                                 </tr>
                                 @endforeach

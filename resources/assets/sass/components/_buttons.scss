@@ -70,11 +70,17 @@
   opacity:1;
 }
 
-.voyager .btn.btn-sm, .voyager .btn.btn-sm:hover{
+.voyager .btn.btn-sm {
   border-width:1px;
   border-color:rgba(255, 255, 255, 0);
-  color:#fff;
+  color:#eeeeee;
+  transition: color .5s;
 }
+
+.voyager .btn.btn-sm:hover {
+  color: #fff;
+}
+
 .voyager .btn.btn-default.btn-sm, .voyager .btn.btn-default.btn-sm:hover{
   color:inherit;
 }
