@@ -16,9 +16,11 @@
     <div id="adv-json-list-{{ $row->field }}" class="adv-json-list" data-field="{{ $row->field }}">
         @foreach($fieldsData->rows as $key => $item)
         <div class="adv-json-item">
-            <span class="adv-json-drag-handle">
-                <i class="voyager-hamburger"></i>
-            </span>
+            <div class="adv-json-drag-handle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
             @foreach($fieldsData->fields as $fieldKey => $fieldLabel)
             <div class="form-group-line">
                 <input type="text"
@@ -40,9 +42,11 @@
     <!-- Form to add new rows -->
     <div class="adv-json-add-holder">
         <div class="adv-json-add-form">
-            <span class="adv-json-drag-handle">
-                <i class="voyager-hamburger"></i>
-            </span>
+            <div class="adv-json-drag-handle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
             @foreach($fieldsData->fields as $fieldKey => $fieldLabel)
             <div class="form-group-line">
                 <label for="{{ $row->field }}-{{ $fieldKey }}">{{ $fieldLabel }}</label>
