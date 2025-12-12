@@ -68,6 +68,13 @@
                                         @endif
                                     @elseif($row->type == 'image')
                                          <img src="@if( !filter_var($data->{$row->field}, FILTER_VALIDATE_URL)){{ Voyager::image( $data->{$row->field} ) }}@else{{ $data->{$row->field} }}@endif" style="height: 30px; width:auto">
+                                    @elseif($row->type == 'adv_fields_group')
+                                        @php
+                                            $groupData = json_decode($data->{$row->field});
+                                        @endphp
+                                        @if($groupData && isset($groupData->fields))
+                                            <span><small>@foreach($groupData->fields as $field){{ $field->label ?? $field->name ?? '' }}: {{ $field->value ?? '' }}{{ !$loop->last ? ' | ' : '' }}@endforeach</small></span>
+                                        @endif
                                     @else
                                         @include('voyager::multilingual.input-hidden-bread-browse')
                                         <span>{{ mb_strlen( $item[$row->field] ) > 200 ? mb_substr($item[$row->field], 0, 200) . ' ...' : $item[$row->field] }}</span>

@@ -299,6 +299,17 @@
                                                 @elseif($row->type == 'rich_text_box')
                                                     @include('voyager::multilingual.input-hidden-bread-browse')
                                                     <div>{{ mb_strlen( strip_tags($data->{$row->field}, '<b><i><u>') ) > 200 ? mb_substr(strip_tags($data->{$row->field}, '<b><i><u>'), 0, 200) . ' ...' : strip_tags($data->{$row->field}, '<b><i><u>') }}</div>
+                                                @elseif($row->type == 'adv_fields_group')
+                                                    @php
+                                                        $groupData = json_decode($data->{$row->field});
+                                                    @endphp
+                                                    @if($groupData && isset($groupData->fields))
+                                                        <div class="adv-fields-group-display">
+                                                            @foreach($groupData->fields as $field)
+                                                                <small><strong>{{ $field->label ?? $field->name ?? '' }}:</strong> {{ $field->value ?? '' }}</small><br>
+                                                            @endforeach
+                                                        </div>
+                                                    @endif
                                                 @elseif($row->type == 'coordinates')
                                                     @include('voyager::partials.coordinates-static-image')
                                                 @elseif($row->type == 'multiple_images')
