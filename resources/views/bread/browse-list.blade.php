@@ -897,6 +897,27 @@
                 .then(responseData => {
                     if (responseData.status === 'success') {
                         toastr.success(responseData.message);
+
+                        // Update the button's data-group-data attribute with new values
+                        const updatedGroupData = { fields: {} };
+                        inputs.forEach((input) => {
+                            const key = input.dataset.key;
+                            updatedGroupData.fields[key] = {
+                                type: 'text',
+                                label: input.dataset.label || key,
+                                value: input.value
+                            };
+                        });
+
+                        // Find the edit button in the correct row and update its data attribute
+                        const correctRow = document.querySelector(`[data-record-id="${currentRecordId}"]`);
+                        if (correctRow) {
+                            const editBtn = correctRow.querySelector(`[data-name="${currentFieldName}"]`);
+                            if (editBtn) {
+                                editBtn.setAttribute('data-group-data', JSON.stringify(updatedGroupData));
+                            }
+                        }
+
                         // Close modal
                         if (typeof $ !== 'undefined') {
                             $('#group_inline_edit_modal').modal('hide');
