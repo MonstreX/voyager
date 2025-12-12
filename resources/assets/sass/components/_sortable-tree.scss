@@ -29,7 +29,7 @@
 .browse-tree .dd-item,
 .browse-tree .dd-empty,
 .browse-tree .dd-placeholder,
-.dd-dragging {
+.dd-dragging.dd-item {
     display: block;
     position: relative;
     margin: 0;
@@ -188,11 +188,6 @@
     line-height: 20px;
 }
 
-/* Dragging State */
-.dd-dragging .bread-actions a {
-    display: none !important;
-}
-
 /* Field Specific Styles */
 .browse-tree .dd-content-main .tree-extra-fields,
 .dd-dragging .dd-content-main .tree-extra-fields {
@@ -280,7 +275,8 @@
     float: none;
 }
 
-.browse-tree .bread-actions a.btn-sm {
+.browse-tree .bread-actions a.btn-sm,
+.dd-dragging .bread-actions a.btn-sm {
     background: none;
     padding: 0 5px;
     display: flex;
@@ -320,7 +316,8 @@
     cursor: default;
 }
 
-.browse-tree .dd-content-actions a span {
+.browse-tree .dd-content-actions a span,
+.dd-dragging .dd-content-actions a span {
     display: none;
 }
 
@@ -340,9 +337,5 @@
 
 .voyager-status-toggle.inactive {
     background-color: #ddd;
-}
-
-.dd-dragging {
-    list-style: none;
 }
 
