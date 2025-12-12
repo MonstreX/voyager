@@ -75,3 +75,56 @@ if (!function_exists('voyager_tree_build')) {
         return $branch;
     }
 }
+
+if (!function_exists('flat_to_tree')) {
+    /**
+     * Convert flat array to tree structure (wrapper for voyager_tree_build)
+     */
+    function flat_to_tree($flat_array)
+    {
+        if (empty($flat_array) || !is_array($flat_array)) {
+            return [];
+        }
+        if (!array_key_exists('parent_id', $flat_array[0])) {
+            return $flat_array;
+        }
+        return voyager_tree_build($flat_array);
+    }
+}
+
+if (!function_exists('build_flat_from_tree')) {
+    /**
+     * Convert tree back to flat array with level info
+     */
+    function build_flat_from_tree($tree)
+    {
+        $result = [];
+        $level = 0;
+        build_flat_children($tree, $result, $level);
+        return $result;
+    }
+}
+
+if (!function_exists('build_flat_children')) {
+    /**
+     * Recursive helper for flattening tree and adding level info
+     */
+    function build_flat_children($children, &$result, &$level)
+    {
+        foreach ($children as $child) {
+            $elements = [];
+            foreach ($child as $key => $field) {
+                if ($key !== 'children') {
+                    $elements[$key] = $field;
+                    $elements['level'] = $level;
+                }
+            }
+            $result[] = $elements;
+            if (isset($child['children'])) {
+                $level++;
+                build_flat_children($child['children'], $result, $level);
+                $level--;
+            }
+        }
+    }
+}

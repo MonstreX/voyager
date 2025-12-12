@@ -349,6 +349,7 @@ class VoyagerServiceProvider extends ServiceProvider
         // Register custom extension fields
         VoyagerFacade::addFormField("TCG\\Voyager\\FormFields\\AdvFieldsGroupHandler");
         VoyagerFacade::addFormField("TCG\\Voyager\\FormFields\\AdvJsonHandler");
+        VoyagerFacade::addFormField("TCG\\Voyager\\FormFields\\AdvSelectDropdownTreeHandler");
 
         VoyagerFacade::addAfterFormField(DescriptionHandler::class);
 
