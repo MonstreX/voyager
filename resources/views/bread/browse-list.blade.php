@@ -807,24 +807,31 @@
                 modalForm.appendChild(input);
             });
 
+            // Store current context in modal data attributes so save button can access it
+            groupModal.dataset.recordId = recordId;
+            groupModal.dataset.fieldName = fieldName;
+            groupModal.dataset.slug = slug;
+            groupModal.dataset.fieldsContainer = fieldsContainer;
+
             // Show modal
             if (window.Voyager && window.Voyager.bootstrap && window.Voyager.bootstrap.showModal) {
                 window.Voyager.bootstrap.showModal(groupModal);
             } else if (typeof $ !== 'undefined') {
                 $('#group_inline_edit_modal').modal('show');
             } else {
+                // Remove any existing backdrop first
+                const existingBackdrop = document.querySelector('.modal-backdrop');
+                if (existingBackdrop) {
+                    existingBackdrop.remove();
+                }
+
                 groupModal.classList.add('in');
                 groupModal.style.display = 'block';
                 const backdrop = document.createElement('div');
                 backdrop.className = 'modal-backdrop fade in';
                 document.body.appendChild(backdrop);
+                groupModal.dataset.backdropElement = backdrop;
             }
-
-            // Store current context in modal data attributes so save button can access it
-            groupModal.dataset.recordId = recordId;
-            groupModal.dataset.fieldName = fieldName;
-            groupModal.dataset.slug = slug;
-            groupModal.dataset.fieldsContainer = fieldsContainer;
 
             // Save button handler - remove old handlers and add new one
             const saveBtn = groupModal.querySelector('.group-save-btn');
@@ -936,6 +943,42 @@
                     toastr.error('Error updating field');
                 });
             };
+        });
+
+        // Handle modal close to clean up backdrop in vanilla JS mode
+        const groupModal = document.getElementById('group_inline_edit_modal');
+
+        const closeGroupModal = () => {
+            groupModal.classList.remove('in');
+            groupModal.style.display = 'none';
+
+            // Remove backdrop
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) {
+                backdrop.remove();
+            }
+
+            // Clear modal data
+            groupModal.dataset.recordId = '';
+            groupModal.dataset.fieldName = '';
+            groupModal.dataset.slug = '';
+            groupModal.dataset.fieldsContainer = '';
+        };
+
+        // Close button and cancel buttons
+        const dismissButtons = groupModal.querySelectorAll('[data-dismiss="modal"]');
+        dismissButtons.forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                closeGroupModal();
+            });
+        });
+
+        // Escape key handler
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && groupModal.style.display === 'block') {
+                closeGroupModal();
+            }
         });
 
     </script>
