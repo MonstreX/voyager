@@ -32,7 +32,7 @@ document.addEventListener('click', (e) => {
     if (!jsonList || !addForm) return;
 
     // Get the input values from the form BEFORE cloning
-    const formInputs = addForm.querySelectorAll('input:not([type="button"])');
+    const formInputs = Array.from(addForm.querySelectorAll('.form-group-line input'));
     const rowData = {};
     let hasData = false;
 
@@ -70,10 +70,15 @@ document.addEventListener('click', (e) => {
     }
 
     // Set input values from rowData and remove IDs
-    newItem.querySelectorAll('input:not([type="button"])').forEach(input => {
+    const newInputs = Array.from(newItem.querySelectorAll('.form-group-line input'));
+    newInputs.forEach(input => {
         const fieldKey = input.dataset.field;
         input.value = rowData[fieldKey] || '';
         input.removeAttribute('id');
+        // Add master-field attribute if not present
+        if (!input.dataset.masterField) {
+            input.setAttribute('data-master-field', field);
+        }
     });
 
     jsonList.appendChild(newItem);
