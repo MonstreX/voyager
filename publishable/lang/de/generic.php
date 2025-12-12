@@ -7,6 +7,7 @@ return [
     'add'                    => 'Hinzufügen',
     'add_folder'             => 'Ordner hinzufügen',
     'add_new'                => 'Neu hinzufügen',
+    'all'                    => 'Alle',
     'all_done'               => 'Alles erledigt',
     'are_you_sure'           => 'Sind Sie sicher',
     'are_you_sure_delete'    => 'Sind Sie sicher dass Sie löschen möchten',

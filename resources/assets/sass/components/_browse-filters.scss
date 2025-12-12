@@ -1,0 +1,53 @@
+.browse-filters-holder {
+  background-color: #f5f5f5;
+  padding: 15px 20px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  border: 1px solid #e0e0e0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+}
+
+.filter-selector {
+  display: inline-flex;
+  align-items: center;
+  min-width: 250px;
+  gap: 10px;
+
+  label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #2e2e2e;
+    text-transform: uppercase;
+    margin-bottom: 0;
+    white-space: nowrap;
+  }
+
+  select {
+    flex: 1;
+    min-width: 180px;
+  }
+
+  .select2-container {
+    flex: 1;
+    min-width: 180px;
+  }
+
+  .select2-container--default .select2-selection--single {
+    height: 34px;
+    border-color: #ddd;
+
+    .select2-selection__rendered {
+      color: #444;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 32px;
+    }
+
+    .select2-selection__arrow {
+      height: 32px;
+    }
+  }
+}

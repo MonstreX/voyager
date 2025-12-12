@@ -7,6 +7,7 @@ return [
     'add'                    => 'Ekle',
     'add_folder'             => 'Klasör ekle',
     'add_new'                => 'Yeni Ekle',
+    'all'                    => 'Tümü',
     'all_done'               => 'Hepsi tamam',
     'are_you_sure'           => 'Emin misin',
     'are_you_sure_delete'    => 'Silmek istediğinizden emin misiniz?',

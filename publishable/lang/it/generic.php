@@ -7,6 +7,7 @@ return [
     'add'                    => 'Aggiungi',
     'add_folder'             => 'Aggiungi Cartella',
     'add_new'                => 'Aggiungi Nuovo',
+    'all'                    => 'Tutti',
     'all_done'               => 'Tutto Fatto',
     'are_you_sure'           => 'Sei sicuro',
     'are_you_sure_delete'    => 'Sei sicuro di voler eliminare',

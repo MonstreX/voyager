@@ -7,6 +7,7 @@ return [
     'add'                    => 'Adicionar',
     'add_folder'             => 'Adicionar Pasta',
     'add_new'                => 'Adicionar',
+    'all'                    => 'Todos',
     'all_done'               => 'Concluído',
     'are_you_sure'           => 'Tem certeza',
     'are_you_sure_delete'    => 'Tem certeza de que deseja remover',

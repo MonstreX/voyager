@@ -50,6 +50,59 @@
             <div class="col-md-12">
                 <div class="panel panel-bordered">
                     <div class="panel-body">
+                        @php
+                            // Build filters array from BREAD configuration
+                            $model_filters = [];
+                            foreach($dataType->browseRows as $row) {
+                                if(isset($row->details->browse_filter) && $row->details->browse_filter) {
+                                    if (isset($row->details->relationship)) {
+                                        // Relationship-based filter
+                                        $model_filters[] = [
+                                            'filter_items' => build_flat_from_tree(flat_to_tree(app($row->details->relationship->model)->get()->toArray())),
+                                            'filter_title' => $row->details->relationship->filter_label ?? $row->details->display_name ?? $row->display_name,
+                                            'filter_column' => $row->details->relationship->ref_field,
+                                            'filter_key' => $row->details->relationship->key,
+                                            'filter_label' => $row->details->relationship->label,
+                                        ];
+                                    }
+                                }
+                            }
+                        @endphp
+
+                        @if(count($model_filters) > 0)
+                            <div class="browse-filters-holder" data-url="{{ Request::url() }}">
+                                @foreach($model_filters as $key => $filter)
+                                    <span class="filter-selector">
+                                        <label for="filter-selector-{{ $key }}">{{ $filter['filter_title'] }}:</label>
+                                        <select id="filter-selector-{{ $key }}"
+                                                name="filter-selector[]"
+                                                data-column="{{ $filter['filter_column'] }}"
+                                                class="filter-select select2">
+                                            <option value="">{{ __('voyager::generic.all') }}</option>
+
+                                            @php
+                                                $val = null;
+                                                if (isset($filters) && $filters) {
+                                                    foreach ($filters['field'] as $idx => $field) {
+                                                        if ($field === $filter['filter_column']) {
+                                                            $val = $filters['value'][$idx];
+                                                        }
+                                                    }
+                                                }
+                                            @endphp
+
+                                            @foreach($filter['filter_items'] as $item)
+                                                <option value="{{ $item[$filter['filter_key']] }}"
+                                                        @if ($val && $item[$filter['filter_key']] == $val) selected @endif>
+                                                    @if(isset($item['level']) && $item['level'] > 0){{ str_repeat("--", $item['level']) }} @endif
+                                                    {{ $item[$filter['filter_label']] }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </span>
+                                @endforeach
+                            </div>
+                        @endif
                         @if ($isServerSide)
                             <form method="get" class="form-search">
                                 <div id="search-input">
@@ -974,6 +1027,33 @@
                 closeGroupModal();
             }
         });
+
+        // Browse Filters - обработчик изменения фильтров
+        const filterSelects = document.querySelectorAll('.filter-select');
+        if (filterSelects.length > 0) {
+            filterSelects.forEach(function(select) {
+                select.addEventListener('change', function() {
+                    const holder = document.querySelector('.browse-filters-holder');
+                    const url = holder.dataset.url;
+                    let filterParams = '';
+                    let i = 0;
+
+                    filterSelects.forEach(function(elem) {
+                        if (elem.value) {
+                            filterParams += (i > 0 ? '&' : '') +
+                                `field[${i}]=${elem.dataset.column}&value[${i}]=${elem.value}`;
+                            i++;
+                        }
+                    });
+
+                    if (filterParams.length === 0) {
+                        window.location.href = `${url}?reset_filters`;
+                    } else {
+                        window.location.href = `${url}?${filterParams}`;
+                    }
+                });
+            });
+        }
 
     </script>
 @stop

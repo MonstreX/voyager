@@ -8,6 +8,7 @@ return [
     'add'                    => 'Añadir',
     'add_folder'             => 'Añadir carpeta',
     'add_new'                => 'Crear',
+    'all'                    => 'Todos',
     'all_done'               => 'Todo listo',
     'are_you_sure'           => '¿Estás seguro?',
     'are_you_sure_delete'    => '¿Estás seguro que quieres eliminar?',

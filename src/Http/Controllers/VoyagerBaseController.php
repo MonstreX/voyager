@@ -47,6 +47,28 @@ class VoyagerBaseController extends Controller
 
         $search = (object) ['value' => $request->get('s'), 'key' => $request->get('key'), 'filter' => $request->get('filter')];
 
+        // Browse Filters - Session-based storage
+        $filters = null;
+
+        // Reset filters if slug changed
+        if ($request->session()->has('filters') && $request->session()->get('filters')['slug'] !== $slug) {
+            $request->session()->forget('filters');
+        }
+
+        // Store new filters or restore from session
+        if ($request->has('field') && $request->has('value')) {
+            $filters = [
+                'slug' => $slug,
+                'field' => $request->get('field'),
+                'value' => $request->get('value')
+            ];
+            $request->session()->put('filters', $filters);
+        } elseif ($request->session()->has('filters') && !$request->has('reset_filters')) {
+            $filters = $request->session()->get('filters');
+        } else {
+            $request->session()->forget('filters');
+        }
+
         $searchNames = [];
         if ($dataType->server_side) {
             $searchNames = $dataType->browseRows->mapWithKeys(function ($row) {
@@ -96,6 +118,13 @@ class VoyagerBaseController extends Controller
                     if ($dataType->browseRows->pluck('field')->contains($search->key)) {
                         $query->where($searchField, $search_filter, $search_value);
                     }
+                }
+            }
+
+            // Apply browse filters to query
+            if ($filters) {
+                foreach ($filters['field'] as $key => $filter) {
+                    $query->where($filters['field'][$key], '=', $filters['value'][$key]);
                 }
             }
 
@@ -198,7 +227,8 @@ class VoyagerBaseController extends Controller
             'defaultSearchKey',
             'usesSoftDeletes',
             'showSoftDeleted',
-            'showCheckboxColumn'
+            'showCheckboxColumn',
+            'filters'
         ));
     }
 

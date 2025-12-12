@@ -7,6 +7,7 @@ return [
     'add'                    => 'Добавить',
     'add_folder'             => 'Создать папку',
     'add_new'                => 'Добавить',
+    'all'                    => 'Все',
     'all_done'               => 'Готово',
     'are_you_sure'           => 'Вы уверены',
     'are_you_sure_delete'    => 'Вы точно хотите удалить',

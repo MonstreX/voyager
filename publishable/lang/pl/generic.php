@@ -7,6 +7,7 @@ return [
     'add'                    => 'Dodaj',
     'add_folder'             => 'Dodaj folder',
     'add_new'                => 'Dodaj nowy',
+    'all'                    => 'Wszystko',
     'all_done'               => 'Wszystko gotowe',
     'are_you_sure'           => 'Na pewno',
     'are_you_sure_delete'    => 'Na pewno usunąć',

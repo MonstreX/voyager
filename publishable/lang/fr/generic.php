@@ -7,6 +7,7 @@ return [
     'add'                    => 'Ajouter',
     'add_folder'             => 'Ajouter un dossier',
     'add_new'                => 'Ajouter nouveau',
+    'all'                    => 'Tous',
     'all_done'               => 'Terminé',
     'are_you_sure'           => 'Etes-vous sûr',
     'are_you_sure_delete'    => 'Etes-vous sûr de vouloir supprimer',
