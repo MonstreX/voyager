@@ -30,18 +30,19 @@
 
 .adv-json-drag-handle {
   cursor: move;
-  padding: 5px 8px;
+  padding: 5px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  height: 35px;
+  gap: 4px;
   flex-shrink: 0;
   transition: background 0.2s ease;
 
   span {
     display: block;
-    width: 10px;
+    width: 16px;
     height: 1px;
     background: #929292;
     transition: background 0.2s ease;
@@ -50,6 +51,11 @@
   &:hover span {
     background: #666;
   }
+}
+
+.adv-json-add-holder .adv-json-drag-handle {
+  opacity: 0;
+  cursor: inherit;
 }
 
 .form-group-line {
