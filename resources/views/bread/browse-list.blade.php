@@ -308,7 +308,7 @@
                                                             $fields = $group->fields ?? null;
                                                         }
                                                     @endphp
-                                                    <div class="browse-group-fields">
+                                                    <div class="browse-group-fields" data-field-name="{{ $row->field }}">
                                                         @if(isset($fields))
                                                             @foreach($fields as $key => $field)
                                                                 <span class="browse-group-field" data-key="{{ $key }}" title="{{ $field->label ?? '' }}">
@@ -820,68 +820,101 @@
                 document.body.appendChild(backdrop);
             }
 
-            // Save button handler
+            // Store current context in modal data attributes so save button can access it
+            groupModal.dataset.recordId = recordId;
+            groupModal.dataset.fieldName = fieldName;
+            groupModal.dataset.slug = slug;
+            groupModal.dataset.fieldsContainer = fieldsContainer;
+
+            // Save button handler - remove old handlers and add new one
             const saveBtn = groupModal.querySelector('.group-save-btn');
-            if (saveBtn && !saveBtn.dataset.initialized) {
-                saveBtn.dataset.initialized = 'true';
-                saveBtn.onclick = () => {
-                    const inputs = modalForm.querySelectorAll('input');
-                    const data = { fields: {} };
+            saveBtn.onclick = null; // Clear previous handler
+            saveBtn.onclick = (e) => {
+                e.preventDefault();
 
-                    inputs.forEach((input) => {
-                        const key = input.dataset.key;
-                        data.fields[key] = {
-                            type: 'text',
-                            label: input.dataset.label || key,
-                            value: input.value
-                        };
+                // Get current context from modal data attributes
+                const currentRecordId = groupModal.dataset.recordId;
+                const currentFieldName = groupModal.dataset.fieldName;
+                const currentSlug = groupModal.dataset.slug;
+                const currentFieldsContainer = groupModal.dataset.fieldsContainer;
 
-                        // Update icon
+                const inputs = modalForm.querySelectorAll('input');
+                const data = { fields: {} };
+
+                inputs.forEach((input) => {
+                    const key = input.dataset.key;
+                    data.fields[key] = {
+                        type: 'text',
+                        label: input.dataset.label || key,
+                        value: input.value
+                    };
+
+                    // Update icon in the actual row
+                    const actualFieldsContainer = document.querySelector(`[data-record-id="${currentRecordId}"] .browse-group-fields[data-field-name="${currentFieldName}"]`);
+                    if (!actualFieldsContainer) {
+                        // Fallback: find by position if data-field-name not available
+                        const actualRow = document.querySelector(`[data-record-id="${currentRecordId}"]`);
+                        if (actualRow) {
+                            const allGroupFields = actualRow.querySelectorAll('.browse-group-fields');
+                            let found = false;
+                            allGroupFields.forEach((container) => {
+                                const btn = container.querySelector(`[data-name="${currentFieldName}"]`);
+                                if (btn) {
+                                    found = true;
+                                    const icon = input.value && input.value.length > 0 ? 'voyager-check' : 'voyager-dot';
+                                    const fieldSpan = container.querySelector(`[data-key="${key}"]`);
+                                    if (fieldSpan) {
+                                        fieldSpan.innerHTML = `<i class="${icon}"></i>`;
+                                    }
+                                }
+                            });
+                        }
+                    } else {
                         const icon = input.value && input.value.length > 0 ? 'voyager-check' : 'voyager-dot';
-                        const fieldSpan = fieldsContainer.querySelector(`[data-key="${key}"]`);
+                        const fieldSpan = actualFieldsContainer.querySelector(`[data-key="${key}"]`);
                         if (fieldSpan) {
                             fieldSpan.innerHTML = `<i class="${icon}"></i>`;
                         }
-                    });
+                    }
+                });
 
-                    const updateUrl = '{{ route("voyager.".$dataType->slug.".update-field", ["id" => "__id"]) }}'.replace('__id', recordId);
-                    const params = new URLSearchParams();
-                    params.append('field', fieldName);
-                    params.append('value', JSON.stringify(data));
-                    params.append('slug', slug);
-                    params.append('_token', '{{ csrf_token() }}');
+                const updateUrl = '{{ route("voyager.".$dataType->slug.".update-field", ["id" => "__id"]) }}'.replace('__id', currentRecordId);
+                const params = new URLSearchParams();
+                params.append('field', currentFieldName);
+                params.append('value', JSON.stringify(data));
+                params.append('slug', currentSlug);
+                params.append('_token', '{{ csrf_token() }}');
 
-                    fetch(updateUrl, {
-                        method: 'POST',
-                        body: params,
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            toastr.success(data.message);
-                            // Close modal
-                            if (typeof $ !== 'undefined') {
-                                $('#group_inline_edit_modal').modal('hide');
-                            } else {
-                                groupModal.classList.remove('in');
-                                groupModal.style.display = 'none';
-                                const backdrop = document.querySelector('.modal-backdrop');
-                                if (backdrop) backdrop.remove();
-                            }
+                fetch(updateUrl, {
+                    method: 'POST',
+                    body: params,
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(responseData => {
+                    if (responseData.status === 'success') {
+                        toastr.success(responseData.message);
+                        // Close modal
+                        if (typeof $ !== 'undefined') {
+                            $('#group_inline_edit_modal').modal('hide');
                         } else {
-                            toastr.error(data.message || 'Error updating field');
+                            groupModal.classList.remove('in');
+                            groupModal.style.display = 'none';
+                            const backdrop = document.querySelector('.modal-backdrop');
+                            if (backdrop) backdrop.remove();
                         }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        toastr.error('Error updating field');
-                    });
-                };
-            }
+                    } else {
+                        toastr.error(responseData.message || 'Error updating field');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    toastr.error('Error updating field');
+                });
+            };
         });
 
     </script>
