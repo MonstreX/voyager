@@ -814,24 +814,18 @@
             groupModal.dataset.fieldsContainer = fieldsContainer;
 
             // Show modal
-            if (window.Voyager && window.Voyager.bootstrap && window.Voyager.bootstrap.showModal) {
-                window.Voyager.bootstrap.showModal(groupModal);
-            } else if (typeof $ !== 'undefined') {
-                $('#group_inline_edit_modal').modal('show');
-            } else {
-                // Remove any existing backdrop first
-                const existingBackdrop = document.querySelector('.modal-backdrop');
-                if (existingBackdrop) {
-                    existingBackdrop.remove();
-                }
-
-                groupModal.classList.add('in');
-                groupModal.style.display = 'block';
-                const backdrop = document.createElement('div');
-                backdrop.className = 'modal-backdrop fade in';
-                document.body.appendChild(backdrop);
-                groupModal.dataset.backdropElement = backdrop;
+            // Remove any existing backdrop first
+            const existingBackdrop = document.querySelector('.modal-backdrop');
+            if (existingBackdrop) {
+                existingBackdrop.remove();
             }
+
+            groupModal.classList.add('in');
+            groupModal.style.display = 'block';
+            document.body.classList.add('modal-open');
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop fade in';
+            document.body.appendChild(backdrop);
 
             // Save button handler - remove old handlers and add new one
             const saveBtn = groupModal.querySelector('.group-save-btn');
@@ -926,14 +920,11 @@
                         }
 
                         // Close modal
-                        if (typeof $ !== 'undefined') {
-                            $('#group_inline_edit_modal').modal('hide');
-                        } else {
-                            groupModal.classList.remove('in');
-                            groupModal.style.display = 'none';
-                            const backdrop = document.querySelector('.modal-backdrop');
-                            if (backdrop) backdrop.remove();
-                        }
+                        groupModal.classList.remove('in');
+                        groupModal.style.display = 'none';
+                        document.body.classList.remove('modal-open');
+                        const backdrop = document.querySelector('.modal-backdrop');
+                        if (backdrop) backdrop.remove();
                     } else {
                         toastr.error(responseData.message || 'Error updating field');
                     }
@@ -951,6 +942,7 @@
         const closeGroupModal = () => {
             groupModal.classList.remove('in');
             groupModal.style.display = 'none';
+            document.body.classList.remove('modal-open');
 
             // Remove backdrop
             const backdrop = document.querySelector('.modal-backdrop');
