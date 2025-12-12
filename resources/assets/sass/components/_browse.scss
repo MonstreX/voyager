@@ -37,31 +37,21 @@
   }
 
   .group-inline-edit {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    padding: 0;
-    border: 1px solid #ddd;
-    background: #fff;
-    border-radius: 3px;
+    opacity: 0.2;
+    border: none;
+    padding: 0 3px;
+    background-color: transparent;
     cursor: pointer;
-    color: #666;
-    transition: all 0.2s ease;
+    transition: opacity 0.2s ease;
 
     i {
+      margin: 3px 0 0 3px;
+      color: #3152b5;
       font-size: 14px;
     }
 
     &:hover {
-      background: #f5f5f5;
-      border-color: #999;
-      color: #333;
-    }
-
-    &:active {
-      background: #e8e8e8;
+      opacity: 1;
     }
   }
 }

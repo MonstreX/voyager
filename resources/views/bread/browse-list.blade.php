@@ -323,7 +323,7 @@
                                                             <i class="voyager-dot"></i><i class="voyager-dot"></i><i class="voyager-dot"></i>
                                                         @endif
                                                         @if(property_exists($row->details, 'browse_inline_editor') && $canEdit)
-                                                            <button data-name="{{ $row->field }}" class="group-inline-edit" type="button" title="{{ __('voyager::generic.edit') }}"><i class="voyager-edit"></i></button>
+                                                            <button data-name="{{ $row->field }}" data-group-data="{{ json_encode($group) }}" class="group-inline-edit" type="button" title="{{ __('voyager::generic.edit') }}"><i class="voyager-edit"></i></button>
                                                         @endif
                                                     </div>
                                                 @elseif($row->type == 'coordinates')
@@ -753,37 +753,57 @@
             // Get current field data from the page
             const groupModal = document.getElementById('group_inline_edit_modal');
             const modalForm = groupModal.querySelector('.inline-group-form');
-            const modalBody = groupModal.querySelector('.modal-body-content');
 
             // Clear previous fields
             modalForm.innerHTML = '';
 
-            // Get field configuration from data attribute or reconstruct
+            // Get field data from data-group-data attribute
+            let groupData = null;
+            try {
+                const groupDataAttr = groupEditBtn.getAttribute('data-group-data');
+                if (groupDataAttr) {
+                    groupData = JSON.parse(groupDataAttr);
+                }
+            } catch (e) {
+                console.error('Error parsing group data:', e);
+            }
+
+            // Get field configuration from DOM
             const groupFields = fieldsContainer.querySelectorAll('.browse-group-field');
             const fieldsData = {};
 
             groupFields.forEach((field) => {
                 const key = field.dataset.key;
-                const hasValue = field.querySelector('.voyager-check') !== null;
+                const fieldSpan = fieldsContainer.querySelector(`[data-key="${key}"]`);
+
+                // Get value from groupData if available, otherwise empty string
+                let fieldValue = '';
+                let fieldLabel = key;
+
+                if (groupData && groupData.fields && groupData.fields[key]) {
+                    fieldValue = groupData.fields[key].value || '';
+                    fieldLabel = groupData.fields[key].label || key;
+                } else if (fieldSpan && fieldSpan.title) {
+                    fieldLabel = fieldSpan.title;
+                }
+
                 fieldsData[key] = {
                     key: key,
-                    hasValue: hasValue
+                    value: fieldValue,
+                    label: fieldLabel
                 };
             });
 
-            // Build form inputs
+            // Build form inputs with existing values
             Object.entries(fieldsData).forEach(([key, data]) => {
                 const input = document.createElement('input');
                 input.type = 'text';
                 input.className = 'form-control';
                 input.style.marginBottom = '10px';
                 input.dataset.key = key;
-                input.placeholder = key;
-                // Try to get label from span title attribute
-                const fieldSpan = fieldsContainer.querySelector(`[data-key="${key}"]`);
-                if (fieldSpan && fieldSpan.title) {
-                    input.dataset.label = fieldSpan.title;
-                }
+                input.dataset.label = data.label;
+                input.placeholder = data.label;
+                input.value = data.value; // Set the actual value
                 modalForm.appendChild(input);
             });
 
