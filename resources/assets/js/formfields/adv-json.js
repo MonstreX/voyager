@@ -31,6 +31,28 @@ document.addEventListener('click', (e) => {
 
     if (!jsonList || !addForm) return;
 
+    // Get the input values from the form BEFORE cloning
+    const formInputs = addForm.querySelectorAll('input:not([type="button"])');
+    const rowData = {};
+    let hasData = false;
+
+    formInputs.forEach((input) => {
+        const fieldKey = input.dataset.field;
+        const fieldValue = input.value.trim();
+        if (fieldKey) {
+            rowData[fieldKey] = fieldValue;
+            if (fieldValue) {
+                hasData = true;
+            }
+        }
+    });
+
+    // Only add row if there's at least some data
+    if (!hasData) {
+        console.warn('Cannot add empty row');
+        return;
+    }
+
     // Clone the form
     const newItem = addForm.cloneNode(true);
     newItem.classList.remove('adv-json-add-form');
@@ -47,13 +69,20 @@ document.addEventListener('click', (e) => {
         btn.innerHTML = '<i class="voyager-x"></i>';
     }
 
-    // Clear input values and remove IDs
-    newItem.querySelectorAll('input').forEach(input => {
-        input.value = '';
+    // Set input values from rowData and remove IDs
+    newItem.querySelectorAll('input:not([type="button"])').forEach(input => {
+        const fieldKey = input.dataset.field;
+        input.value = rowData[fieldKey] || '';
         input.removeAttribute('id');
     });
 
     jsonList.appendChild(newItem);
+
+    // Clear the form for next entry
+    formInputs.forEach((input) => {
+        input.value = '';
+    });
+
     collectFieldsAndMakeJSON(jsonList);
     initAdvJsonSortable();
 });
@@ -123,11 +152,22 @@ function collectFieldsAndMakeJSON(jsonList) {
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
     initAdvJsonSortable();
+    // Ensure JSON is properly set from current form values
+    document.querySelectorAll('.adv-json-list').forEach((list) => {
+        collectFieldsAndMakeJSON(list);
+    });
 });
 
 // Re-initialize when DOM is updated
 if (window.Voyager && window.Voyager.events) {
     window.Voyager.events.on('dom:updated', () => {
         initAdvJsonSortable();
+        // Also ensure JSON is updated for newly added lists
+        document.querySelectorAll('.adv-json-list').forEach((list) => {
+            if (!list.dataset.jsonInitialized) {
+                collectFieldsAndMakeJSON(list);
+                list.dataset.jsonInitialized = 'true';
+            }
+        });
     });
 }
