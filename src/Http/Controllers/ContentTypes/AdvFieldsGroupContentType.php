@@ -7,11 +7,13 @@ class AdvFieldsGroupContentType extends BaseType
     public function handle()
     {
         if (isset($this->options->fields)) {
-            $data = $this->options;
+            // Convert to array for easier manipulation
+            $data = json_decode(json_encode($this->options), true);
 
-            foreach ($data->fields as $key => $field) {
+            // Update each field with the submitted value
+            foreach ($data['fields'] as $key => &$field) {
                 $value = $this->request->input($this->row->field.'_'.$key);
-                $data->fields->{$key}->value = $value;
+                $field['value'] = $value;
             }
 
             return json_encode($data);

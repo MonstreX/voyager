@@ -10,7 +10,7 @@
             @php
                 $fieldValue = isset($field->value) ? $field->value : '';
                 $fieldId = "{$row->field}_{$fieldKey}";
-                $fieldName = "{$row->field}[{$fieldKey}]";
+                $fieldName = "{$row->field}_{$fieldKey}";
             @endphp
 
             <div class="form-group">
