@@ -99,6 +99,51 @@ class VoyagerModelController extends Controller
     }
 
     /**
+     * Search related records for adv_related form field
+     */
+    public function searchRelatedRecords(Request $request)
+    {
+        $query = $request->get('query');
+        $slug = $request->get('slug');
+        $searchField = $request->get('search_field');
+        $displayField = $request->get('display_field');
+        $fields = explode(',', $request->get('fields'));
+
+        // GET THE DataType based on the slug
+        $dataType = Voyager::model('DataType')->where('slug', '=', $slug)->first();
+
+        if (!$dataType) {
+            return response()->json(['status' => 'error', 'message' => 'DataType not found'], 404);
+        }
+
+        // Load model and search
+        $model = app($dataType->model_name);
+        $this->authorize('browse', $model);
+
+        $records = $model::where($searchField, 'like', "%{$query}%")
+            ->limit(10)
+            ->get()
+            ->toArray();
+
+        $suggestions = [];
+        foreach ($records as $record) {
+            $item = ['id' => $record['id']];
+            foreach ($fields as $field) {
+                $item[$field] = $record[$field] ?? null;
+            }
+            $suggestions[] = [
+                'value' => $record[$displayField],
+                'data' => $item
+            ];
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'suggestions' => $suggestions
+        ]);
+    }
+
+    /**
      * Clone a record
      */
     public function clone(Request $request, $id)
