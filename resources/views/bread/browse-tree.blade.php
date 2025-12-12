@@ -194,8 +194,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // Show modal using Voyager's bootstrap compatibility or standard jQuery
             if (window.Voyager && window.Voyager.bootstrap && window.Voyager.bootstrap.showModal) {
                 window.Voyager.bootstrap.showModal(deleteModal);
-            } else if (typeof $ !== 'undefined') {
-                $('#delete_modal').modal('show');
             } else {
                 // Vanilla fallback if no helpers
                 deleteModal.classList.add('in');
@@ -221,8 +219,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // Show modal using Voyager's bootstrap compatibility or standard jQuery
             if (window.Voyager && window.Voyager.bootstrap && window.Voyager.bootstrap.showModal) {
                 window.Voyager.bootstrap.showModal(cloneModal);
-            } else if (typeof $ !== 'undefined') {
-                $('#clone_modal').modal('show');
             } else {
                 // Vanilla fallback if no helpers
                 cloneModal.classList.add('in');
