@@ -26,6 +26,9 @@ import * as helpers from './helpers.js';
 import Cropper from 'cropperjs';
 import Sortable from 'sortablejs';
 
+// Form fields
+import './formfields/adv-json';
+
 // Voyager namespace and ready Promises are initialized in master.blade.php <head>
 // Get the resolvers that were created there
 const resolveAppReady = window.__resolveAppReady;

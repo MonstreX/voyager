@@ -1,0 +1,106 @@
+.adv-json-wrapper {
+  margin-bottom: 20px;
+}
+
+.adv-json-list {
+  margin-bottom: 10px;
+  min-height: 50px;
+}
+
+.adv-json-add-form,
+.adv-json-item {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.adv-json-item {
+  margin-bottom: 5px;
+  padding: 8px;
+  background: #f9f9f9;
+  border-radius: 3px;
+  border: 1px solid #e8e8e8;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #f0f0f0;
+    border-color: #d8d8d8;
+  }
+}
+
+.adv-json-drag-handle {
+  cursor: move;
+  padding: 5px 8px;
+  color: #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+  flex-shrink: 0;
+
+  i {
+    font-size: 16px;
+  }
+
+  &:hover {
+    color: #666;
+  }
+}
+
+.form-group-line {
+  display: flex;
+  flex-direction: column;
+  margin-right: 5px;
+  min-width: 150px;
+
+  label {
+    white-space: nowrap;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 3px;
+    color: #666;
+  }
+
+  input {
+    margin-bottom: 0;
+    height: 34px;
+    font-size: 12px;
+
+    &:focus {
+      border-color: #3152b5;
+      box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(49, 82, 181, 0.6);
+    }
+  }
+}
+
+.adv-json-add-form button,
+.adv-json-item button {
+  height: 34px;
+  margin: 0;
+  padding: 0 10px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  i {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.adv-json-add-holder {
+  margin-top: 10px;
+  padding: 10px;
+  background: #fafafa;
+  border-radius: 3px;
+  border: 1px dashed #ddd;
+}
+
+// Sortable animation
+.sortable-ghost {
+  opacity: 0.5;
+  background: #f0f0f0;
+}
