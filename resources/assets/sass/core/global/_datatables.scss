@@ -47,8 +47,9 @@ table.dataTable.no-footer {
   text-decoration: none;
 }
 
-#dataTable .bread-actions .btn,
+.bread-actions .btn,
+.bread-actions a.btn,
 .actions a.btn {
-  padding: 5px 10px;
+  padding: 4px 9px;
   font-size: 12px;
 }
