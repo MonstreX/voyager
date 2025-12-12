@@ -301,15 +301,31 @@
                                                     <div>{{ mb_strlen( strip_tags($data->{$row->field}, '<b><i><u>') ) > 200 ? mb_substr(strip_tags($data->{$row->field}, '<b><i><u>'), 0, 200) . ' ...' : strip_tags($data->{$row->field}, '<b><i><u>') }}</div>
                                                 @elseif($row->type == 'adv_fields_group')
                                                     @php
-                                                        $groupData = json_decode($data->{$row->field});
+                                                        $group = json_decode($data->{$row->field});
+                                                        if (!isset($group->fields) && isset($row->details->fields)) {
+                                                            $fields = $row->details->fields;
+                                                        } else {
+                                                            $fields = $group->fields ?? null;
+                                                        }
                                                     @endphp
-                                                    @if($groupData && isset($groupData->fields))
-                                                        <div class="adv-fields-group-display">
-                                                            @foreach($groupData->fields as $field)
-                                                                <small><strong>{{ $field->label ?? $field->name ?? '' }}:</strong> {{ $field->value ?? '' }}</small><br>
+                                                    <div class="browse-group-fields">
+                                                        @if(isset($fields))
+                                                            @foreach($fields as $key => $field)
+                                                                <span class="browse-group-field" data-key="{{ $key }}" title="{{ $field->label ?? '' }}">
+                                                                    @if(!empty($field->value))
+                                                                        <i class="voyager-check"></i>
+                                                                    @else
+                                                                        <i class="voyager-dot"></i>
+                                                                    @endif
+                                                                </span>
                                                             @endforeach
-                                                        </div>
-                                                    @endif
+                                                        @else
+                                                            <i class="voyager-dot"></i><i class="voyager-dot"></i><i class="voyager-dot"></i>
+                                                        @endif
+                                                        @if(property_exists($row->details, 'browse_inline_editor') && $canEdit)
+                                                            <button data-name="{{ $row->field }}" class="group-inline-edit" type="button" title="{{ __('voyager::generic.edit') }}"><i class="voyager-edit"></i></button>
+                                                        @endif
+                                                    </div>
                                                 @elseif($row->type == 'coordinates')
                                                     @include('voyager::partials.coordinates-static-image')
                                                 @elseif($row->type == 'multiple_images')
@@ -434,6 +450,25 @@
                         <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
                         <input type="submit" class="btn btn-warning clone-confirm" value="{{ __('voyager::generic.yes_please') }}">
                     </form>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    {{-- Group Fields Inline Edit Modal --}}
+    <div class="modal modal-info fade" tabindex="-1" id="group_inline_edit_modal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><i class="voyager-edit"></i> {{ __('voyager::generic.edit') }} Fields</h4>
+                </div>
+                <div class="modal-body">
+                    <form class="inline-group-form"></form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
+                    <button type="button" class="btn btn-primary group-save-btn">{{ __('voyager::generic.save') }}</button>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
@@ -700,6 +735,133 @@
                     });
                 }
             });
+        });
+
+        // Group Fields Inline Edit
+        document.addEventListener('click', (e) => {
+            const groupEditBtn = e.target.closest('.group-inline-edit');
+            if (!groupEditBtn) return;
+
+            e.preventDefault();
+
+            const fieldsContainer = groupEditBtn.closest('.browse-group-fields');
+            const tr = groupEditBtn.closest('tr');
+            const recordId = tr.dataset.recordId;
+            const slug = tr.dataset.slug;
+            const fieldName = groupEditBtn.dataset.name;
+
+            // Get current field data from the page
+            const groupModal = document.getElementById('group_inline_edit_modal');
+            const modalForm = groupModal.querySelector('.inline-group-form');
+            const modalBody = groupModal.querySelector('.modal-body-content');
+
+            // Clear previous fields
+            modalForm.innerHTML = '';
+
+            // Get field configuration from data attribute or reconstruct
+            const groupFields = fieldsContainer.querySelectorAll('.browse-group-field');
+            const fieldsData = {};
+
+            groupFields.forEach((field) => {
+                const key = field.dataset.key;
+                const hasValue = field.querySelector('.voyager-check') !== null;
+                fieldsData[key] = {
+                    key: key,
+                    hasValue: hasValue
+                };
+            });
+
+            // Build form inputs
+            Object.entries(fieldsData).forEach(([key, data]) => {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'form-control';
+                input.style.marginBottom = '10px';
+                input.dataset.key = key;
+                input.placeholder = key;
+                // Try to get label from span title attribute
+                const fieldSpan = fieldsContainer.querySelector(`[data-key="${key}"]`);
+                if (fieldSpan && fieldSpan.title) {
+                    input.dataset.label = fieldSpan.title;
+                }
+                modalForm.appendChild(input);
+            });
+
+            // Show modal
+            if (window.Voyager && window.Voyager.bootstrap && window.Voyager.bootstrap.showModal) {
+                window.Voyager.bootstrap.showModal(groupModal);
+            } else if (typeof $ !== 'undefined') {
+                $('#group_inline_edit_modal').modal('show');
+            } else {
+                groupModal.classList.add('in');
+                groupModal.style.display = 'block';
+                const backdrop = document.createElement('div');
+                backdrop.className = 'modal-backdrop fade in';
+                document.body.appendChild(backdrop);
+            }
+
+            // Save button handler
+            const saveBtn = groupModal.querySelector('.group-save-btn');
+            if (saveBtn && !saveBtn.dataset.initialized) {
+                saveBtn.dataset.initialized = 'true';
+                saveBtn.onclick = () => {
+                    const inputs = modalForm.querySelectorAll('input');
+                    const data = { fields: {} };
+
+                    inputs.forEach((input) => {
+                        const key = input.dataset.key;
+                        data.fields[key] = {
+                            type: 'text',
+                            label: input.dataset.label || key,
+                            value: input.value
+                        };
+
+                        // Update icon
+                        const icon = input.value && input.value.length > 0 ? 'voyager-check' : 'voyager-dot';
+                        const fieldSpan = fieldsContainer.querySelector(`[data-key="${key}"]`);
+                        if (fieldSpan) {
+                            fieldSpan.innerHTML = `<i class="${icon}"></i>`;
+                        }
+                    });
+
+                    const updateUrl = '{{ route("voyager.".$dataType->slug.".update-field", ["id" => "__id"]) }}'.replace('__id', recordId);
+                    const params = new URLSearchParams();
+                    params.append('field', fieldName);
+                    params.append('value', JSON.stringify(data));
+                    params.append('slug', slug);
+                    params.append('_token', '{{ csrf_token() }}');
+
+                    fetch(updateUrl, {
+                        method: 'POST',
+                        body: params,
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            toastr.success(data.message);
+                            // Close modal
+                            if (typeof $ !== 'undefined') {
+                                $('#group_inline_edit_modal').modal('hide');
+                            } else {
+                                groupModal.classList.remove('in');
+                                groupModal.style.display = 'none';
+                                const backdrop = document.querySelector('.modal-backdrop');
+                                if (backdrop) backdrop.remove();
+                            }
+                        } else {
+                            toastr.error(data.message || 'Error updating field');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        toastr.error('Error updating field');
+                    });
+                };
+            }
         });
 
     </script>

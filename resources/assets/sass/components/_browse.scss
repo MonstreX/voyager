@@ -1,3 +1,67 @@
 .field-relationship p {
   margin: 0;
 }
+
+// Browse Group Fields Styles
+.browse-group-fields {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  .browse-group-field {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 3px;
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    cursor: help;
+    transition: all 0.2s ease;
+
+    i {
+      font-size: 12px;
+      color: #666;
+    }
+
+    &:hover {
+      background: #e8e8e8;
+      border-color: #bbb;
+    }
+  }
+
+  .browse-group-field[data-key]:not(:last-child)::after {
+    content: '';
+  }
+
+  .group-inline-edit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid #ddd;
+    background: #fff;
+    border-radius: 3px;
+    cursor: pointer;
+    color: #666;
+    transition: all 0.2s ease;
+
+    i {
+      font-size: 14px;
+    }
+
+    &:hover {
+      background: #f5f5f5;
+      border-color: #999;
+      color: #333;
+    }
+
+    &:active {
+      background: #e8e8e8;
+    }
+  }
+}
