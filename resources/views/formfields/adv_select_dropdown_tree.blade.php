@@ -1,37 +1,54 @@
 @if(isset($options->relationship))
-    {{-- Check if relationship method exists --}}
-    @if( !method_exists( $dataType->model_name, Str::camel($options->relationship->field) ) )
-        <p class="label label-warning">
-            <i class="voyager-warning"></i>
-            {{ __('voyager::form.field_select_dd_relationship', [
-                'method' => Str::camel($options->relationship->field).'()',
-                'class' => $dataType->model_name
-            ]) }}
-        </p>
-    @endif
-
-    @if( method_exists( $dataType->model_name, Str::camel($options->relationship->field) ) )
+    {{-- BROWSE/READ VIEW: Show category name --}}
+    @if(isset($view) && ($view == 'browse' || $view == 'read'))
         @php
-            // Get selected value from relationship
-            $selected_value = $dataTypeContent->{$options->relationship->field}?->{$options->relationship->key};
-
-            // Build tree structure with level info
-            $flatRecords = app($row->details->relationship->model)->get()->toArray();
-            $tree = flat_to_tree($flatRecords);
-            $treeOptions = build_flat_from_tree($tree);
+            $relationshipData = (isset($data)) ? $data : $dataTypeContent;
+            $model = app($options->relationship->model);
+            $query = $model::where($options->relationship->key, $relationshipData->{$options->relationship->ref_field})->first();
         @endphp
 
-        <select class="form-control select2" name="{{ $options->relationship->ref_field }}">
-            <option value="0" @if(empty($selected_value)) selected="selected" @endif>
-                {{ __('voyager::generic.none') }}
-            </option>
-            @foreach($treeOptions as $option)
-                <option value="{{ $option['id'] }}"
-                        @if($selected_value == $option['id']) selected="selected" @endif>
-                    @if($option['level'] > 0){{ str_repeat("--", $option['level']) }} @endif
-                    {{ $option[$options->relationship->label] }}
+        @if(isset($query))
+            <p>{{ $query->{$options->relationship->label} }}</p>
+        @else
+            <p>{{ __('voyager::generic.no_results') }}</p>
+        @endif
+
+    {{-- FORM VIEW: Show hierarchical dropdown --}}
+    @else
+        {{-- Check if relationship method exists --}}
+        @if( !method_exists( $dataType->model_name, Str::camel($options->relationship->field) ) )
+            <p class="label label-warning">
+                <i class="voyager-warning"></i>
+                {{ __('voyager::form.field_select_dd_relationship', [
+                    'method' => Str::camel($options->relationship->field).'()',
+                    'class' => $dataType->model_name
+                ]) }}
+            </p>
+        @endif
+
+        @if( method_exists( $dataType->model_name, Str::camel($options->relationship->field) ) )
+            @php
+                // Get selected value from relationship
+                $selected_value = $dataTypeContent->{$options->relationship->field}?->{$options->relationship->key};
+
+                // Build tree structure with level info
+                $flatRecords = app($row->details->relationship->model)->get()->toArray();
+                $tree = flat_to_tree($flatRecords);
+                $treeOptions = build_flat_from_tree($tree);
+            @endphp
+
+            <select class="form-control select2" name="{{ $options->relationship->ref_field }}">
+                <option value="0" @if(empty($selected_value)) selected="selected" @endif>
+                    {{ __('voyager::generic.none') }}
                 </option>
-            @endforeach
-        </select>
+                @foreach($treeOptions as $option)
+                    <option value="{{ $option['id'] }}"
+                            @if($selected_value == $option['id']) selected="selected" @endif>
+                        @if($option['level'] > 0){{ str_repeat("--", $option['level']) }} @endif
+                        {{ $option[$options->relationship->label] }}
+                    </option>
+                @endforeach
+            </select>
+        @endif
     @endif
 @endif
