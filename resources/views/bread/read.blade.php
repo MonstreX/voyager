@@ -68,6 +68,8 @@
                                 @endif
                             @elseif($row->type == 'relationship')
                                  @include('voyager::formfields.relationship', ['view' => 'read', 'options' => $row->details])
+                            @elseif($row->type == 'adv_select_dropdown_tree')
+                                 @include('voyager::formfields.adv_select_dropdown_tree', ['view' => 'read', 'options' => $row->details])
                             @elseif($row->type == 'select_dropdown' && property_exists($row->details, 'options') &&
                                     !empty($row->details->options->{$dataTypeContent->{$row->field}})
                             )

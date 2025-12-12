@@ -163,6 +163,8 @@
                                                     <img src="@if( !filter_var($data->{$row->field}, FILTER_VALIDATE_URL)){{ Voyager::image( $data->{$row->field} ) }}@else{{ $data->{$row->field} }}@endif" style="{{ $imageStyle }}">
                                                 @elseif($row->type == 'relationship')
                                                     @include('voyager::formfields.relationship', ['view' => 'browse','options' => $row->details])
+                                                @elseif($row->type == 'adv_select_dropdown_tree')
+                                                    @include('voyager::formfields.adv_select_dropdown_tree', ['view' => 'browse','options' => $row->details])
                                                 @elseif($row->type == 'select_multiple')
                                                     @if(property_exists($row->details, 'relationship'))
 
