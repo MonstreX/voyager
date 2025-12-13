@@ -54,7 +54,7 @@ function checkRelated(relatedObj, fieldName) {
 // ====================================
 function relatedTemplate(relatedObj) {
     return `
-        <div class="adv-related-item" data-data='${JSON.stringify(relatedObj.data)}'>
+        <div class="adv-related-item" data-data='${JSON.stringify(relatedObj.itemData)}'>
             <div class="adv-related-item__handle"><span></span><span></span><span></span></div>
             <div class="adv-related-item__title">${relatedObj.display}</div>
             <div class="adv-related-item__remove">
@@ -167,11 +167,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const input = document.getElementById('adv-related-autocomplete-' + fieldName)
             const list = document.getElementById('adv-related-list-' + fieldName)
 
+            const itemToSave = {
+                display_field: input.dataset.displayField,
+                fields: JSON.parse(input.dataset.data)
+            }
+
             const relatedObj = {
                 field: fieldName,
                 display: input.dataset.display,
-                display_field: input.dataset.displayField,
-                data: JSON.parse(input.dataset.data)
+                itemData: itemToSave
             }
 
             if (!checkRelated(relatedObj, fieldName)) {

@@ -3,9 +3,25 @@
     <div id="adv-related-list-{{$row->field}}" data-field="{{$row->field}}" class="adv-related-list">
     @if (!empty($dataTypeContent->{$row->field}))
         @foreach(json_decode($dataTypeContent->{$row->field}) as $item)
-        <div class="adv-related-item" data-data="{{ json_encode($item) }}">
+        @php
+            // Поддержка старой (плоской) и новой (вложенной) структуры
+            if (isset($item->display_field) && isset($item->fields)) {
+                // Новая структура
+                $displayValue = $item->fields->{$item->display_field};
+                $itemData = $item;
+            } else {
+                // Старая структура (плоская) - конвертировать
+                $displayField = $related_options->display_field;
+                $displayValue = $item->{$displayField};
+                $itemData = (object)[
+                    'display_field' => $displayField,
+                    'fields' => $item
+                ];
+            }
+        @endphp
+        <div class="adv-related-item" data-data="{{ json_encode($itemData) }}">
             <div class="adv-related-item__handle"><span></span><span></span><span></span></div>
-            <div class="adv-related-item__title">{{ $item->fields->{$item->display_field} }}</div>
+            <div class="adv-related-item__title">{{ $displayValue }}</div>
             <div class="adv-related-item__remove">
                 <button data-field="{{ $row->field }}" type="button" class="btn btn-danger remove-related"><i class='voyager-x'></i></button>
             </div>
