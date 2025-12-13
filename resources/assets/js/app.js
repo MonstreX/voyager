@@ -29,6 +29,7 @@ import Sortable from 'sortablejs';
 // Form fields
 import './formfields/adv-json';
 import './components/adv-related';
+import './formfields/adv-image';
 
 // Voyager namespace and ready Promises are initialized in master.blade.php <head>
 // Get the resolvers that were created there

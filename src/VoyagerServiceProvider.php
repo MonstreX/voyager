@@ -351,6 +351,7 @@ class VoyagerServiceProvider extends ServiceProvider
         VoyagerFacade::addFormField("TCG\\Voyager\\FormFields\\AdvJsonHandler");
         VoyagerFacade::addFormField("TCG\\Voyager\\FormFields\\AdvSelectDropdownTreeHandler");
         VoyagerFacade::addFormField("TCG\\Voyager\\FormFields\\AdvRelatedHandler");
+        VoyagerFacade::addFormField("TCG\\Voyager\\FormFields\\AdvImageHandler");
 
         VoyagerFacade::addAfterFormField(DescriptionHandler::class);
 

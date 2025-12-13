@@ -4,13 +4,10 @@
     @if (!empty($dataTypeContent->{$row->field}))
         @foreach(json_decode($dataTypeContent->{$row->field}) as $item)
         @php
-            // Поддержка старой (плоской) и новой (вложенной) структуры
             if (isset($item->display_field) && isset($item->fields)) {
-                // Новая структура
                 $displayValue = $item->fields->{$item->display_field};
                 $itemData = $item;
             } else {
-                // Старая структура (плоская) - конвертировать
                 $displayField = $related_options->display_field;
                 $displayValue = $item->{$displayField};
                 $itemData = (object)[
