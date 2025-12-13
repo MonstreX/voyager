@@ -90,7 +90,7 @@ function showSuggestions(input, suggestions) {
 
             input.dataset.display = data.value
             input.dataset.data = JSON.stringify(data.data)
-            input.value = ''
+            input.value = data.value
 
             dropdown.remove()
             input.parentElement.querySelector('.add-related').disabled = false
