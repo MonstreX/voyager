@@ -270,12 +270,12 @@
     <!-- Delete File Modal -->
     <div class="modal fade modal-danger" :id="'confirm_delete_modal_'+uid" v-if="allowDelete">
         @include('voyager::components.modal-confirm', [
-            'id' => 'confirm_delete_modal_'.$uid,
+            'id' => 'confirm_delete_modal_@{{ uid }}',
             'title' => __('voyager::generic.are_you_sure'),
             'message' => '<h4>'.__('voyager::media.delete_question').'</h4><ul><li v-for="file in selected_files">@{{ file.name }}</li></ul><h5 class=\"folder_warning\"><i class=\"voyager-warning\"></i> '.__('voyager::media.delete_folder_question').'</h5>',
             'confirmText' => __('voyager::generic.delete_confirm'),
             'confirmClass' => 'btn-danger',
-            'confirmButtonId' => 'confirm_delete_files_'.$uid,
+            'confirmButtonId' => 'confirm_delete_files_@{{ uid }}',
             'icon' => 'voyager-warning'
         ])
     </div>
