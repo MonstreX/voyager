@@ -269,30 +269,15 @@
 
     <!-- Delete File Modal -->
     <div class="modal fade modal-danger" :id="'confirm_delete_modal_'+uid" v-if="allowDelete">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title"><i class="voyager-warning"></i> {{ __('voyager::generic.are_you_sure') }}</h4>
-                </div>
-
-                <div class="modal-body">
-                    <h4>{{ __('voyager::media.delete_question') }}</h4>
-                    <ul>
-                        <li v-for="file in selected_files">@{{ file.name }}</li>
-                    </ul>
-                    <h5 class="folder_warning">
-                        <i class="voyager-warning"></i> {{ __('voyager::media.delete_folder_question') }}
-                    </h5>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
-                    <button type="button" class="btn btn-danger" v-on:click="deleteFiles">{{ __('voyager::generic.delete_confirm') }}
-                    </button>
-                </div>
-            </div>
-        </div>
+        @include('voyager::components.modal-confirm', [
+            'id' => 'confirm_delete_modal_'.$uid,
+            'title' => __('voyager::generic.are_you_sure'),
+            'message' => '<h4>'.__('voyager::media.delete_question').'</h4><ul><li v-for="file in selected_files">@{{ file.name }}</li></ul><h5 class=\"folder_warning\"><i class=\"voyager-warning\"></i> '.__('voyager::media.delete_folder_question').'</h5>',
+            'confirmText' => __('voyager::generic.delete_confirm'),
+            'confirmClass' => 'btn-danger',
+            'confirmButtonId' => 'confirm_delete_files_'.$uid,
+            'icon' => 'voyager-warning'
+        ])
     </div>
     <!-- End Delete File Modal -->
 
