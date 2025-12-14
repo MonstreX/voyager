@@ -17,8 +17,6 @@ class MediaController extends Controller
 
     public function upload(Request $request)
     {
-        $this->authorize('add', \TCG\Voyager\Models\DataType::class);
-
         $request->validate([
             'file' => 'required|file|max:10240',
             'model_type' => 'required|string',
@@ -39,6 +37,9 @@ class MediaController extends Controller
             }
 
             $model = $modelClass::findOrFail($modelId);
+
+            $this->authorize('edit', $model);
+
             $file = $request->file('file');
 
             $media = $this->mediaService->createFromFile($model, $file, $collectionName);
@@ -57,9 +58,12 @@ class MediaController extends Controller
 
     public function delete(Media $media)
     {
-        $this->authorize('delete', $media->model());
-
         try {
+            $model = $media->model;
+            if ($model) {
+                $this->authorize('delete', $model);
+            }
+
             $this->mediaService->deleteMedia($media);
 
             return response()->json([
@@ -76,9 +80,12 @@ class MediaController extends Controller
 
     public function updateProps(Request $request, Media $media)
     {
-        $this->authorize('edit', $media->model());
-
         try {
+            $model = $media->model;
+            if ($model) {
+                $this->authorize('edit', $model);
+            }
+
             $props = $request->input('props', []);
             $this->mediaService->updateMediaProps($media, $props);
 
@@ -96,8 +103,6 @@ class MediaController extends Controller
 
     public function reorder(Request $request)
     {
-        $this->authorize('edit', \TCG\Voyager\Models\DataType::class);
-
         $request->validate([
             'model_type' => 'required|string',
             'model_id' => 'required|integer',
@@ -119,6 +124,9 @@ class MediaController extends Controller
             }
 
             $model = $modelClass::findOrFail($modelId);
+
+            $this->authorize('edit', $model);
+
             $this->mediaService->reorderCollection($model, $collectionName, $order);
 
             return response()->json([
