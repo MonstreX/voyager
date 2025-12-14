@@ -32,28 +32,22 @@
     </div>
 
 
-    <div class="modal modal-danger fade" tabindex="-1" id="delete_modal" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span
-                            aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title"><i class="voyager-trash"></i> {{ __('voyager::menu_builder.delete_item_question') }}</h4>
-                </div>
-                <div class="modal-footer">
-                    <form action="{{ route('voyager.menus.item.destroy', ['menu' => $menu->id, 'id' => '__id']) }}"
-                          id="delete_form"
-                          method="POST">
-                        {{ method_field("DELETE") }}
-                        {{ csrf_field() }}
-                        <input type="submit" class="btn btn-danger pull-right delete-confirm"
-                               value="{{ __('voyager::menu_builder.delete_item_confirm') }}">
-                    </form>
-                    <button type="button" class="btn btn-default pull-right" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
-                </div>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
+    @include('voyager::components.modal-confirm', [
+        'id' => 'delete_modal',
+        'title' => __('voyager::menu_builder.delete_item_question'),
+        'message' => '',
+        'confirmText' => __('voyager::menu_builder.delete_item_confirm'),
+        'confirmClass' => 'btn-danger delete-confirm',
+        'confirmButtonId' => 'delete_confirm_button',
+        'icon' => 'voyager-trash'
+    ])
+    <form action="{{ route('voyager.menus.item.destroy', ['menu' => $menu->id, 'id' => '__id']) }}"
+          id="delete_form"
+          method="POST"
+          style="display:none">
+        {{ method_field("DELETE") }}
+        {{ csrf_field() }}
+    </form>
 
 
     <div class="modal modal-info fade" tabindex="-1" id="menu_item_modal" role="dialog">
@@ -152,6 +146,7 @@
             var submitButton = menuForm ? menuForm.querySelector('input[type="submit"]') : null;
             var deleteForm = document.getElementById('delete_form');
             var deleteActionTemplate = deleteForm ? deleteForm.getAttribute('action') : '';
+            var deleteConfirmButton = document.getElementById('delete_confirm_button');
             var menuOrderUrl = '{{ route('voyager.menus.order_item',['menu' => $menu->id]) }}';
             var modalMultilingualInstance = null;
 
@@ -195,58 +190,35 @@
                 }
             }
 
-            function createBackdrop(modal) {
-                var backdrop = document.createElement('div');
-                backdrop.className = 'modal-backdrop fade in';
-                backdrop.dataset.modalTarget = modal.id;
-                return backdrop;
-            }
-
             function openModal(modal) {
                 if (!modal) {
+                    return;
+                }
+                if (window.VoyagerBootstrapCompat && typeof window.VoyagerBootstrapCompat.showModal === 'function') {
+                    window.VoyagerBootstrapCompat.showModal(modal);
                     return;
                 }
                 modal.classList.add('in');
                 modal.style.display = 'block';
                 modal.setAttribute('aria-hidden', 'false');
                 document.body.classList.add('modal-open');
-                document.body.appendChild(createBackdrop(modal));
             }
 
             function closeModal(modal) {
                 if (!modal) {
                     return;
                 }
+                if (window.VoyagerBootstrapCompat && typeof window.VoyagerBootstrapCompat.hideModal === 'function') {
+                    window.VoyagerBootstrapCompat.hideModal(modal);
+                    return;
+                }
                 modal.classList.remove('in');
                 modal.style.display = 'none';
                 modal.setAttribute('aria-hidden', 'true');
-                var backdrop = document.querySelector('.modal-backdrop[data-modal-target="' + modal.id + '"]');
-                if (backdrop) {
-                    backdrop.remove();
-                }
                 if (!document.querySelector('.modal.in')) {
                     document.body.classList.remove('modal-open');
                 }
             }
-
-            function bindModalDismiss(modal) {
-                if (!modal) {
-                    return;
-                }
-                modal.querySelectorAll('[data-dismiss="modal"]').forEach(function (button) {
-                    button.addEventListener('click', function () {
-                        closeModal(modal);
-                    });
-                });
-                modal.addEventListener('click', function (event) {
-                    if (event.target === modal) {
-                        closeModal(modal);
-                    }
-                });
-            }
-
-            bindModalDismiss(menuModal);
-            bindModalDismiss(deleteModal);
 
             function setLinkType(type) {
                 if (!linkTypeSelect) {
@@ -412,17 +384,12 @@
                 }
             });
 
-            document.addEventListener('keydown', function (event) {
-                if (event.key !== 'Escape') {
-                    return;
-                }
-                if (menuModal && menuModal.classList.contains('in')) {
-                    closeModal(menuModal);
-                }
-                if (deleteModal && deleteModal.classList.contains('in')) {
-                    closeModal(deleteModal);
-                }
-            });
+            if (deleteConfirmButton) {
+                deleteConfirmButton.addEventListener('click', function () {
+                    if (!deleteForm) return;
+                    deleteForm.submit();
+                });
+            }
 
             var menuNestable = document.querySelector('.dd');
             if (menuNestable && window.VoyagerInitNestable) {

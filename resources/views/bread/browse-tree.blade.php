@@ -54,24 +54,19 @@
     </div>
 </div>
     {{-- Single delete modal --}}
-    <div class="modal modal-danger fade" tabindex="-1" id="delete_modal" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title"><i class="voyager-trash"></i> {{ __('voyager::generic.delete_question') }} {{ strtolower($dataType->getTranslatedAttribute('display_name_singular')) }}?</h4>
-                </div>
-                <div class="modal-footer">
-                    <form action="#" id="delete_form" method="POST">
-                        {{ method_field('DELETE') }}
-                        {{ csrf_field() }}
-                        <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
-                        <input type="submit" class="btn btn-danger delete-confirm" value="{{ __('voyager::generic.delete_confirm') }}">
-                    </form>
-                </div>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
+    @include('voyager::components.modal-confirm', [
+        'id' => 'delete_modal',
+        'title' => __('voyager::generic.delete_question').' '.strtolower($dataType->getTranslatedAttribute('display_name_singular')).'?',
+        'message' => '',
+        'confirmText' => __('voyager::generic.delete_confirm'),
+        'confirmClass' => 'btn-danger delete-confirm',
+        'confirmButtonId' => 'delete_confirm_button',
+        'icon' => 'voyager-trash'
+    ])
+    <form action="#" id="delete_form" method="POST" style="display:none">
+        {{ method_field('DELETE') }}
+        {{ csrf_field() }}
+    </form>
 
     {{-- Clone record modal --}}
     <div class="modal modal-warning fade" tabindex="-1" id="clone_modal" role="dialog">
@@ -172,6 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let deleteFormAction;
     const deleteModal = document.getElementById('delete_modal');
     const deleteForm = document.getElementById('delete_form');
+    const deleteConfirmButton = deleteModal ? deleteModal.querySelector('#delete_confirm_button') : null;
     const cloneModal = document.getElementById('clone_modal');
     const cloneForm = document.getElementById('clone_form');
 
@@ -191,11 +187,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             deleteForm.action = deleteFormAction;
 
-            // Show modal using Voyager's bootstrap compatibility or standard jQuery
-            if (window.Voyager && window.Voyager.bootstrap && window.Voyager.bootstrap.showModal) {
+            // Show modal using Voyager's bootstrap compatibility or fallback
+            if (window.VoyagerBootstrapCompat && typeof window.VoyagerBootstrapCompat.showModal === 'function') {
+                window.VoyagerBootstrapCompat.showModal(deleteModal);
+            } else if (window.Voyager && window.Voyager.bootstrap && window.Voyager.bootstrap.showModal) {
                 window.Voyager.bootstrap.showModal(deleteModal);
             } else {
-                // Vanilla fallback if no helpers
                 deleteModal.classList.add('in');
                 deleteModal.style.display = 'block';
                 const backdrop = document.createElement('div');
@@ -204,6 +201,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+
+    if (deleteConfirmButton) {
+        deleteConfirmButton.addEventListener('click', () => {
+            if (!deleteForm) return;
+            deleteForm.submit();
+        });
+    }
 
     // Vanilla JS delegation for .clone buttons
     document.addEventListener('click', (e) => {
