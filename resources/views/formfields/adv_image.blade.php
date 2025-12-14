@@ -44,7 +44,7 @@
     </div>
 
     <div class="adv-image-upload">
-        <div class="adv-image-dropzone" id="adv-image-dropzone-{{ $row->field }}" data-field="{{ $row->field }}" data-model-type="{{ get_class($dataTypeContent) }}" data-model-id="{{ $dataTypeContent->id ?? 0 }}" data-collection="{{ $collectionName }}">
+        <div class="adv-image-dropzone" id="adv-image-dropzone-{{ $row->field }}" data-field="{{ $row->field }}" data-model-type="{{ \get_class($dataTypeContent) }}" data-model-id="{{ $dataTypeContent->id ?? 0 }}" data-collection="{{ $collectionName }}">
             <div class="dz-message">
                 <span>Drop image here or click to upload</span>
             </div>
