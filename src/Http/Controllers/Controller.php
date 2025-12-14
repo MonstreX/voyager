@@ -139,6 +139,8 @@ abstract class Controller extends BaseController
             }
         }
 
+        $this->handleAdvImageUploads($request, $rows, $data);
+
         $data->save();
 
         // Save translations
@@ -293,9 +295,6 @@ abstract class Controller extends BaseController
             /********** ADV FIELDS GROUP TYPE **********/
             case 'adv_fields_group':
                 return (new \TCG\Voyager\Http\Controllers\ContentTypes\AdvFieldsGroupContentType($request, $slug, $row, $options))->handle();
-            /********** ADV IMAGE TYPE **********/
-            case 'adv_image':
-                return (new \TCG\Voyager\Http\Controllers\ContentTypes\AdvImage($request, $slug, $row, $options))->handle();
             /********** ALL OTHER TEXT TYPE **********/
             default:
                 return (new Text($request, $slug, $row, $options))->handle();
@@ -326,5 +325,41 @@ abstract class Controller extends BaseController
 
             return !empty($value->details->validation->rule);
         });
+    }
+
+    protected function handleAdvImageUploads($request, $rows, $data)
+    {
+        foreach ($rows as $row) {
+            if ($row->type == 'adv_image' && $request->hasFile($row->field)) {
+                $file = $request->file($row->field);
+                $collectionName = $row->details->collection_name ?? $row->field;
+
+                if ($data->id && method_exists($data, 'getFirstMedia')) {
+                    $oldMedia = $data->getFirstMedia($collectionName);
+                    if ($oldMedia) {
+                        app(\TCG\Voyager\Services\MediaService::class)->deleteMedia($oldMedia);
+                    }
+                }
+
+                $media = app(\TCG\Voyager\Services\MediaService::class)->createFromFile($data, $file, $collectionName);
+
+                $titleField = $row->field . '_title';
+                $altField = $row->field . '_alt';
+                $props = [];
+
+                if ($request->has($titleField)) {
+                    $props['title'] = $request->input($titleField);
+                }
+                if ($request->has($altField)) {
+                    $props['alt'] = $request->input($altField);
+                }
+
+                if (!empty($props)) {
+                    app(\TCG\Voyager\Services\MediaService::class)->updateMediaProps($media, $props);
+                }
+
+                $data->{$row->field} = $media->id;
+            }
+        }
     }
 }
