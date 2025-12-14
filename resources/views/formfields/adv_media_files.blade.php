@@ -16,9 +16,11 @@
              data-extra-fields="{{ !empty($extraFields) ? 'true' : 'false' }}"
              data-type="adv_media_files"
              data-model="{{ $dataType->model_name }}"
+             data-model-type="{{ $dataType->model_name }}"
              data-slug="{{ $dataType->slug }}"
              data-field-name="{{ $row->field }}"
              data-id="{{ $dataTypeContent->id ?? '' }}"
+             data-model-id="{{ $dataTypeContent->id ?? '' }}"
              data-delete-url-template="{{ $deleteUrlTemplate }}"
              data-reorder-url="{{ $reorderUrl }}"
              data-collection-name="{{ $collectionName }}"
@@ -93,13 +95,15 @@
 
             <button type="button"
                     title="{{ __('voyager::generic.select_all') }}"
-                    class="bunch-adv-media-files-select-all btn btn-sm btn-success">
+                    class="bunch-adv-media-files-select-all btn btn-sm btn-success"
+                    data-files-gallery-list="{{ $row->field }}">
                 <span>{{ __('voyager::generic.select_all') }}</span>
             </button>
 
             <button type="button"
                     title="{{ __('voyager::generic.deselect_all') }}"
-                    class="bunch-adv-media-files-unmark btn btn-sm btn-info hidden">
+                    class="bunch-adv-media-files-unmark btn btn-sm btn-info hidden"
+                    data-files-gallery-list="{{ $row->field }}">
                 <span>{{ __('voyager::generic.deselect_all') }}</span>
             </button>
         </div>

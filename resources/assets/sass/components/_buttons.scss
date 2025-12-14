@@ -130,3 +130,11 @@
   -webkit-box-shadow:none;
   box-shadow: none;
 }
+
+.btn:focus,
+.btn:active:focus,
+.btn:active.focus,
+.btn.focus {
+    outline: none;
+    box-shadow: none;
+}

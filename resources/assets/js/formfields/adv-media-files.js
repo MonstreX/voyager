@@ -63,7 +63,14 @@ const callReorder = (listEl) => {
             collection_name: collectionName,
             order,
         }),
-    }).catch(() => {});
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            if (window.toastr && data && data.status === 'success') {
+                window.toastr.success(data.message || 'Order updated');
+            }
+        })
+        .catch(() => {});
 };
 
 const bindSortable = (listEl) => {
