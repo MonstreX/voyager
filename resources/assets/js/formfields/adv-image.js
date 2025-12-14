@@ -12,18 +12,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const modal = document.getElementById('adv-image-delete-modal');
             if (modal) {
-                const bootstrapCompat = window.VoyagerBootstrapCompat;
-                if (bootstrapCompat && typeof bootstrapCompat.showModal === 'function') {
-                    bootstrapCompat.showModal(modal);
-                } else {
-                    modal.classList.add('in');
-                    modal.style.display = 'block';
-                    modal.setAttribute('aria-hidden', 'false');
-                    const backdrop = document.createElement('div');
-                    backdrop.className = 'modal-backdrop fade in';
-                    backdrop.dataset.modalTarget = modal.id;
-                    document.body.appendChild(backdrop);
-                    document.body.classList.add('modal-open');
+                if (window.VoyagerBootstrapCompat && typeof window.VoyagerBootstrapCompat.showModal === 'function') {
+                    window.VoyagerBootstrapCompat.showModal(modal);
+                } else if (window.Voyager && window.Voyager.bootstrap && typeof window.Voyager.bootstrap.showModal === 'function') {
+                    window.Voyager.bootstrap.showModal(modal);
                 }
             }
         }
@@ -46,14 +38,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(data => {
                     const modal = document.getElementById('adv-image-delete-modal');
                     if (modal) {
-                        modal.classList.remove('in');
-                        modal.style.display = 'none';
-                        modal.setAttribute('aria-hidden', 'true');
-                        const backdrop = document.querySelector('[data-modal-target="adv-image-delete-modal"]');
-                        if (backdrop) {
-                            backdrop.remove();
+                        if (window.VoyagerBootstrapCompat && typeof window.VoyagerBootstrapCompat.hideModal === 'function') {
+                            window.VoyagerBootstrapCompat.hideModal(modal);
+                        } else if (window.Voyager && window.Voyager.bootstrap && typeof window.Voyager.bootstrap.hideModal === 'function') {
+                            window.Voyager.bootstrap.hideModal(modal);
                         }
-                        document.body.classList.remove('modal-open');
                     }
 
                     if (data.status === 'success') {
@@ -71,6 +60,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     pendingDeleteData = null;
                 })
                 .catch(error => {
+                    const modal = document.getElementById('adv-image-delete-modal');
+                    if (modal) {
+                        if (window.VoyagerBootstrapCompat && typeof window.VoyagerBootstrapCompat.hideModal === 'function') {
+                            window.VoyagerBootstrapCompat.hideModal(modal);
+                        } else if (window.Voyager && window.Voyager.bootstrap && typeof window.Voyager.bootstrap.hideModal === 'function') {
+                            window.Voyager.bootstrap.hideModal(modal);
+                        }
+                    }
                     if (window.toastr && typeof window.toastr.error === 'function') {
                         window.toastr.error('Error deleting image');
                     }
