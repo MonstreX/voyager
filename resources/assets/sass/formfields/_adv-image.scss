@@ -1,104 +1,54 @@
 .adv-image-wrapper {
     margin-bottom: 20px;
 
-    .adv-image-preview {
+    .adv-image {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 15px;
+        background-color: #f9f9f9;
         margin-bottom: 20px;
+        display: flex;
+        gap: 15px;
+        align-items: flex-start;
 
-        .adv-image-current {
-            border: 1px solid #e0e0e0;
+        img {
+            max-width: 150px;
+            max-height: 150px;
+            object-fit: contain;
             border-radius: 4px;
-            padding: 15px;
-            background-color: #f9f9f9;
-
-            .adv-image-item {
-                display: flex;
-                gap: 15px;
-                align-items: flex-start;
-
-                img {
-                    max-width: 150px;
-                    max-height: 150px;
-                    object-fit: contain;
-                }
-
-                .adv-image-info {
-                    flex: 1;
-
-                    .filename {
-                        font-weight: 500;
-                        margin: 0 0 5px 0;
-                        word-break: break-all;
-                    }
-
-                    .filesize {
-                        color: #999;
-                        font-size: 12px;
-                        margin: 0 0 10px 0;
-                    }
-
-                    .adv-image-props {
-                        display: flex;
-                        flex-direction: column;
-                        gap: 8px;
-                        margin-bottom: 10px;
-
-                        input {
-                            font-size: 12px;
-                            padding: 6px 10px;
-                        }
-                    }
-
-                    .adv-image-delete {
-                        font-size: 12px;
-                        padding: 6px 10px;
-                    }
-                }
-            }
         }
 
-        .adv-image-empty {
-            border: 2px dashed #ddd;
-            border-radius: 4px;
-            padding: 30px;
-            text-align: center;
-            background-color: #fafafa;
-        }
-    }
+        .adv-image-fields {
+            flex: 1;
 
-    .adv-image-upload {
-        .adv-image-dropzone {
-            border: 2px dashed #4a90e2;
-            border-radius: 4px;
-            padding: 40px 20px;
-            text-align: center;
-            background-color: #f0f5fb;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            .adv-image-file {
+                margin-bottom: 10px;
 
-            .dz-message {
-                color: #666;
-                font-size: 14px;
-                margin: 0;
-            }
-
-            &:hover {
-                border-color: #2563eb;
-                background-color: #e8efff;
-
-                .dz-message {
-                    color: #2563eb;
-                }
-            }
-
-            &.dragover {
-                border-color: #2563eb;
-                background-color: #dbe4ff;
-                box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-
-                .dz-message {
-                    color: #2563eb;
+                .adv-image-file-name {
+                    display: block;
                     font-weight: 500;
+                    margin-bottom: 3px;
+                    word-break: break-all;
                 }
+
+                .adv-image-file-size {
+                    display: block;
+                    color: #999;
+                    font-size: 12px;
+                }
+            }
+
+            input {
+                display: block;
+                width: 100%;
+                margin-bottom: 10px;
+                font-size: 12px;
+                padding: 6px 10px;
+            }
+
+            .single-adv-image-remove {
+                font-size: 12px;
+                padding: 6px 10px;
             }
         }
     }

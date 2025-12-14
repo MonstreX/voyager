@@ -17,19 +17,12 @@ class Media extends Model
 
     public function url()
     {
-        $disk = $this->disk ?? 'public';
-        $path = $this->path;
-
-        if ($disk === 'public') {
-            return asset('storage/' . $path);
-        }
-
-        return \Storage::disk($disk)->url($path);
+        return '/storage/' . $this->path;
     }
 
     public function fullUrl()
     {
-        return url($this->url());
+        return url('/storage/' . $this->path);
     }
 
     public function fileName()
