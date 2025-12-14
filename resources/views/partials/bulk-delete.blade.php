@@ -12,6 +12,11 @@
     'confirmButtonId' => 'bulk_delete_confirm',
     'icon' => 'voyager-trash'
 ])
+<form action="{{ route('voyager.'.$dataType->slug.'.index') }}/0" id="bulk_delete_form" method="POST" style="display:none">
+    {{ method_field("DELETE") }}
+    {{ csrf_field() }}
+    <input type="hidden" name="ids" id="bulk_delete_input" value="">
+</form>
 
 <script>
 window.addEventListener('load', function () {
@@ -20,6 +25,8 @@ window.addEventListener('load', function () {
     const bulkDeleteCount = document.getElementById('bulk_delete_count');
     const bulkDeleteDisplayName = document.getElementById('bulk_delete_display_name');
     const bulkDeleteInput = document.getElementById('bulk_delete_input');
+    const bulkDeleteConfirmButton = document.getElementById('bulk_delete_confirm');
+    const bulkDeleteForm = document.getElementById('bulk_delete_form');
     const bootstrapCompat = window.VoyagerBootstrapCompat;
 
     const showModal = (modal) => {
@@ -72,6 +79,13 @@ window.addEventListener('load', function () {
                 bulkDeleteInput.value = ids.join(',');
             }
             showModal(bulkDeleteModal);
+        });
+    }
+
+    if (bulkDeleteConfirmButton) {
+        bulkDeleteConfirmButton.addEventListener('click', () => {
+            if (!bulkDeleteForm) return;
+            bulkDeleteForm.submit();
         });
     }
 });

@@ -481,6 +481,10 @@
         'confirmButtonId' => 'delete_confirm_button',
         'icon' => 'voyager-trash'
     ])
+    <form action="#" id="delete_form" method="POST" style="display:none">
+        {{ method_field('DELETE') }}
+        {{ csrf_field() }}
+    </form>
 
     {{-- Clone record modal --}}
     <div class="modal modal-warning fade" tabindex="-1" id="clone_modal" role="dialog">
@@ -556,6 +560,7 @@
 
             const deleteModal = document.getElementById('delete_modal');
             const deleteForm = document.getElementById('delete_form');
+            const deleteConfirmButton = deleteModal ? deleteModal.querySelector('#delete_confirm_button') : null;
             const deleteActionTemplate = '{{ route("voyager.".$dataType->slug.".destroy", ["id" => "__id"]) }}';
             const bootstrapCompat = window.VoyagerBootstrapCompat;
 
@@ -607,6 +612,13 @@
                     openCloneModal(event.currentTarget);
                 });
             });
+
+            if (deleteConfirmButton) {
+                deleteConfirmButton.addEventListener('click', () => {
+                    if (!deleteForm) return;
+                    deleteForm.submit();
+                });
+            }
 
             document.querySelectorAll('td .delete').forEach((button) => {
                 button.addEventListener('click', (event) => {
