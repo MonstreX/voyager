@@ -9,7 +9,13 @@
     $icon = $icon ?? 'voyager-trash';
 @endphp
 
-<div class="modal fade modal-danger" id="{{ $modalId }}" tabindex="-1" role="dialog" aria-hidden="true" data-voyager-confirm-modal>
+<div class="modal fade modal-danger"
+     @if(!empty($bindId))
+         :id="{{ $bindId }}"
+     @else
+         id="{{ $modalId }}"
+     @endif
+     tabindex="-1" role="dialog" aria-hidden="true" data-voyager-confirm-modal>
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -25,7 +31,11 @@
                 <button type="button" class="btn btn-default pull-right" data-dismiss="modal">{{ $cancelText }}</button>
                 <button type="button"
                         class="btn {{ $confirmClass }} pull-right"
-                        @if($confirmButtonId) id="{{ $confirmButtonId }}" @endif
+                        @if(!empty($bindConfirmButtonId))
+                            :id="{{ $bindConfirmButtonId }}"
+                        @elseif($confirmButtonId)
+                            id="{{ $confirmButtonId }}"
+                        @endif
                         data-voyager-confirm-accept>
                     {{ $confirmText }}
                 </button>
