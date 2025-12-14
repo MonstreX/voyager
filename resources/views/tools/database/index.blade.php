@@ -263,6 +263,14 @@
                 });
             });
 
+            const deleteTableConfirm = document.getElementById('delete_table_confirm');
+            if (deleteTableConfirm) {
+                deleteTableConfirm.addEventListener('click', function () {
+                    if (!deleteTableForm) return;
+                    deleteTableForm.submit();
+                });
+            }
+
             document.querySelectorAll('table .bread_actions .delete').forEach((button) => {
                 button.addEventListener('click', function (event) {
                     event.preventDefault();
@@ -277,6 +285,14 @@
                     showModal(deleteBreadModal);
                 });
             });
+
+            const deleteBreadConfirm = document.getElementById('delete_bread_confirm');
+            if (deleteBreadConfirm) {
+                deleteBreadConfirm.addEventListener('click', function () {
+                    if (!deleteBreadForm) return;
+                    deleteBreadForm.submit();
+                });
+            }
         });
     </script>
 
