@@ -293,6 +293,9 @@ abstract class Controller extends BaseController
             /********** ADV FIELDS GROUP TYPE **********/
             case 'adv_fields_group':
                 return (new \TCG\Voyager\Http\Controllers\ContentTypes\AdvFieldsGroupContentType($request, $slug, $row, $options))->handle();
+            /********** ADV IMAGE TYPE **********/
+            case 'adv_image':
+                return (new \TCG\Voyager\Http\Controllers\ContentTypes\AdvImage($request, $slug, $row, $options))->handle();
             /********** ALL OTHER TEXT TYPE **********/
             default:
                 return (new Text($request, $slug, $row, $options))->handle();
