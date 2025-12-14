@@ -84,48 +84,33 @@
     </div>
 
     {{-- Delete BREAD Modal --}}
-    <div class="modal modal-danger fade" tabindex="-1" id="delete_bread_modal" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span
-                                aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title"><i class="voyager-trash"></i>  {!! __('voyager::bread.delete_bread_quest', ['table' => '<span id="delete_bread_name"></span>']) !!}</h4>
-                </div>
-                <div class="modal-footer">
-                    <form action="#" id="delete_bread_form" method="POST">
-                        {{ method_field('DELETE') }}
-                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                        <input type="submit" class="btn btn-danger" value="{{ __('voyager::bread.delete_bread_conf') }}">
-                    </form>
-                    <button type="button" class="btn btn-outline pull-right" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
-                </div>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
+    @include('voyager::components.modal-confirm', [
+        'id' => 'delete_bread_modal',
+        'title' => '<i class=\"voyager-trash\"></i> ' . __('voyager::bread.delete_bread_quest', ['table' => '<span id=\"delete_bread_name\"></span>']),
+        'message' => '',
+        'confirmText' => __('voyager::bread.delete_bread_conf'),
+        'confirmClass' => 'btn-danger',
+        'confirmButtonId' => 'delete_bread_confirm',
+        'icon' => 'voyager-trash'
+    ])
+    <form action="#" id="delete_bread_form" method="POST" style="display:none">
+        {{ method_field('DELETE') }}
+        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+    </form>
 
-    <div class="modal modal-danger fade" tabindex="-1" id="delete_modal" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span
-                                aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title"><i class="voyager-trash"></i> {!! __('voyager::database.delete_table_question', ['table' => '<span id="delete_table_name"></span>']) !!}</h4>
-                </div>
-                <div class="modal-footer">
-                    <form action="#" id="delete_table_form" method="POST">
-                        {{ method_field('DELETE') }}
-                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                        <input type="submit" class="btn btn-danger pull-right" value="{{ __('voyager::database.delete_table_confirm') }}">
-                        <button type="button" class="btn btn-outline pull-right" style="margin-right:10px;"
-                                data-dismiss="modal">{{ __('voyager::generic.cancel') }}
-                        </button>
-                    </form>
-
-                </div>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
+    @include('voyager::components.modal-confirm', [
+        'id' => 'delete_modal',
+        'title' => '<i class=\"voyager-trash\"></i> ' . __('voyager::database.delete_table_question', ['table' => '<span id=\"delete_table_name\"></span>']),
+        'message' => '',
+        'confirmText' => __('voyager::database.delete_table_confirm'),
+        'confirmClass' => 'btn-danger',
+        'confirmButtonId' => 'delete_table_confirm',
+        'icon' => 'voyager-trash'
+    ])
+    <form action="#" id="delete_table_form" method="POST" style="display:none">
+        {{ method_field('DELETE') }}
+        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+    </form>
 
     <div class="modal modal-info fade" tabindex="-1" id="table_info" role="dialog">
         <div class="modal-dialog">
