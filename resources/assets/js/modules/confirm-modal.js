@@ -5,8 +5,16 @@ export function showConfirmModal(modal) {
     if (!modal) return;
     if (compat && typeof compat.showModal === 'function') {
         compat.showModal(modal);
-    } else if (modal.showModal) {
-        modal.showModal();
+    } else {
+        // Minimal fallback for plain DOM
+        modal.classList.add('in');
+        modal.style.display = 'block';
+        modal.setAttribute('aria-hidden', 'false');
+        const backdrop = document.createElement('div');
+        backdrop.className = 'modal-backdrop fade in';
+        backdrop.dataset.modalTarget = modal.id || '';
+        document.body.appendChild(backdrop);
+        document.body.classList.add('modal-open');
     }
 }
 
@@ -15,8 +23,17 @@ export function hideConfirmModal(modal) {
     if (!modal) return;
     if (compat && typeof compat.hideModal === 'function') {
         compat.hideModal(modal);
-    } else if (modal.close) {
-        modal.close();
+    } else {
+        modal.classList.remove('in');
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden', 'true');
+        const backdrop = modal.id ? document.querySelector(`.modal-backdrop[data-modal-target="${modal.id}"]`) : null;
+        if (backdrop) {
+            backdrop.remove();
+        }
+        if (!document.querySelector('.modal.in')) {
+            document.body.classList.remove('modal-open');
+        }
     }
 }
 
