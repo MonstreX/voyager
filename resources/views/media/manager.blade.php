@@ -490,6 +490,13 @@
                     window.VoyagerBootstrapCompat.hideModal(modal);
                 }
             },
+            bindDeleteConfirmButton: function() {
+                var btnId = 'confirm_delete_files_' + this.uid;
+                var btn = document.getElementById(btnId);
+                if (btn) {
+                    btn.onclick = this.deleteFiles;
+                }
+            },
             sendRequest: function(url, payload = {}) {
                 return voyagerMediaRequest(url, payload).then(function(response) {
                     if (!response.ok) {
@@ -522,6 +529,7 @@
                     }
                 }).finally(function() {
                     vm.is_loading = false;
+                    vm.$nextTick(vm.bindDeleteConfirmButton);
                 });
             },
             selectFile: function(file, e) {
@@ -869,6 +877,13 @@
                 }).finally(function() {
                     vm.toggleModalVisibility('confirm_delete_modal_' + vm.uid, false);
                 });
+            },
+            bindDeleteConfirmButton: function() {
+                var btnId = 'confirm_delete_files_' + this.uid;
+                var btn = document.getElementById(btnId);
+                if (btn) {
+                    btn.onclick = this.deleteFiles;
+                }
             },
             moveFiles: function(e) {
                 if (!this.allowMove) {
