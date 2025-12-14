@@ -12,12 +12,14 @@ class MediaUploadService
     protected $disk = 'public';
     protected $props = [];
     protected $originalFileName = null;
+    protected MediaService $mediaService;
 
     public function __construct($model, $collectionName = 'default', $file = null)
     {
         $this->model = $model;
         $this->collectionName = $collectionName;
         $this->setFile($file);
+        $this->mediaService = app(MediaService::class);
     }
 
     public function file($file)
@@ -76,8 +78,7 @@ class MediaUploadService
             throw new \Exception('No file set for upload');
         }
 
-        $mediaService = new MediaService();
-        $media = $mediaService->createFromFile(
+        $media = $this->mediaService->createFromFile(
             $this->model,
             $this->file,
             $this->collectionName,
@@ -88,7 +89,7 @@ class MediaUploadService
         );
 
         if ($this->props) {
-            $mediaService->updateMediaProps($media, $this->props);
+            $this->mediaService->updateMediaProps($media, $this->props);
         }
 
         return $media;

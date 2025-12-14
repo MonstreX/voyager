@@ -24,6 +24,10 @@ class BreadMediaUploadTest extends TestCase
     {
         parent::setUp();
 
+        if (!extension_loaded('gd')) {
+            $this->markTestSkipped('GD extension required for media upload tests.');
+        }
+
         Auth::loginUsingId(1);
 
         $this->storage = Storage::disk(config('voyager.storage.disk'));

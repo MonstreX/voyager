@@ -55,6 +55,10 @@ class Media extends Model
     public function getPropsAttribute()
     {
         $propsValue = $this->attributes['props'] ?? null;
+        if (is_array($propsValue)) {
+            return $propsValue;
+        }
+
         return $propsValue ? json_decode($propsValue, true) : [];
     }
 

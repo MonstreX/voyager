@@ -20,17 +20,21 @@ class HasMediaTraitTest extends TestCase
     {
         parent::setUp();
 
-        $role = Role::first() ?: Role::create([
-            'name' => 'admin',
-            'display_name' => 'Administrator',
-        ]);
+        $this->user = User::first();
 
-        $this->user = User::create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'password' => bcrypt('password'),
-            'role_id' => $role->id,
-        ]);
+        if (!$this->user) {
+            $role = Role::first() ?: Role::create([
+                'name' => 'admin',
+                'display_name' => 'Administrator',
+            ]);
+
+            $this->user = User::create([
+                'name' => 'Test User',
+                'email' => 'test@example.com',
+                'password' => bcrypt('password'),
+                'role_id' => $role->id,
+            ]);
+        }
 
         $this->actingAs($this->user);
 
@@ -160,7 +164,7 @@ class HasMediaTraitTest extends TestCase
             'body' => 'Test body',
         ]);
 
-        $file = UploadedFile::fake()->image('test.jpg');
+        $file = UploadedFile::fake()->create('test.bin', 10, 'application/octet-stream');
         $this->mediaService->createFromFile($post, $file, 'featured');
 
         $media = $post->media()->first();

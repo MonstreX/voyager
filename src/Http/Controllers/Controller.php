@@ -337,6 +337,7 @@ abstract class Controller extends BaseController
             $collectionName = $row->details->collection_name ?? $row->field;
             $titleField = $row->field . '_title';
             $altField = $row->field . '_alt';
+            $clearField = $row->field . '_clear';
             $props = [];
 
             if ($request->has($titleField)) {
@@ -344,6 +345,21 @@ abstract class Controller extends BaseController
             }
             if ($request->has($altField)) {
                 $props['alt'] = $request->input($altField);
+            }
+
+            if ($request->boolean($clearField)) {
+                if ($data->id && method_exists($data, 'getFirstMedia')) {
+                    $oldMedia = $data->getFirstMedia($collectionName);
+                    if ($oldMedia) {
+                        app(\TCG\Voyager\Services\MediaService::class)->deleteMedia($oldMedia);
+                    }
+                }
+
+                $data->{$row->field} = null;
+
+                if (empty($props)) {
+                    continue;
+                }
             }
 
             if ($request->hasFile($row->field)) {

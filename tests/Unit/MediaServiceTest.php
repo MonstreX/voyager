@@ -19,17 +19,21 @@ class MediaServiceTest extends TestCase
     {
         parent::setUp();
 
-        $role = Role::first() ?: Role::create([
-            'name' => 'admin',
-            'display_name' => 'Administrator',
-        ]);
+        $this->user = User::first();
 
-        $this->user = User::create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'password' => bcrypt('password'),
-            'role_id' => $role->id,
-        ]);
+        if (!$this->user) {
+            $role = Role::first() ?: Role::create([
+                'name' => 'admin',
+                'display_name' => 'Administrator',
+            ]);
+
+            $this->user = User::create([
+                'name' => 'Test User',
+                'email' => 'test@example.com',
+                'password' => bcrypt('password'),
+                'role_id' => $role->id,
+            ]);
+        }
 
         $this->actingAs($this->user);
 

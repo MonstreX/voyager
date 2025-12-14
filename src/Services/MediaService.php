@@ -73,10 +73,18 @@ class MediaService
         return true;
     }
 
-    protected function deleteFile($path, $disk = 'public')
+    protected function deleteFile($path, $disk = null)
     {
-        if (Storage::disk($disk)->exists($path)) {
-            return Storage::disk($disk)->delete($path);
+        if (!$path) {
+            return false;
+        }
+
+        $disk = $disk ?: config('voyager.storage.disk', 'public');
+
+        $fs = Storage::disk($disk);
+
+        if ($fs->exists($path)) {
+            return $fs->delete($path);
         }
 
         return false;

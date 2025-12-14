@@ -29,6 +29,7 @@
     @endif
 
     <div class="form-group">
+        <input type="hidden" name="{{ $row->field }}_clear" value="0">
         <input type="file" class="form-control" id="adv-image-input-{{ $row->field }}" name="{{ $row->field }}" accept="image/*">
     </div>
 </div>

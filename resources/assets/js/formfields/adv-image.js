@@ -61,6 +61,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const { mediaId, field, mediaDiv, modal, button } = pendingDeleteData;
         const url = buildDeleteUrl(button, mediaId);
 
+        const clearInput = document.querySelector(`input[name="${field}_clear"]`);
+        if (clearInput) {
+            clearInput.value = '1';
+        }
+
+        confirmButton.disabled = true;
+
         fetch(url, {
             method: 'DELETE',
             headers: {
@@ -71,6 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             closeModal(modal);
+            confirmButton.disabled = false;
 
             if (data.status === 'success') {
                 if (mediaDiv) {
@@ -88,6 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => {
             closeModal(modal);
+            confirmButton.disabled = false;
             if (window.toastr && typeof window.toastr.error === 'function') {
                 window.toastr.error('Error deleting image');
             }

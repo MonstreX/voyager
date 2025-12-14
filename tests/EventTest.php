@@ -26,6 +26,15 @@ class EventTest extends TestCase
 {
     use DatabaseTransactions;
 
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        if (!extension_loaded('gd')) {
+            $this->markTestSkipped('GD extension required for event image tests.');
+        }
+    }
+
     public function testBreadAddedEvent()
     {
         Event::fake();
