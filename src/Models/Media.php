@@ -32,21 +32,29 @@ class Media extends Model
 
     public function prop($key, $default = null)
     {
-        $props = $this->props ? json_decode($this->props, true) : [];
+        $propsValue = $this->attributes['props'] ?? null;
+        $props = $propsValue ? json_decode($propsValue, true) : [];
         return $props[$key] ?? $default;
     }
 
     public function setProp($key, $value)
     {
-        $props = $this->props ? json_decode($this->props, true) : [];
+        $propsValue = $this->attributes['props'] ?? null;
+        $props = $propsValue ? json_decode($propsValue, true) : [];
         $props[$key] = $value;
-        $this->props = json_encode($props);
+        $this->attributes['props'] = json_encode($props);
         return $this;
     }
 
     public function getPropsAttribute()
     {
-        return $this->props ? json_decode($this->props, true) : [];
+        $propsValue = $this->attributes['props'] ?? null;
+        return $propsValue ? json_decode($propsValue, true) : [];
+    }
+
+    public function setPropsAttribute($value)
+    {
+        $this->attributes['props'] = is_array($value) ? json_encode($value) : $value;
     }
 
     public function sizeForHumans()
