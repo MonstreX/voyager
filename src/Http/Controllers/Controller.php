@@ -22,6 +22,7 @@ use TCG\Voyager\Http\Controllers\ContentTypes\SelectMultiple;
 use TCG\Voyager\Http\Controllers\ContentTypes\Text;
 use TCG\Voyager\Http\Controllers\ContentTypes\Timestamp;
 use TCG\Voyager\Traits\AlertsMessages;
+use TCG\Voyager\Services\MediaService;
 use Validator;
 
 abstract class Controller extends BaseController
@@ -142,6 +143,8 @@ abstract class Controller extends BaseController
         $this->handleAdvImageUploads($request, $rows, $data);
 
         $data->save();
+
+        $this->handleAdvMediaFilesUploads($request, $rows, $data);
 
         // Save translations
         if (count($translations) > 0) {
@@ -295,6 +298,8 @@ abstract class Controller extends BaseController
             /********** ADV FIELDS GROUP TYPE **********/
             case 'adv_fields_group':
                 return (new \TCG\Voyager\Http\Controllers\ContentTypes\AdvFieldsGroupContentType($request, $slug, $row, $options))->handle();
+            case 'adv_media_files':
+                return null;
             /********** ALL OTHER TEXT TYPE **********/
             default:
                 return (new Text($request, $slug, $row, $options))->handle();
@@ -384,6 +389,79 @@ abstract class Controller extends BaseController
                 if ($existingMedia) {
                     app(\TCG\Voyager\Services\MediaService::class)->updateMediaProps($existingMedia, $props);
                 }
+            }
+        }
+    }
+
+    protected function handleAdvMediaFilesUploads($request, $rows, $data)
+    {
+        if (!$data->id || !method_exists($data, 'media')) {
+            return;
+        }
+
+        $mediaService = app(MediaService::class);
+
+        foreach ($rows as $row) {
+            if ($row->type !== 'adv_media_files') {
+                continue;
+            }
+
+            $collectionName = $row->details->collection_name ?? $row->field;
+            $propsInput = $request->input($row->field . '_props', []);
+            $replaceFiles = $request->file($row->field . '_replace', []);
+
+            if (is_array($replaceFiles)) {
+                foreach ($replaceFiles as $mediaId => $file) {
+                    if (!$file) {
+                        continue;
+                    }
+
+                    $media = $data->media()
+                        ->where('collection_name', $collectionName)
+                        ->where('id', $mediaId)
+                        ->first();
+
+                    if ($media) {
+                        $mediaService->replaceMediaFile($media, $file, [
+                            'original_name' => $file->getClientOriginalName(),
+                        ]);
+
+                        if (isset($propsInput[$mediaId]) && is_array($propsInput[$mediaId])) {
+                            $mediaService->updateMediaProps($media, $propsInput[$mediaId]);
+                        }
+                    }
+                }
+            }
+
+            if (is_array($propsInput)) {
+                foreach ($propsInput as $mediaId => $props) {
+                    if (!is_array($props)) {
+                        continue;
+                    }
+
+                    $media = $data->media()
+                        ->where('collection_name', $collectionName)
+                        ->where('id', $mediaId)
+                        ->first();
+
+                    if ($media) {
+                        $mediaService->updateMediaProps($media, $props);
+                    }
+                }
+            }
+
+            if ($request->hasFile($row->field)) {
+                $files = (array) $request->file($row->field);
+                foreach ($files as $file) {
+                    if ($file) {
+                        $mediaService->createFromFile($data, $file, $collectionName);
+                    }
+                }
+            }
+
+            $orderInput = $request->input($row->field . '_order', []);
+            if (is_array($orderInput) && !empty($orderInput)) {
+                $mediaService->reorderCollection($data, $collectionName, $orderInput);
             }
         }
     }

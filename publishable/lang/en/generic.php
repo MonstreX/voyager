@@ -100,6 +100,7 @@ return [
     'sweet_success'          => 'Sweet Success!',
     'timestamp'              => 'Timestamp',
     'title'                  => 'Title',
+    'alt_text'               => 'Alt text',
     'type'                   => 'Type',
     'restore'                => 'Restore',
     'unsigned'               => 'Unsigned',

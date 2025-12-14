@@ -44,6 +44,42 @@ class MediaService
         ]);
     }
 
+    public function replaceMediaFile(Media $media, $file, array $meta = [])
+    {
+        $disk = $media->disk ?: config('voyager.storage.disk', 'public');
+
+        $filePayload = $this->normalizeFilePayload($file, $meta);
+        $originalFileName = $filePayload['original_name'];
+        $mimeType = $filePayload['mime_type'];
+        $size = $filePayload['size'];
+
+        $model = $media->model;
+        $dirPath = $model
+            ? PathGeneratorService::generate(['model' => $model])
+            : pathinfo($media->path, PATHINFO_DIRNAME);
+
+        $fileName = $this->generateUniqueFileName($originalFileName, $dirPath, $disk);
+        $fullPath = $dirPath . '/' . $fileName;
+
+        $this->deleteFile($media->path, $disk);
+
+        if ($filePayload['uploaded_file']) {
+            Storage::disk($disk)->putFileAs($dirPath, $filePayload['uploaded_file'], $fileName);
+        } else {
+            Storage::disk($disk)->put($fullPath, $filePayload['contents']);
+        }
+
+        $media->update([
+            'file_name' => $originalFileName,
+            'path' => $fullPath,
+            'disk' => $disk,
+            'mime_type' => $mimeType,
+            'size' => $size,
+        ]);
+
+        return $media;
+    }
+
     public function deleteMedia(Media $media)
     {
         $this->deleteFile($media->path, $media->disk);

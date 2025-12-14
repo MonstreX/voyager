@@ -30,6 +30,7 @@ import Sortable from 'sortablejs';
 import './formfields/adv-json';
 import './components/adv-related';
 import './formfields/adv-image';
+import './formfields/adv-media-files';
 import { attachConfirmDelegates } from './modules/confirm-modal';
 
 // Voyager namespace and ready Promises are initialized in master.blade.php <head>
