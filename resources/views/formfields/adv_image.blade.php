@@ -35,20 +35,12 @@
 </div>
 
 <!-- Modal for confirming delete -->
-<div class="modal modal-danger fade" tabindex="-1" id="adv-image-delete-modal-{{ $row->field }}" role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title"><i class="voyager-trash"></i> {{ __('voyager::generic.are_you_sure_delete') }}</h4>
-            </div>
-            <div class="modal-body">
-                <p>{{ __('voyager::generic.delete_confirm') }}</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
-                <button type="button" class="btn btn-danger pull-right adv-image-delete-confirm" data-field="{{ $row->field }}">{{ __('voyager::generic.delete_confirm') }}</button>
-            </div>
-        </div>
-    </div>
-</div>
+@include('voyager::components.modal-confirm', [
+    'id' => 'adv-image-delete-modal-'.$row->field,
+    'title' => __('voyager::generic.are_you_sure_delete'),
+    'message' => __('voyager::generic.delete_confirm'),
+    'confirmText' => __('voyager::generic.delete_confirm'),
+    'confirmClass' => 'btn-danger',
+    'confirmButtonClass' => 'adv-image-delete-confirm',
+    'icon' => 'voyager-trash'
+])

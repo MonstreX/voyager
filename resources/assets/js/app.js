@@ -30,6 +30,7 @@ import Sortable from 'sortablejs';
 import './formfields/adv-json';
 import './components/adv-related';
 import './formfields/adv-image';
+import { attachConfirmDelegates } from './modules/confirm-modal';
 
 // Voyager namespace and ready Promises are initialized in master.blade.php <head>
 // Get the resolvers that were created there
@@ -191,6 +192,8 @@ const startDomObserver = () => {
     observer.observe(root, { childList: true, subtree: true });
     return observer;
 };
+
+attachConfirmDelegates();
 
 // Event system
 window.Voyager.events = voyagerEvents;
