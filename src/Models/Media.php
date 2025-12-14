@@ -17,12 +17,18 @@ class Media extends Model
 
     public function url()
     {
-        return '/storage/' . $this->path;
+        $disk = $this->disk ?: config('voyager.storage.disk', 'public');
+
+        try {
+            return \Illuminate\Support\Facades\Storage::disk($disk)->url($this->path);
+        } catch (\Exception $e) {
+            return '/storage/' . $this->path;
+        }
     }
 
     public function fullUrl()
     {
-        return url('/storage/' . $this->path);
+        return $this->url();
     }
 
     public function fileName()

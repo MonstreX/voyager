@@ -5,6 +5,7 @@ namespace TCG\Voyager\Tests\Feature;
 use Illuminate\Http\UploadedFile;
 use TCG\Voyager\Models\Media;
 use TCG\Voyager\Models\Post;
+use TCG\Voyager\Models\Role;
 use TCG\Voyager\Models\User;
 use TCG\Voyager\Services\MediaService;
 use TCG\Voyager\Tests\TestCase;
@@ -17,12 +18,19 @@ class MediaControllerTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
         $this->mediaService = new MediaService();
+
+        $role = Role::first() ?: Role::create([
+            'name' => 'admin',
+            'display_name' => 'Administrator',
+        ]);
 
         $this->user = User::create([
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => bcrypt('password'),
+            'role_id' => $role->id,
         ]);
 
         $this->actingAs($this->user);
@@ -36,7 +44,7 @@ class MediaControllerTest extends TestCase
             'body' => 'Test body',
         ]);
 
-        $file = UploadedFile::fake()->image('test.jpg');
+        $file = UploadedFile::fake()->create('test.bin', 10, 'application/octet-stream');
 
         $response = $this->post('/admin/api/media/upload', [
             'file' => $file,
@@ -58,7 +66,7 @@ class MediaControllerTest extends TestCase
             'body' => 'Test body',
         ]);
 
-        $file = UploadedFile::fake()->image('test.jpg');
+        $file = UploadedFile::fake()->create('test.bin', 10, 'application/octet-stream');
 
         $response = $this->post('/admin/api/media/upload', [
             'file' => $file,
@@ -82,7 +90,7 @@ class MediaControllerTest extends TestCase
             'body' => 'Test body',
         ]);
 
-        $file = UploadedFile::fake()->image('test.jpg');
+        $file = UploadedFile::fake()->create('test.bin', 10, 'application/octet-stream');
         $media = $this->mediaService->createFromFile($post, $file, 'featured');
 
         $response = $this->delete("/admin/api/media/{$media->id}");
@@ -99,7 +107,7 @@ class MediaControllerTest extends TestCase
             'body' => 'Test body',
         ]);
 
-        $file = UploadedFile::fake()->image('test.jpg');
+        $file = UploadedFile::fake()->create('test.jpg', 10, 'image/jpeg');
         $media = $this->mediaService->createFromFile($post, $file, 'featured');
 
         $mediaId = $media->id;
@@ -165,8 +173,8 @@ class MediaControllerTest extends TestCase
             'body' => 'Test body',
         ]);
 
-        $file1 = UploadedFile::fake()->image('test1.jpg');
-        $file2 = UploadedFile::fake()->image('test2.jpg');
+        $file1 = UploadedFile::fake()->create('test1.jpg', 10, 'image/jpeg');
+        $file2 = UploadedFile::fake()->create('test2.jpg', 10, 'image/jpeg');
 
         $media1 = $this->mediaService->createFromFile($post, $file1, 'gallery');
         $media2 = $this->mediaService->createFromFile($post, $file2, 'gallery');
@@ -190,8 +198,8 @@ class MediaControllerTest extends TestCase
             'body' => 'Test body',
         ]);
 
-        $file1 = UploadedFile::fake()->image('test1.jpg');
-        $file2 = UploadedFile::fake()->image('test2.jpg');
+        $file1 = UploadedFile::fake()->create('test1.jpg', 10, 'image/jpeg');
+        $file2 = UploadedFile::fake()->create('test2.jpg', 10, 'image/jpeg');
 
         $media1 = $this->mediaService->createFromFile($post, $file1, 'gallery');
         $media2 = $this->mediaService->createFromFile($post, $file2, 'gallery');

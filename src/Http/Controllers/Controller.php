@@ -330,9 +330,24 @@ abstract class Controller extends BaseController
     protected function handleAdvImageUploads($request, $rows, $data)
     {
         foreach ($rows as $row) {
-            if ($row->type == 'adv_image' && $request->hasFile($row->field)) {
+            if ($row->type !== 'adv_image') {
+                continue;
+            }
+
+            $collectionName = $row->details->collection_name ?? $row->field;
+            $titleField = $row->field . '_title';
+            $altField = $row->field . '_alt';
+            $props = [];
+
+            if ($request->has($titleField)) {
+                $props['title'] = $request->input($titleField);
+            }
+            if ($request->has($altField)) {
+                $props['alt'] = $request->input($altField);
+            }
+
+            if ($request->hasFile($row->field)) {
                 $file = $request->file($row->field);
-                $collectionName = $row->details->collection_name ?? $row->field;
 
                 if ($data->id && method_exists($data, 'getFirstMedia')) {
                     $oldMedia = $data->getFirstMedia($collectionName);
@@ -343,22 +358,16 @@ abstract class Controller extends BaseController
 
                 $media = app(\TCG\Voyager\Services\MediaService::class)->createFromFile($data, $file, $collectionName);
 
-                $titleField = $row->field . '_title';
-                $altField = $row->field . '_alt';
-                $props = [];
-
-                if ($request->has($titleField)) {
-                    $props['title'] = $request->input($titleField);
-                }
-                if ($request->has($altField)) {
-                    $props['alt'] = $request->input($altField);
-                }
-
                 if (!empty($props)) {
                     app(\TCG\Voyager\Services\MediaService::class)->updateMediaProps($media, $props);
                 }
 
                 $data->{$row->field} = $media->id;
+            } elseif (!empty($props) && method_exists($data, 'getFirstMedia')) {
+                $existingMedia = $data->getFirstMedia($collectionName);
+                if ($existingMedia) {
+                    app(\TCG\Voyager\Services\MediaService::class)->updateMediaProps($existingMedia, $props);
+                }
             }
         }
     }

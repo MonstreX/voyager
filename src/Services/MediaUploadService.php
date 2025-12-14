@@ -11,17 +11,18 @@ class MediaUploadService
     protected $file;
     protected $disk = 'public';
     protected $props = [];
+    protected $originalFileName = null;
 
     public function __construct($model, $collectionName = 'default', $file = null)
     {
         $this->model = $model;
         $this->collectionName = $collectionName;
-        $this->file = $file;
+        $this->setFile($file);
     }
 
     public function file($file)
     {
-        $this->file = $file;
+        $this->setFile($file);
         return $this;
     }
 
@@ -52,7 +53,7 @@ class MediaUploadService
         $processor = ImageProcessor::make($this->file);
         $processor->crop($width, $height, $x, $y);
 
-        $this->file = $processor->encoded;
+        $this->file = (string) $processor->encode();
         return $this;
     }
 
@@ -65,7 +66,7 @@ class MediaUploadService
         $processor = ImageProcessor::make($this->file);
         $processor->resize($width, $height, $aspectRatio);
 
-        $this->file = $processor->encoded;
+        $this->file = (string) $processor->encode();
         return $this;
     }
 
@@ -80,7 +81,10 @@ class MediaUploadService
             $this->model,
             $this->file,
             $this->collectionName,
-            $this->disk
+            $this->disk,
+            [
+                'original_name' => $this->originalFileName,
+            ]
         );
 
         if ($this->props) {
@@ -88,5 +92,16 @@ class MediaUploadService
         }
 
         return $media;
+    }
+
+    protected function setFile($file): void
+    {
+        $this->file = $file;
+
+        if ($file instanceof \Illuminate\Http\UploadedFile) {
+            $this->originalFileName = $file->getClientOriginalName();
+        } elseif (is_string($file)) {
+            $this->originalFileName = $this->originalFileName ?: 'file';
+        }
     }
 }

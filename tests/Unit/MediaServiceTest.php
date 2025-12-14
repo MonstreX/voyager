@@ -5,16 +5,34 @@ namespace TCG\Voyager\Tests\Unit;
 use Illuminate\Http\UploadedFile;
 use TCG\Voyager\Models\Media;
 use TCG\Voyager\Models\Post;
+use TCG\Voyager\Models\Role;
+use TCG\Voyager\Models\User;
 use TCG\Voyager\Services\MediaService;
 use TCG\Voyager\Tests\TestCase;
 
 class MediaServiceTest extends TestCase
 {
     protected $mediaService;
+    protected $user;
 
     public function setUp(): void
     {
         parent::setUp();
+
+        $role = Role::first() ?: Role::create([
+            'name' => 'admin',
+            'display_name' => 'Administrator',
+        ]);
+
+        $this->user = User::create([
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+            'password' => bcrypt('password'),
+            'role_id' => $role->id,
+        ]);
+
+        $this->actingAs($this->user);
+
         $this->mediaService = new MediaService();
     }
 
@@ -26,7 +44,7 @@ class MediaServiceTest extends TestCase
             'body' => 'Test body',
         ]);
 
-        $file = UploadedFile::fake()->image('test.jpg');
+        $file = UploadedFile::fake()->create('test.bin', 10, 'application/octet-stream');
 
         $media = $this->mediaService->createFromFile($post, $file, 'featured');
 
@@ -34,7 +52,7 @@ class MediaServiceTest extends TestCase
         $this->assertEquals($post->id, $media->model_id);
         $this->assertEquals(Post::class, $media->model_type);
         $this->assertEquals('featured', $media->collection_name);
-        $this->assertEquals('test.jpg', $media->file_name);
+        $this->assertEquals('test.bin', $media->file_name);
     }
 
     public function testDeleteMedia()
@@ -45,7 +63,7 @@ class MediaServiceTest extends TestCase
             'body' => 'Test body',
         ]);
 
-        $file = UploadedFile::fake()->image('test.jpg');
+        $file = UploadedFile::fake()->create('test.bin', 10, 'application/octet-stream');
         $media = $this->mediaService->createFromFile($post, $file, 'featured');
 
         $mediaId = $media->id;
@@ -63,7 +81,7 @@ class MediaServiceTest extends TestCase
             'body' => 'Test body',
         ]);
 
-        $file = UploadedFile::fake()->image('test.jpg');
+        $file = UploadedFile::fake()->create('test.bin', 10, 'application/octet-stream');
         $media = $this->mediaService->createFromFile($post, $file, 'featured');
 
         $this->mediaService->updateMediaProps($media, [
@@ -85,9 +103,9 @@ class MediaServiceTest extends TestCase
             'body' => 'Test body',
         ]);
 
-        $file1 = UploadedFile::fake()->image('test1.jpg');
-        $file2 = UploadedFile::fake()->image('test2.jpg');
-        $file3 = UploadedFile::fake()->image('test3.jpg');
+        $file1 = UploadedFile::fake()->create('test1.bin', 10, 'application/octet-stream');
+        $file2 = UploadedFile::fake()->create('test2.bin', 10, 'application/octet-stream');
+        $file3 = UploadedFile::fake()->create('test3.bin', 10, 'application/octet-stream');
 
         $media1 = $this->mediaService->createFromFile($post, $file1, 'gallery');
         $media2 = $this->mediaService->createFromFile($post, $file2, 'gallery');
@@ -116,8 +134,8 @@ class MediaServiceTest extends TestCase
             'body' => 'Test body',
         ]);
 
-        $file1 = UploadedFile::fake()->image('test1.jpg');
-        $file2 = UploadedFile::fake()->image('test2.jpg');
+        $file1 = UploadedFile::fake()->create('test1.bin', 10, 'application/octet-stream');
+        $file2 = UploadedFile::fake()->create('test2.bin', 10, 'application/octet-stream');
 
         $media1 = $this->mediaService->createFromFile($post, $file1, 'gallery');
         $media2 = $this->mediaService->createFromFile($post, $file2, 'gallery');
@@ -134,9 +152,9 @@ class MediaServiceTest extends TestCase
             'body' => 'Test body',
         ]);
 
-        $file1 = UploadedFile::fake()->image('featured.jpg');
-        $file2 = UploadedFile::fake()->image('gallery1.jpg');
-        $file3 = UploadedFile::fake()->image('gallery2.jpg');
+        $file1 = UploadedFile::fake()->create('featured.bin', 10, 'application/octet-stream');
+        $file2 = UploadedFile::fake()->create('gallery1.bin', 10, 'application/octet-stream');
+        $file3 = UploadedFile::fake()->create('gallery2.bin', 10, 'application/octet-stream');
 
         $featured = $this->mediaService->createFromFile($post, $file1, 'featured');
         $gallery1 = $this->mediaService->createFromFile($post, $file2, 'gallery');
