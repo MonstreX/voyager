@@ -355,6 +355,8 @@ class VoyagerMediaController extends Controller
         $y = $request->get('y');
         $height = $request->get('height');
         $width = $request->get('width');
+        $maxWidth = $request->get('max_width');
+        $maxHeight = $request->get('max_height');
 
         $realPath = Storage::disk($this->filesystem)->path('/');
         $originImagePath = $request->upload_path.'/'.$request->originImageName;
@@ -374,6 +376,26 @@ class VoyagerMediaController extends Controller
 
             $content = Storage::disk($this->filesystem)->get($originImagePath);
             $image = Image::make($content)->crop($width, $height, $x, $y);
+
+            $maxWidth = $maxWidth ? (int) $maxWidth : null;
+            $maxHeight = $maxHeight ? (int) $maxHeight : null;
+
+            $curWidth = $image->width();
+            $curHeight = $image->height();
+            $ratio = 1.0;
+
+            if ($maxWidth && $curWidth > $maxWidth) {
+                $ratio = min($ratio, $maxWidth / $curWidth);
+            }
+            if ($maxHeight && $curHeight > $maxHeight) {
+                $ratio = min($ratio, $maxHeight / $curHeight);
+            }
+
+            if ($ratio < 1.0) {
+                $newWidth = max(1, (int) round($curWidth * $ratio));
+                $newHeight = max(1, (int) round($curHeight * $ratio));
+                $image->resize($newWidth, $newHeight);
+            }
             Storage::disk($this->filesystem)->put($destImagePath, $image->encode()->encoded);
 
             $success = true;

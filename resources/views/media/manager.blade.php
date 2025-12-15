@@ -326,6 +326,29 @@
                     <div class="new-image-info">
                         {{ __('voyager::media.width') }} <span :id="'new-image-width_'+uid"></span>, {{ __('voyager::media.height') }}<span :id="'new-image-height_'+uid"></span>
                     </div>
+                    <div class="row" style="margin-top: 15px;">
+                        <div class="col-sm-4">
+                            <label>{{ __('voyager::media.aspect_ratio') }}</label>
+                            <select class="form-control" v-model="modals.crop.aspect" v-on:change="setCropAspectRatio">
+                                <option value="free">{{ __('voyager::media.aspect_free') }}</option>
+                                <option value="1">1:1</option>
+                                <option value="1.3333333333">4:3</option>
+                                <option value="1.5">3:2</option>
+                                <option value="1.7777777778">16:9</option>
+                                <option value="0.75">3:4</option>
+                                <option value="0.6666666667">2:3</option>
+                                <option value="0.5625">9:16</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-4">
+                            <label>{{ __('voyager::media.max_width') }}</label>
+                            <input type="number" class="form-control" v-model="modals.crop.max_width" min="1" placeholder="1000">
+                        </div>
+                        <div class="col-sm-4">
+                            <label>{{ __('voyager::media.max_height') }}</label>
+                            <input type="number" class="form-control" v-model="modals.crop.max_height" min="1" placeholder="1000">
+                        </div>
+                    </div>
                 </div>
 
                 <div class="modal-footer">
@@ -455,6 +478,11 @@
                     },
                     move_files: {
                         destination: ''
+                    },
+                    crop: {
+                        aspect: 'free',
+                        max_width: '',
+                        max_height: ''
                     }
                 }
             };
@@ -929,6 +957,16 @@
 
                 var vm = this;
                 var postData = Object.assign({}, croppedData);
+                if (vm.modals && vm.modals.crop) {
+                    var maxWidth = parseInt(vm.modals.crop.max_width, 10);
+                    var maxHeight = parseInt(vm.modals.crop.max_height, 10);
+                    if (Number.isFinite(maxWidth) && maxWidth > 0) {
+                        postData.max_width = maxWidth;
+                    }
+                    if (Number.isFinite(maxHeight) && maxHeight > 0) {
+                        postData.max_height = maxHeight;
+                    }
+                }
 				this.sendRequest('{{ route('voyager.media.crop') }}', postData).then(function(data) {
 					if (data.success) {
 						toastr.success(data.message);
@@ -942,6 +980,18 @@
                 }).finally(function() {
                     vm.toggleModalVisibility('crop_modal_' + vm.uid, false);
                 });
+            },
+            setCropAspectRatio: function() {
+                if (!this._cropperInstance) {
+                    return;
+                }
+                var raw = this.modals && this.modals.crop ? this.modals.crop.aspect : 'free';
+                if (raw === 'free') {
+                    this._cropperInstance.setAspectRatio(NaN);
+                    return;
+                }
+                var ratio = parseFloat(raw);
+                this._cropperInstance.setAspectRatio(Number.isFinite(ratio) ? ratio : NaN);
             },
             addSelectedFiles: function () {
                 var vm = this;
@@ -1228,6 +1278,9 @@
                             return;
                         }
                         cropperInstance = new window.Cropper(croppingImage, {
+                            viewMode: 1,
+                            responsive: true,
+                            background: false,
                             crop: function(e) {
                                 document.getElementById('new-image-width_'+vm.uid).innerText = Math.round(e.detail.width) + 'px';
                                 document.getElementById('new-image-height_'+vm.uid).innerText = Math.round(e.detail.height) + 'px';
@@ -1239,6 +1292,10 @@
                                 };
                             }
                         });
+                        vm._cropperInstance = cropperInstance;
+                        if (typeof vm.setCropAspectRatio === 'function') {
+                            vm.setCropAspectRatio();
+                        }
                     });
 
                     cropperModal.addEventListener('hidden.bs.modal', function () {
@@ -1246,6 +1303,7 @@
                             cropperInstance.destroy();
                             cropperInstance = null;
                         }
+                        vm._cropperInstance = null;
                     });
                 }
             }
