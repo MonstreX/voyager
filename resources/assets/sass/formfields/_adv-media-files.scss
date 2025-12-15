@@ -185,6 +185,11 @@
     text-decoration: none;
 }
 
+.modal-adv-media-props .ace_editor {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
 @media (max-width: 1600px) {
     .adv-media-files-item {
         flex-basis: calc(100%/6 - 10px);

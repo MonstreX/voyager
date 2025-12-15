@@ -84,6 +84,7 @@ Route::group(['as' => 'voyager.'], function () {
             'prefix' => 'api/media',
         ], function () {
             Route::post('upload', '\TCG\Voyager\Http\Controllers\MediaController@upload')->name('upload');
+            Route::get('{media}', '\TCG\Voyager\Http\Controllers\MediaController@show')->name('show');
             Route::delete('{media}', '\TCG\Voyager\Http\Controllers\MediaController@delete')->name('delete');
             Route::post('{media}/props', '\TCG\Voyager\Http\Controllers\MediaController@updateProps')->name('update-props');
             Route::post('reorder', '\TCG\Voyager\Http\Controllers\MediaController@reorder')->name('reorder');

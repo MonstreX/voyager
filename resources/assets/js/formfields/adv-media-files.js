@@ -33,10 +33,9 @@ const collectOrder = (listEl) => {
         if (mediaId) {
             ids.push(mediaId);
         }
-        const orderLabel = item.closest('.adv-media-files-item')?.querySelector('.adv-media-files-order');
-        if (orderLabel) {
-            orderLabel.textContent = String(index + 1);
-        }
+        const itemWrapper = item.closest('.adv-media-files-item');
+        const orderLabel = itemWrapper ? itemWrapper.querySelector('.adv-media-files-order') : null;
+        if (orderLabel) orderLabel.textContent = String(index + 1);
     });
     return ids;
 };
@@ -72,6 +71,17 @@ const callReorder = (listEl) => {
         })
         .catch(() => {});
 };
+
+const buildMediaUrl = (listEl, mediaId) => {
+    const template = listEl.getAttribute('data-delete-url-template');
+    if (template) {
+        return template.replace('__MEDIA_ID__', mediaId);
+    }
+    const prefix = (window.voyagerPrefix || '/admin').replace(/\/?$/, '');
+    return `${prefix}/api/media/${mediaId}`;
+};
+
+const buildUpdatePropsUrl = (mediaUrl) => `${mediaUrl.replace(/\/$/, '')}/props`;
 
 const bindSortable = (listEl) => {
     if (typeof Sortable === 'undefined') {
@@ -122,23 +132,24 @@ const bindList = (listEl) => {
 
     const fieldName = listEl.getAttribute('data-field-name');
     const deleteModal = document.getElementById(`adv-media-delete-modal-${fieldName}`);
-    const deleteUrlTemplate = listEl.getAttribute('data-delete-url-template');
     const propsModal = document.getElementById(`adv-media-props-modal-${fieldName}`);
     const inputId = listEl.getAttribute('data-input-id');
     const masterFileInput = inputId ? document.getElementById(inputId) : null;
     let pendingDeleteIds = [];
     let activeItem = null;
     const replaceInputs = new Map();
+    const loadedProps = new Map();
 
     if (deleteModal) {
         const confirmBtn = deleteModal.querySelector('.adv-media-delete-confirm');
         if (confirmBtn) {
             confirmBtn.addEventListener('click', () => {
-                if (pendingDeleteIds.length === 0 || !deleteUrlTemplate) {
+                const template = listEl.getAttribute('data-delete-url-template');
+                if (pendingDeleteIds.length === 0 || !template) {
                     closeModal(deleteModal);
                     return;
                 }
-                removeItems(listEl, pendingDeleteIds, deleteUrlTemplate, deleteModal);
+                removeItems(listEl, pendingDeleteIds, template, deleteModal);
                 pendingDeleteIds = [];
             });
         }
@@ -215,23 +226,69 @@ const bindList = (listEl) => {
             if (!activeItem) {
                 return;
             }
-            const titleInput = propsModal.querySelector('.modal-prop-title');
-            const altInput = propsModal.querySelector('.modal-prop-alt');
-            const extraInputs = propsModal.querySelectorAll('.modal-prop-extra');
             const mediaId = activeItem.getAttribute('data-file-id');
-            if (mediaId) {
-                if (titleInput) {
-                    titleInput.value = activeItem.getAttribute('data-title') || '';
-                }
-                if (altInput) {
-                    altInput.value = activeItem.getAttribute('data-alt') || '';
-                }
-                extraInputs.forEach((input) => {
-                    const key = input.getAttribute('data-extra-key');
-                    input.value = activeItem.getAttribute(`data-extra-${key}`) || '';
+            if (!mediaId) return;
+
+            const mediaUrl = buildMediaUrl(listEl, mediaId);
+
+            const editorsPromise = (window.Voyager && typeof window.Voyager.loadEditors === 'function')
+                ? window.Voyager.loadEditors().catch(() => {})
+                : Promise.resolve();
+
+            fetch(mediaUrl, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                },
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (!data || data.status !== 'success' || !data.media) {
+                        throw new Error(data && data.message ? data.message : 'Failed to load media props');
+                    }
+
+                    const props = (data.media.props && typeof data.media.props === 'object') ? data.media.props : {};
+                    loadedProps.set(mediaId, props);
+
+                    const titleInput = propsModal.querySelector('.modal-prop-title');
+                    const altInput = propsModal.querySelector('.modal-prop-alt');
+                    const extraInputs = propsModal.querySelectorAll('.modal-prop-extra');
+                    const aceEditors = propsModal.querySelectorAll('.modal-prop-ace');
+
+                    if (titleInput) titleInput.value = props.title || '';
+                    if (altInput) altInput.value = props.alt || '';
+
+                    extraInputs.forEach((input) => {
+                        const key = input.getAttribute('data-extra-key');
+                        input.value = key ? (props[key] || '') : '';
+                    });
+
+                    return Promise.resolve(editorsPromise).then(() => {
+                        if (window.Voyager && window.Voyager.editors && typeof window.Voyager.editors.initAceEditors === 'function') {
+                            window.Voyager.editors.initAceEditors(propsModal);
+                        }
+
+                        aceEditors.forEach((el) => {
+                            const key = el.getAttribute('data-extra-key');
+                            const editorId = el.id;
+                            if (!key || !editorId) return;
+                            const textarea = document.getElementById(editorId + '_textarea');
+                            const value = props[key] || '';
+                            if (textarea) textarea.value = value;
+                            if (window.ace && typeof window.ace.edit === 'function') {
+                                const editor = window.ace.edit(editorId);
+                                editor.setValue(value, -1);
+                                editor.clearSelection();
+                                setTimeout(() => editor.resize(), 0);
+                            }
+                        });
+
+                        openModal(propsModal);
+                    });
+                })
+                .catch((err) => {
+                    if (window.toastr) window.toastr.error(err.message || 'Error loading media');
                 });
-            }
-            openModal(propsModal);
             return;
         }
     });
@@ -247,24 +304,62 @@ const bindList = (listEl) => {
                 const titleInput = propsModal.querySelector('.modal-prop-title');
                 const altInput = propsModal.querySelector('.modal-prop-alt');
                 const extraInputs = propsModal.querySelectorAll('.modal-prop-extra');
+                const aceEditors = propsModal.querySelectorAll('.modal-prop-ace');
                 const mediaId = activeItem.getAttribute('data-file-id');
-                if (mediaId) {
-                    if (titleInput) {
-                        activeItem.setAttribute('data-title', titleInput.value);
+                if (!mediaId) {
+                    closeModal(propsModal);
+                    return;
+                }
+
+                const mediaUrl = buildMediaUrl(listEl, mediaId);
+                const updateUrl = buildUpdatePropsUrl(mediaUrl);
+
+                const props = Object.assign({}, loadedProps.get(mediaId) || {});
+                if (titleInput) props.title = titleInput.value;
+                if (altInput) props.alt = altInput.value;
+
+                extraInputs.forEach((input) => {
+                    const key = input.getAttribute('data-extra-key');
+                    if (key) props[key] = input.value;
+                });
+
+                aceEditors.forEach((el) => {
+                    const key = el.getAttribute('data-extra-key');
+                    const editorId = el.id;
+                    if (!key || !editorId) return;
+                    if (window.ace && typeof window.ace.edit === 'function') {
+                        props[key] = window.ace.edit(editorId).getValue();
+                    } else {
+                        const textarea = document.getElementById(editorId + '_textarea');
+                        props[key] = textarea ? textarea.value : '';
+                    }
+                });
+
+                fetch(updateUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': getCsrfToken(),
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({ props }),
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        if (!data || data.status !== 'success') {
+                            throw new Error(data && data.message ? data.message : 'Error saving');
+                        }
+                        loadedProps.set(mediaId, props);
                         const display = activeItem.closest('.adv-media-files-item')?.querySelector('.adv-media-prop-display');
                         if (display) {
-                            display.textContent = titleInput.value || window.voyager?.__('voyager.generic.none') || '...';
+                            display.textContent = props.title || window.voyager?.__('voyager.generic.none') || '...';
                         }
-                    }
-                    if (altInput) {
-                        activeItem.setAttribute('data-alt', altInput.value);
-                    }
-                    extraInputs.forEach((input) => {
-                        const key = input.getAttribute('data-extra-key');
-                        activeItem.setAttribute(`data-extra-${key}`, input.value);
+                        if (window.toastr) window.toastr.success(window.voyager?.__('voyager.generic.successfully_updated') || 'Saved');
+                        closeModal(propsModal);
+                    })
+                    .catch((err) => {
+                        if (window.toastr) window.toastr.error(err.message || 'Error saving');
                     });
-                }
-                closeModal(propsModal);
             });
         }
     }
@@ -313,50 +408,7 @@ const bindList = (listEl) => {
         });
     }
 
-    const form = listEl.closest('form');
-    if (form) {
-        form.addEventListener('submit', () => {
-            const order = collectOrder(listEl);
-            order.forEach((id) => {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = `${fieldName}_order[]`;
-                input.value = id;
-                form.appendChild(input);
-            });
-
-            listEl.querySelectorAll('.adv-media-files-item-holder').forEach((item) => {
-                const mediaId = item.getAttribute('data-file-id');
-                if (!mediaId) return;
-                const title = item.getAttribute('data-title') || '';
-                const alt = item.getAttribute('data-alt') || '';
-
-                const titleInput = document.createElement('input');
-                titleInput.type = 'hidden';
-                titleInput.name = `${fieldName}_props[${mediaId}][title]`;
-                titleInput.value = title;
-                form.appendChild(titleInput);
-
-                const altInput = document.createElement('input');
-                altInput.type = 'hidden';
-                altInput.name = `${fieldName}_props[${mediaId}][alt]`;
-                altInput.value = alt;
-                form.appendChild(altInput);
-
-                item.getAttributeNames()
-                    .filter((name) => name.startsWith('data-extra-'))
-                    .forEach((attr) => {
-                        const key = attr.replace('data-extra-', '');
-                        const value = item.getAttribute(attr) || '';
-                        const extraInput = document.createElement('input');
-                        extraInput.type = 'hidden';
-                        extraInput.name = `${fieldName}_props[${mediaId}][${key}]`;
-                        extraInput.value = value;
-                        form.appendChild(extraInput);
-                    });
-            });
-        }, { once: false });
-    }
+    // Props and order are saved immediately via API (like in the original VE field).
 };
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -34,15 +34,7 @@
                          data-field-name="{{ $row->field }}"
                          data-file-name="{{ $media->file_name }}"
                          data-id="{{ $dataTypeContent->id ?? '' }}"
-                         data-file-id="{{ $media->id }}"
-                         data-title="{{ $media->prop('title', '') }}"
-                         data-alt="{{ $media->prop('alt', '') }}"
-                         @if(!empty($extraFields))
-                            @foreach($extraFields as $key => $field)
-                                data-extra-{{ $key }}="{{ $media->prop($key, '') }}"
-                            @endforeach
-                         @endif
-                    >
+                         data-file-id="{{ $media->id }}">
 
                         <div class="adv-media-files-order">
                             {{ $index + 1 }}
@@ -152,7 +144,26 @@
                     @foreach($extraFields as $key => $field)
                         <div class="form-group">
                             <label>{{ $field->title ?? $key }}</label>
-                            @if(($field->type ?? 'text') === 'textarea')
+                            @php $fieldType = $field->type ?? 'text'; @endphp
+                            @if($fieldType === 'ace' || $fieldType === 'codemirror')
+                                @php
+                                    $aceId = 'adv_media_files_ace_'.$row->field.'_'.$key;
+                                @endphp
+                                <div
+                                    id="{{ $aceId }}"
+                                    class="ace_editor modal-prop-ace"
+                                    data-extra-key="{{ $key }}"
+                                    data-language="html"
+                                    data-theme="monokai"
+                                    data-min-lines="8"
+                                ></div>
+                                <textarea
+                                    id="{{ $aceId }}_textarea"
+                                    class="modal-prop-ace-textarea"
+                                    data-extra-key="{{ $key }}"
+                                    style="display:none;"
+                                ></textarea>
+                            @elseif($fieldType === 'textarea')
                                 <textarea class="form-control modal-prop-extra"
                                           data-extra-key="{{ $key }}"
                                           rows="4"></textarea>

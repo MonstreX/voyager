@@ -56,6 +56,30 @@ class MediaController extends Controller
         }
     }
 
+    public function show(Media $media)
+    {
+        try {
+            $model = $media->model;
+            if ($model) {
+                $this->authorize('edit', $model);
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'media' => $media->toArray() + [
+                    'props' => $media->props,
+                    'url' => $media->url(),
+                    'full_url' => $media->fullUrl(),
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
     public function delete(Media $media)
     {
         try {
