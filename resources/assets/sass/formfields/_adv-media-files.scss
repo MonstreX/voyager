@@ -187,6 +187,37 @@
     border-radius: 4px;
 }
 
+.modal-adv-media-crop .modal-dialog {
+    width: calc(100vw - 30px);
+    max-width: 1100px;
+}
+
+.modal-adv-media-crop .modal-content {
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 30px);
+}
+
+.modal-adv-media-crop .modal-body {
+    overflow: auto;
+}
+
+.modal-adv-media-crop .crop-container {
+    position: relative;
+    width: 100%;
+    height: 60vh;
+    max-height: calc(100vh - 320px);
+}
+
+.modal-adv-media-crop .crop-container img {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    margin: 0 auto;
+}
+
 @media (max-width: 1600px) {
     .adv-media-files-item {
         flex-basis: calc(100%/6 - 10px);

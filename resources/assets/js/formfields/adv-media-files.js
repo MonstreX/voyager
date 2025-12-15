@@ -180,6 +180,9 @@ const bindList = (listEl) => {
                 return;
             }
             cropper = new window.Cropper(cropImg, {
+                viewMode: 1,
+                responsive: true,
+                background: false,
                 crop: function (e) {
                     const w = Math.round(e.detail.width);
                     const h = Math.round(e.detail.height);
@@ -193,6 +196,12 @@ const bindList = (listEl) => {
                     };
                 },
             });
+
+            setTimeout(() => {
+                if (cropper && typeof cropper.resize === 'function') {
+                    cropper.resize();
+                }
+            }, 0);
         });
 
         cropModal.addEventListener('hidden.bs.modal', function () {
