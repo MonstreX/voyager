@@ -45,6 +45,8 @@ return [
     'crop_override_confirm'  => 'It will override the original image, are you sure?',
     'crop_image'             => 'Crop Image',
     'success_crop_image'     => 'Successfully cropped the image',
+    'max_width'              => 'Max width',
+    'max_height'             => 'Max height',
     'height'                 => 'Height: ',
     'title'                  => 'Title',
     'type'                   => 'Type',

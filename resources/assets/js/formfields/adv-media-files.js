@@ -82,6 +82,7 @@ const buildMediaUrl = (listEl, mediaId) => {
 };
 
 const buildUpdatePropsUrl = (mediaUrl) => `${mediaUrl.replace(/\/$/, '')}/props`;
+const buildCropUrl = (mediaUrl) => `${mediaUrl.replace(/\/$/, '')}/crop`;
 
 const bindSortable = (listEl) => {
     if (typeof Sortable === 'undefined') {
@@ -152,6 +153,62 @@ const bindList = (listEl) => {
     let activeItem = null;
     const replaceInputs = new Map();
     const loadedProps = new Map();
+    let cropTarget = null;
+    let cropper = null;
+    let cropData = null;
+
+    const fieldNameForModal = listEl.getAttribute('data-field-name');
+    const cropModal = document.getElementById(`adv-media-crop-modal-${fieldNameForModal}`);
+    const cropConfirm = cropModal ? cropModal.querySelector('.adv-media-crop-confirm') : null;
+    const cropImg = cropModal ? cropModal.querySelector('img') : null;
+    const cropWidthEl = cropModal ? cropModal.querySelector('.adv-media-crop-width') : null;
+    const cropHeightEl = cropModal ? cropModal.querySelector('.adv-media-crop-height') : null;
+    const cropMaxWidthEl = cropModal ? cropModal.querySelector('.adv-media-crop-max-width') : null;
+    const cropMaxHeightEl = cropModal ? cropModal.querySelector('.adv-media-crop-max-height') : null;
+
+    if (cropModal) {
+        cropModal.addEventListener('shown.bs.modal', function () {
+            if (!cropImg || !cropTarget) {
+                return;
+            }
+            if (cropper && typeof cropper.destroy === 'function') {
+                cropper.destroy();
+                cropper = null;
+            }
+            if (typeof window.Cropper === 'undefined') {
+                if (window.toastr) window.toastr.error('Cropper is not available');
+                return;
+            }
+            cropper = new window.Cropper(cropImg, {
+                crop: function (e) {
+                    const w = Math.round(e.detail.width);
+                    const h = Math.round(e.detail.height);
+                    if (cropWidthEl) cropWidthEl.textContent = `${w}px`;
+                    if (cropHeightEl) cropHeightEl.textContent = `${h}px`;
+                    cropData = {
+                        x: Math.round(e.detail.x),
+                        y: Math.round(e.detail.y),
+                        width: w,
+                        height: h,
+                    };
+                },
+            });
+        });
+
+        cropModal.addEventListener('hidden.bs.modal', function () {
+            if (cropper && typeof cropper.destroy === 'function') {
+                cropper.destroy();
+                cropper = null;
+            }
+            cropTarget = null;
+            cropData = null;
+            if (cropImg) cropImg.src = '';
+            if (cropWidthEl) cropWidthEl.textContent = '0px';
+            if (cropHeightEl) cropHeightEl.textContent = '0px';
+            if (cropMaxWidthEl) cropMaxWidthEl.value = '';
+            if (cropMaxHeightEl) cropMaxHeightEl.value = '';
+        });
+    }
 
     if (deleteModal) {
         const confirmBtn = deleteModal.querySelector('.adv-media-delete-confirm');
@@ -274,6 +331,25 @@ const bindList = (listEl) => {
                 replaceInputs.set(mediaId, fileInput);
             }
             fileInput.click();
+            return;
+        }
+
+        const cropBtn = event.target.closest('.adv-media-files-crop');
+        if (cropBtn && cropModal) {
+            const holder = cropBtn.closest('.adv-media-files-item-holder');
+            if (!holder) return;
+            const isImage = holder.getAttribute('data-is-image');
+            if (isImage !== '1') {
+                return;
+            }
+            const img = holder.querySelector('img');
+            if (!img || !cropImg) {
+                return;
+            }
+            cropTarget = holder;
+            const src = img.getAttribute('src') || '';
+            cropImg.src = src ? (src.indexOf('?') >= 0 ? `${src}&t=${Date.now()}` : `${src}?t=${Date.now()}`) : '';
+            openModal(cropModal);
             return;
         }
 
@@ -420,6 +496,67 @@ const bindList = (listEl) => {
                     });
             });
         }
+    }
+
+    if (cropConfirm && cropModal) {
+        cropConfirm.addEventListener('click', () => {
+            if (!cropTarget) {
+                closeModal(cropModal);
+                return;
+            }
+            const mediaId = cropTarget.getAttribute('data-file-id');
+            if (!mediaId || !cropData) {
+                closeModal(cropModal);
+                return;
+            }
+
+            const maxWidth = cropMaxWidthEl && cropMaxWidthEl.value ? parseInt(cropMaxWidthEl.value, 10) : null;
+            const maxHeight = cropMaxHeightEl && cropMaxHeightEl.value ? parseInt(cropMaxHeightEl.value, 10) : null;
+
+            const mediaUrl = buildMediaUrl(listEl, mediaId);
+            const cropUrl = buildCropUrl(mediaUrl);
+
+            const payload = {
+                x: cropData.x,
+                y: cropData.y,
+                width: cropData.width,
+                height: cropData.height,
+            };
+            if (maxWidth && maxWidth > 0) payload.max_width = maxWidth;
+            if (maxHeight && maxHeight > 0) payload.max_height = maxHeight;
+
+            cropConfirm.disabled = true;
+
+            fetch(cropUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': getCsrfToken(),
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (!data || data.status !== 'success') {
+                        throw new Error(data && data.message ? data.message : 'Crop failed');
+                    }
+                    const img = cropTarget ? cropTarget.querySelector('img') : null;
+                    if (img) {
+                        const current = img.getAttribute('src') || '';
+                        const base = current.split('?')[0];
+                        img.setAttribute('src', `${base}?t=${Date.now()}`);
+                    }
+                    if (window.toastr) window.toastr.success(data.message || 'Cropped');
+                    closeModal(cropModal);
+                })
+                .catch((err) => {
+                    if (window.toastr) window.toastr.error(err.message || 'Crop failed');
+                })
+                .finally(() => {
+                    cropConfirm.disabled = false;
+                });
+        });
     }
 
     listEl.addEventListener('change', (event) => {

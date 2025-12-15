@@ -65,6 +65,7 @@
 
 .adv-media-files-change,
 .adv-media-files-edit,
+.adv-media-files-crop,
 .adv-media-files-remove {
     cursor: pointer;
     display: flex;
@@ -90,6 +91,10 @@
 
 .adv-media-files-edit {
     color: #00a142;
+}
+
+.adv-media-files-crop {
+    color: #22A7F0;
 }
 
 .adv-media-files-remove,

@@ -34,7 +34,8 @@
                          data-field-name="{{ $row->field }}"
                          data-file-name="{{ $media->file_name }}"
                          data-id="{{ $dataTypeContent->id ?? '' }}"
-                         data-file-id="{{ $media->id }}">
+                         data-file-id="{{ $media->id }}"
+                         data-is-image="{{ $media->isImage() ? '1' : '0' }}">
 
                         <div class="adv-media-files-order">
                             {{ $index + 1 }}
@@ -43,6 +44,9 @@
                         <div class="adv-media-files-actions">
                             <span class="adv-media-files-change icon voyager-refresh" title="Change file"></span>
                             <span class="adv-media-files-edit icon voyager-edit" title="Edit meta"></span>
+                            @if($media->isImage())
+                                <span class="adv-media-files-crop icon voyager-crop" title="{{ __('voyager::media.crop') }}"></span>
+                            @endif
                             <span class="adv-media-files-remove icon voyager-x" title="Delete file"></span>
                         </div>
 
@@ -175,6 +179,45 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
                 <button type="button" class="btn btn-primary modal-prop-save">{{ __('voyager::generic.save') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@php
+    $cropModalId = 'adv-media-crop-modal-'.$row->field;
+    $cropImageId = 'adv-media-crop-image-'.$row->field;
+@endphp
+<div class="modal fade modal-warning modal-adv-media-crop" tabindex="-1" role="dialog" id="{{ $cropModalId }}">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">{{ __('voyager::media.crop_image') }}</h4>
+            </div>
+            <div class="modal-body">
+                <div class="crop-container">
+                    <img id="{{ $cropImageId }}" class="img img-responsive" src="" alt="">
+                </div>
+                <div class="clearfix"></div>
+                <div style="margin-top:10px;">
+                    <span>{{ __('voyager::media.width') }} <strong class="adv-media-crop-width">0px</strong></span>
+                    <span style="margin-left: 15px;">{{ __('voyager::media.height') }} <strong class="adv-media-crop-height">0px</strong></span>
+                </div>
+                <div class="row" style="margin-top: 15px;">
+                    <div class="col-sm-6">
+                        <label>{{ __('voyager::media.max_width') }}</label>
+                        <input type="number" class="form-control adv-media-crop-max-width" min="1" placeholder="1000">
+                    </div>
+                    <div class="col-sm-6">
+                        <label>{{ __('voyager::media.max_height') }}</label>
+                        <input type="number" class="form-control adv-media-crop-max-height" min="1" placeholder="1000">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
+                <button type="button" class="btn btn-warning adv-media-crop-confirm">{{ __('voyager::media.crop') }}</button>
             </div>
         </div>
     </div>
