@@ -8,8 +8,9 @@
 }
 
 .adv-media-files-item {
-    display: block;
     position: relative;
+    display: flex;
+    flex-direction: column;
     flex-basis: calc(100%/7 - 10px);
     width: calc(100%/7 - 10px);
     margin-bottom: 20px;
@@ -113,11 +114,14 @@
 }
 
 .adv-media-files-data span {
-    display: block;
+    gap: 5px;
     padding: 0 5px;
 }
 
 .adv-media-files-filename {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-top: 5px;
     font-weight: 600;
     font-size: 0.75em;
