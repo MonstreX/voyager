@@ -40,10 +40,6 @@
                             {{ $index + 1 }}
                         </div>
 
-                        <div class="adv-media-files-bunch">
-                            <span class="adv-media-files-mark icon voyager-check" title="Mark file"></span>
-                        </div>
-
                         <div class="adv-media-files-actions">
                             <span class="adv-media-files-change icon voyager-refresh" title="Change file"></span>
                             <span class="adv-media-files-edit icon voyager-edit" title="Edit meta"></span>

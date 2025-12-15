@@ -65,8 +65,7 @@
 
 .adv-media-files-change,
 .adv-media-files-edit,
-.adv-media-files-remove,
-.adv-media-files-mark {
+.adv-media-files-remove {
     cursor: pointer;
     display: flex;
     justify-content: center;
@@ -94,15 +93,8 @@
 }
 
 .adv-media-files-remove,
-.adv-media-files-mark {
+.adv-media-files-remove {
     color: #FF1100;
-}
-
-.adv-media-files-bunch {
-    display: flex;
-    position: absolute;
-    right: -10px;
-    bottom: -8px;
 }
 
 .adv-media-files-actions {

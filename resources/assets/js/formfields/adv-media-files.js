@@ -91,9 +91,15 @@ const bindSortable = (listEl) => {
         animation: 200,
         sort: true,
         scroll: true,
+        onStart: () => {
+            listEl.__advMediaDragging = true;
+            listEl.__advMediaSuppressClickUntil = Date.now() + 250;
+        },
         onEnd: () => {
             updateOrderInputs(listEl);
             callReorder(listEl);
+            listEl.__advMediaDragging = false;
+            listEl.__advMediaSuppressClickUntil = Date.now() + 250;
         },
     });
 };
@@ -114,7 +120,10 @@ const removeItems = (listEl, ids, deleteUrlTemplate, confirmModal) => {
         removedIds.forEach((id) => {
             const holder = listEl.querySelector(`.adv-media-files-item-holder[data-file-id="${id}"]`);
             if (holder) {
-                holder.closest('.adv-media-files-item')?.remove();
+                const item = holder.closest('.adv-media-files-item');
+                if (item) {
+                    item.remove();
+                }
             }
         });
         updateOrderInputs(listEl);
@@ -129,6 +138,10 @@ const removeItems = (listEl, ids, deleteUrlTemplate, confirmModal) => {
 const bindList = (listEl) => {
     bindSortable(listEl);
     updateOrderInputs(listEl);
+
+    // State flags to avoid click vs drag conflicts
+    listEl.__advMediaDragging = false;
+    listEl.__advMediaSuppressClickUntil = 0;
 
     const fieldName = listEl.getAttribute('data-field-name');
     const deleteModal = document.getElementById(`adv-media-delete-modal-${fieldName}`);
@@ -172,6 +185,58 @@ const bindList = (listEl) => {
         });
     };
 
+    const toggleSelected = (holder) => {
+        if (!holder) {
+            return;
+        }
+        if (holder.classList.contains('remove')) {
+            holder.classList.remove('remove');
+        } else {
+            holder.classList.add('remove');
+        }
+        toggleBulkButtons();
+    };
+
+    let pointerDown = null;
+    listEl.addEventListener('pointerdown', (event) => {
+        const holder = event.target.closest('.adv-media-files-item-holder');
+        if (!holder) {
+            pointerDown = null;
+            return;
+        }
+        if (event.target.closest('.adv-media-files-actions')) {
+            pointerDown = null;
+            return;
+        }
+        pointerDown = {
+            x: event.clientX,
+            y: event.clientY,
+            time: Date.now(),
+            holder,
+        };
+    });
+
+    listEl.addEventListener('pointerup', (event) => {
+        if (!pointerDown) {
+            return;
+        }
+        const now = Date.now();
+        const suppressUntil = listEl.__advMediaSuppressClickUntil || 0;
+        if (now < suppressUntil || listEl.__advMediaDragging) {
+            pointerDown = null;
+            return;
+        }
+        const dx = Math.abs((event.clientX || 0) - pointerDown.x);
+        const dy = Math.abs((event.clientY || 0) - pointerDown.y);
+        const dt = now - pointerDown.time;
+
+        // Treat as click if there was no drag movement
+        if (dx <= 5 && dy <= 5 && dt <= 600) {
+            toggleSelected(pointerDown.holder);
+        }
+        pointerDown = null;
+    });
+
     listEl.addEventListener('click', (event) => {
         const removeBtn = event.target.closest('.adv-media-files-remove');
         if (removeBtn) {
@@ -181,14 +246,6 @@ const bindList = (listEl) => {
                 pendingDeleteIds = [mediaId];
                 openModal(deleteModal);
             }
-            return;
-        }
-
-        const markBtn = event.target.closest('.adv-media-files-mark');
-        if (markBtn) {
-            const holder = markBtn.closest('.adv-media-files-item-holder');
-            holder?.classList.toggle('remove');
-            toggleBulkButtons();
             return;
         }
 
@@ -350,11 +407,12 @@ const bindList = (listEl) => {
                             throw new Error(data && data.message ? data.message : 'Error saving');
                         }
                         loadedProps.set(mediaId, props);
-                        const display = activeItem.closest('.adv-media-files-item')?.querySelector('.adv-media-prop-display');
+                        const item = activeItem.closest('.adv-media-files-item');
+                        const display = item ? item.querySelector('.adv-media-prop-display') : null;
                         if (display) {
-                            display.textContent = props.title || window.voyager?.__('voyager.generic.none') || '...';
+                            display.textContent = props.title || (window.voyager && window.voyager.__ ? window.voyager.__('voyager.generic.none') : '') || '...';
                         }
-                        if (window.toastr) window.toastr.success(window.voyager?.__('voyager.generic.successfully_updated') || 'Saved');
+                        if (window.toastr) window.toastr.success((window.voyager && window.voyager.__ ? window.voyager.__('voyager.generic.successfully_updated') : '') || 'Saved');
                         closeModal(propsModal);
                     })
                     .catch((err) => {
@@ -369,8 +427,11 @@ const bindList = (listEl) => {
         if (fileInput) {
             const mediaId = fileInput.getAttribute('data-file-id');
             const holder = mediaId ? listEl.querySelector(`.adv-media-files-item-holder[data-file-id="${mediaId}"]`) : null;
-            holder?.classList.add('adv-media-file-replaced');
-            const label = holder?.closest('.adv-media-files-item')?.querySelector('.adv-media-files-filename');
+            if (holder) {
+                holder.classList.add('adv-media-file-replaced');
+            }
+            const item = holder ? holder.closest('.adv-media-files-item') : null;
+            const label = item ? item.querySelector('.adv-media-files-filename') : null;
             if (label && fileInput.files && fileInput.files[0]) {
                 label.innerHTML = `${fileInput.files[0].name} <i>${(fileInput.files[0].size / 1024).toFixed(1)} KB</i>`;
             }
