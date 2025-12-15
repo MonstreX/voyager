@@ -47,6 +47,8 @@ return [
     'success_crop_image'     => 'Successfully cropped the image',
     'max_width'              => 'Max width',
     'max_height'             => 'Max height',
+    'aspect_ratio'           => 'Aspect ratio',
+    'aspect_free'            => 'Free',
     'height'                 => 'Height: ',
     'title'                  => 'Title',
     'type'                   => 'Type',

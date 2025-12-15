@@ -46,6 +46,8 @@ return [
     'success_crop_image'     => 'Изображение успешно обрезано',
     'max_width'              => 'Макс. ширина',
     'max_height'             => 'Макс. высота',
+    'aspect_ratio'           => 'Пропорции',
+    'aspect_free'            => 'Свободно',
     'height'                 => 'Высота: ',
     'title'                  => 'Название',
     'type'                   => 'Тип',

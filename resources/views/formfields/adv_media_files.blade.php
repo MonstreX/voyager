@@ -205,11 +205,24 @@
                     <span style="margin-left: 15px;">{{ __('voyager::media.height') }} <strong class="adv-media-crop-height">0px</strong></span>
                 </div>
                 <div class="row" style="margin-top: 15px;">
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
+                        <label>{{ __('voyager::media.aspect_ratio') }}</label>
+                        <select class="form-control adv-media-crop-aspect">
+                            <option value="free">{{ __('voyager::media.aspect_free') }}</option>
+                            <option value="1">1:1</option>
+                            <option value="1.3333333333">4:3</option>
+                            <option value="1.5">3:2</option>
+                            <option value="1.7777777778">16:9</option>
+                            <option value="0.75">3:4</option>
+                            <option value="0.6666666667">2:3</option>
+                            <option value="0.5625">9:16</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-4">
                         <label>{{ __('voyager::media.max_width') }}</label>
                         <input type="number" class="form-control adv-media-crop-max-width" min="1" placeholder="1000">
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                         <label>{{ __('voyager::media.max_height') }}</label>
                         <input type="number" class="form-control adv-media-crop-max-height" min="1" placeholder="1000">
                     </div>

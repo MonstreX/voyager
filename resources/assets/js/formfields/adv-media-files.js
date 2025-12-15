@@ -163,6 +163,7 @@ const bindList = (listEl) => {
     const cropImg = cropModal ? cropModal.querySelector('img') : null;
     const cropWidthEl = cropModal ? cropModal.querySelector('.adv-media-crop-width') : null;
     const cropHeightEl = cropModal ? cropModal.querySelector('.adv-media-crop-height') : null;
+    const cropAspectEl = cropModal ? cropModal.querySelector('.adv-media-crop-aspect') : null;
     const cropMaxWidthEl = cropModal ? cropModal.querySelector('.adv-media-crop-max-width') : null;
     const cropMaxHeightEl = cropModal ? cropModal.querySelector('.adv-media-crop-max-height') : null;
 
@@ -202,6 +203,16 @@ const bindList = (listEl) => {
                     cropper.resize();
                 }
             }, 0);
+
+            if (cropAspectEl) {
+                const raw = cropAspectEl.value;
+                if (raw === 'free') {
+                    cropper.setAspectRatio(NaN);
+                } else {
+                    const ratio = parseFloat(raw);
+                    cropper.setAspectRatio(Number.isFinite(ratio) ? ratio : NaN);
+                }
+            }
         });
 
         cropModal.addEventListener('hidden.bs.modal', function () {
@@ -214,8 +225,24 @@ const bindList = (listEl) => {
             if (cropImg) cropImg.src = '';
             if (cropWidthEl) cropWidthEl.textContent = '0px';
             if (cropHeightEl) cropHeightEl.textContent = '0px';
+            if (cropAspectEl) cropAspectEl.value = 'free';
             if (cropMaxWidthEl) cropMaxWidthEl.value = '';
             if (cropMaxHeightEl) cropMaxHeightEl.value = '';
+        });
+    }
+
+    if (cropAspectEl) {
+        cropAspectEl.addEventListener('change', () => {
+            if (!cropper) {
+                return;
+            }
+            const raw = cropAspectEl.value;
+            if (raw === 'free') {
+                cropper.setAspectRatio(NaN);
+                return;
+            }
+            const ratio = parseFloat(raw);
+            cropper.setAspectRatio(Number.isFinite(ratio) ? ratio : NaN);
         });
     }
 
