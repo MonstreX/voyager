@@ -64,6 +64,11 @@ class MediaController extends Controller
                 $this->authorize('edit', $model);
             }
 
+            $jsonFlags = JSON_UNESCAPED_UNICODE;
+            if (defined('JSON_INVALID_UTF8_SUBSTITUTE')) {
+                $jsonFlags |= JSON_INVALID_UTF8_SUBSTITUTE;
+            }
+
             return response()->json([
                 'status' => 'success',
                 'media' => $media->toArray() + [
@@ -71,7 +76,7 @@ class MediaController extends Controller
                     'url' => $media->url(),
                     'full_url' => $media->fullUrl(),
                 ],
-            ]);
+            ], 200, [], $jsonFlags);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
