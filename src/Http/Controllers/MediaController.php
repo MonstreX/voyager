@@ -118,10 +118,15 @@ class MediaController extends Controller
             $props = $request->input('props', []);
             $this->mediaService->updateMediaProps($media, $props);
 
+            $jsonFlags = JSON_UNESCAPED_UNICODE;
+            if (defined('JSON_INVALID_UTF8_SUBSTITUTE')) {
+                $jsonFlags |= JSON_INVALID_UTF8_SUBSTITUTE;
+            }
+
             return response()->json([
                 'status' => 'success',
                 'media' => $media,
-            ]);
+            ], 200, [], $jsonFlags);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',

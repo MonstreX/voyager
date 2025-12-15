@@ -10,6 +10,16 @@ class Media extends Model
 
     protected $guarded = [];
 
+    protected static function jsonFlags(): int
+    {
+        $flags = JSON_UNESCAPED_UNICODE;
+        if (defined('JSON_INVALID_UTF8_SUBSTITUTE')) {
+            $flags |= JSON_INVALID_UTF8_SUBSTITUTE;
+        }
+
+        return $flags;
+    }
+
     public function model()
     {
         return $this->morphTo();
@@ -48,7 +58,7 @@ class Media extends Model
         $propsValue = $this->attributes['props'] ?? null;
         $props = $propsValue ? json_decode($propsValue, true) : [];
         $props[$key] = $value;
-        $this->attributes['props'] = json_encode($props);
+        $this->attributes['props'] = json_encode($props, static::jsonFlags());
         return $this;
     }
 
@@ -64,7 +74,7 @@ class Media extends Model
 
     public function setPropsAttribute($value)
     {
-        $this->attributes['props'] = is_array($value) ? json_encode($value) : $value;
+        $this->attributes['props'] = is_array($value) ? json_encode($value, static::jsonFlags()) : $value;
     }
 
     public function sizeForHumans()
