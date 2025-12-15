@@ -6,7 +6,7 @@
                 <div class="file_link selected" aria-hidden="true" data-toggle="tooltip" data-placement="auto" :title="getFilePath(file)">
                     <div class="link_icon">
                         <template v-if="fileIs(file, 'image')">
-                            <div class="img_icon" :style="imgIcon(getFilePath(file))"></div>
+                            <div class="img_icon" :style="imgIcon(file)"></div>
                         </template>
                         <template v-else-if="fileIs(file, 'video')">
                             <i class="icon voyager-video"></i>
@@ -97,7 +97,7 @@
                         <div :class="'file_link ' + (isFileSelected(file) ? 'selected' : '')">
                             <div class="link_icon">
                                 <template v-if="fileIs(file, 'image')">
-                                    <div class="img_icon" :style="imgIcon(file.path)"></div>
+                                    <div class="img_icon" :style="imgIcon(file)"></div>
                                 </template>
                                 <template v-else-if="fileIs(file, 'video')">
                                     <i class="icon voyager-video"></i>
@@ -1016,27 +1016,42 @@
 
                 return this.extractNameFromPath(this.getFilePath(file));
             },
-            imgIcon: function(path) {
-                if (!path) {
+            imgIcon: function(fileOrPath) {
+                if (!fileOrPath) {
                     return '';
                 }
 
-                path = this.resolvePreviewPath(path);
+                var path = (typeof fileOrPath === 'object')
+                    ? this.getFilePath(fileOrPath)
+                    : fileOrPath;
+
+                var lastModified = (typeof fileOrPath === 'object')
+                    ? (fileOrPath.last_modified || fileOrPath.lastModified || null)
+                    : null;
+
+                path = this.resolvePreviewPath(path, lastModified);
 				return 'background-size: cover; background-image: url("' + path + '"); background-repeat:no-repeat; background-position:center center;display:inline-block; width:100%; height:100%;';
 			},
-            resolvePreviewPath: function(path) {
+            resolvePreviewPath: function(path, cacheBust) {
                 if (!path) {
                     return '';
                 }
 
                 path = path.replace(/\\/g,"/");
                 if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
+                    if (cacheBust) {
+                        return path + (path.indexOf('?') >= 0 ? '&' : '?') + cacheBust;
+                    }
                     return path;
                 }
 
                 path = path.replace(/^\/+/, '');
                 var basePath = "{{ addslashes(Storage::disk(config('voyager.storage.disk'))->url('/')) }}";
-                return basePath + path;
+                var fullPath = basePath + path;
+                if (cacheBust) {
+                    fullPath = fullPath + (fullPath.indexOf('?') >= 0 ? '&' : '?') + cacheBust;
+                }
+                return fullPath;
             },
             extractNameFromPath: function(path) {
                 if (!path) {
