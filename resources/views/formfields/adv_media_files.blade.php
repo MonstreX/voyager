@@ -138,10 +138,10 @@
                 </div>
                 @if(!empty($extraFields))
                     @foreach($extraFields as $key => $field)
-                        <div class="form-group">
+                        <div class="form-group @if(isset($field->class)) {{ $field->class }} @endif">
                             <label>{{ $field->title ?? $key }}</label>
                             @php $fieldType = $field->type ?? 'text'; @endphp
-                            @if($fieldType === 'ace' || $fieldType === 'codemirror')
+                            @if($fieldType === 'ace')
                                 @php
                                     $aceId = 'adv_media_files_ace_'.$row->field.'_'.$key;
                                 @endphp
