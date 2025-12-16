@@ -121,4 +121,6 @@ return [
     'successfully_cloned'    => 'Successfully cloned :type',
     'error_cloning'          => 'Error cloning :type',
     'unauthorized_action'    => 'You are not authorized to perform this action',
+    'add_new_inline_set'     => 'Add new item',
+    'no_inline_set_data'     => 'Inline set has no fields configured.',
 ];

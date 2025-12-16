@@ -111,4 +111,6 @@ return [
     'whoopsie'               => 'Ой!',
     'yes'                    => 'Да',
     'yes_please'             => 'Да, пожалуйста',
+    'add_new_inline_set'     => 'Добавить элемент',
+    'no_inline_set_data'     => 'Inline set: не задан список полей.',
 ];

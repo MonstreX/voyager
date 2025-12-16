@@ -50,6 +50,50 @@ const getToggleSizeClass = (size) => {
     }
 };
 
+const getDefaultToggleHeight = (size) => {
+    switch (size) {
+        case 'large':
+            return 45;
+        case 'small':
+            return 30;
+        case 'mini':
+        case 'xs':
+            return 22;
+        default:
+            return 34;
+    }
+};
+
+const getDefaultToggleMinWidth = (size) => {
+    switch (size) {
+        case 'large':
+            return 79;
+        case 'small':
+            return 50;
+        case 'mini':
+        case 'xs':
+            return 35;
+        default:
+            return 59;
+    }
+};
+
+const measureElementWidth = (tagName, className, html) => {
+    const el = document.createElement(tagName);
+    el.className = className;
+    el.innerHTML = html;
+    el.style.position = 'absolute';
+    el.style.left = '-10000px';
+    el.style.top = '-10000px';
+    el.style.visibility = 'hidden';
+    el.style.whiteSpace = 'nowrap';
+    el.style.display = 'inline-block';
+    document.body.appendChild(el);
+    const width = el.getBoundingClientRect().width;
+    document.body.removeChild(el);
+    return width;
+};
+
 const buildToggleMarkup = (input, options) => {
     const onClass = `btn-${options.onstyle}`;
     const offClass = `btn-${options.offstyle}`;
@@ -172,30 +216,37 @@ export const initToggleSwitches = (target) => {
         };
 
         const adjustDimensions = () => {
+            const desiredHeight = options.height
+                ? (/^\d+$/.test(String(options.height)) ? Number(options.height) : null)
+                : null;
+
+            const height = desiredHeight || getDefaultToggleHeight(options.size);
+            wrapper.style.height = `${height}px`;
+
             if (options.width) {
                 wrapper.style.width = /^\d+$/.test(String(options.width))
                     ? `${options.width}px`
                     : options.width;
             } else {
-                const onWidth = toggleOn.getBoundingClientRect().width;
-                const offWidth = toggleOff.getBoundingClientRect().width;
-                const handleWidth = handle.getBoundingClientRect().width || 0;
-                const maxLabelWidth = Math.max(onWidth, offWidth);
-                const padding = 20; // Padding on each side
-                const width = maxLabelWidth + handleWidth + padding * 2;
-                wrapper.style.width = `${Math.ceil(width)}px`;
+                const sizeClass = getToggleSizeClass(options.size);
+                const onButtonClass = ['btn', onClass, sizeClass].filter(Boolean).join(' ');
+                const offButtonClass = ['btn', offClass, sizeClass].filter(Boolean).join(' ');
+                const handleClass = ['btn', 'btn-default', sizeClass].filter(Boolean).join(' ');
+
+                const onWidth = measureElementWidth('span', onButtonClass, options.on);
+                const offWidth = measureElementWidth('span', offButtonClass, options.off);
+                const handleWidth = measureElementWidth('span', handleClass, '&nbsp;');
+
+                const minWidth = getDefaultToggleMinWidth(options.size);
+                const calculated = Math.ceil(Math.max(onWidth, offWidth) + handleWidth);
+                const width = Math.max(minWidth, calculated);
+
+                // Safety guard against bad measurements.
+                wrapper.style.width = `${Math.min(width, 600)}px`;
             }
 
-            if (options.height) {
-                wrapper.style.height = /^\d+$/.test(String(options.height))
-                    ? `${options.height}px`
-                    : options.height;
-                toggleOn.style.lineHeight = toggleOn.offsetHeight + 'px';
-                toggleOff.style.lineHeight = toggleOff.offsetHeight + 'px';
-            } else {
-                const height = Math.max(toggleOn.offsetHeight, toggleOff.offsetHeight);
-                wrapper.style.height = `${height}px`;
-            }
+            toggleOn.style.lineHeight = `${height}px`;
+            toggleOff.style.lineHeight = `${height}px`;
         };
 
         // Store handlers for cleanup

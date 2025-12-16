@@ -31,6 +31,7 @@ import './formfields/adv-json';
 import './components/adv-related';
 import './formfields/adv-image';
 import './formfields/adv-media-files';
+import './formfields/adv-inline-set';
 import { attachConfirmDelegates } from './modules/confirm-modal';
 
 // Voyager namespace and ready Promises are initialized in master.blade.php <head>

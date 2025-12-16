@@ -10,6 +10,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Storage;
 use TCG\Voyager\Events\FileDeleted;
+use TCG\Voyager\Http\Controllers\ContentTypes\AdvInlineSetContentType;
 use TCG\Voyager\Http\Controllers\ContentTypes\Checkbox;
 use TCG\Voyager\Http\Controllers\ContentTypes\Coordinates;
 use TCG\Voyager\Http\Controllers\ContentTypes\File;
@@ -46,6 +47,9 @@ abstract class Controller extends BaseController
     public function insertUpdateData($request, $slug, $rows, $data)
     {
         $multi_select = [];
+        $creating = !$data->exists;
+
+        $request->attributes->set('voyagerModel', $data);
 
         // Pass $rows so that we avoid checking unused fields
         $request->attributes->add(['breadRows' => $rows->pluck('field')->toArray()]);
@@ -144,6 +148,10 @@ abstract class Controller extends BaseController
 
         $data->save();
 
+        if ($creating) {
+            $this->handleAdvInlineSetUploads($request, $rows, $data);
+        }
+
         $this->handleAdvMediaFilesUploads($request, $rows, $data);
 
         // Save translations
@@ -185,6 +193,79 @@ abstract class Controller extends BaseController
         }
 
         return $data;
+    }
+
+    protected function handleAdvInlineSetUploads($request, $rows, $data)
+    {
+        if (!$data->id || !method_exists($data, 'media')) {
+            return;
+        }
+
+        $mediaService = app(\TCG\Voyager\Services\MediaService::class);
+
+        foreach ($rows as $row) {
+            if ($row->type !== 'adv_inline_set') {
+                continue;
+            }
+
+            $inlineSet = $row->details->inline_set ?? null;
+            $fields = $inlineSet->fields ?? null;
+            if (!$fields) {
+                continue;
+            }
+
+            $raw = $data->{$row->field} ?? '[]';
+            $items = json_decode(!empty($raw) ? $raw : '[]', true);
+            if (!is_array($items)) {
+                continue;
+            }
+
+            $fields = (array) $fields;
+            $updated = false;
+
+            foreach ($items as $itemIndex => $item) {
+                $rowId = isset($item['row_id']) ? (int) $item['row_id'] : 0;
+                if ($rowId <= 0) {
+                    continue;
+                }
+
+                foreach ($fields as $fieldName => $fieldDef) {
+                    $type = is_array($fieldDef) ? ($fieldDef['type'] ?? 'text') : ($fieldDef->type ?? 'text');
+                    if ($type !== 'media') {
+                        continue;
+                    }
+
+                    $inputBase = $row->field . '_' . $fieldName . '_' . $rowId;
+
+                    if (!$request->hasFile($inputBase)) {
+                        continue;
+                    }
+
+                    $existing = $item[$fieldName] ?? [];
+                    if (is_numeric($existing)) {
+                        $existing = [(int) $existing];
+                    }
+                    $existing = array_values(array_filter(array_map('intval', (array) $existing)));
+
+                    $files = (array) $request->file($inputBase);
+                    foreach ($files as $file) {
+                        if (!$file || !$file->isValid()) {
+                            continue;
+                        }
+                        $media = $mediaService->createFromFile($data, $file, $inputBase);
+                        $existing[] = $media->id;
+                        $updated = true;
+                    }
+
+                    $items[$itemIndex][$fieldName] = array_values(array_unique(array_filter($existing)));
+                }
+            }
+
+            if ($updated) {
+                $data->{$row->field} = json_encode($items, JSON_UNESCAPED_UNICODE);
+                $data->save();
+            }
+        }
     }
 
     /**
@@ -298,6 +379,8 @@ abstract class Controller extends BaseController
             /********** ADV FIELDS GROUP TYPE **********/
             case 'adv_fields_group':
                 return (new \TCG\Voyager\Http\Controllers\ContentTypes\AdvFieldsGroupContentType($request, $slug, $row, $options))->handle();
+            case 'adv_inline_set':
+                return (new AdvInlineSetContentType($request, $slug, $row, $options))->handle();
             case 'adv_media_files':
                 return null;
             /********** ALL OTHER TEXT TYPE **********/
@@ -465,4 +548,5 @@ abstract class Controller extends BaseController
             }
         }
     }
+
 }

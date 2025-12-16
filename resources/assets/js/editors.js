@@ -161,8 +161,11 @@ export function initAceEditors(scope = document) {
         editor.getSession().setUseWorker(false);
 
         // Auto height by default
+        const maxLinesAttr = element.getAttribute('data-max-lines');
+        const maxLines = maxLinesAttr ? Number(maxLinesAttr) : Infinity;
+
         editor.setOptions({
-            maxLines: Infinity,
+            maxLines: Number.isFinite(maxLines) ? maxLines : Infinity,
             minLines: Number(element.getAttribute('data-min-lines') || 8),
             autoScrollEditorIntoView: true
         });
