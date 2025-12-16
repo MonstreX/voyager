@@ -66,6 +66,11 @@
   display: none;
 }
 
+.adv-inline-set-ghost .ace_editor,
+.adv-inline-set-drag .ace_editor {
+  display: none !important;
+}
+
 .adv-inline-set-list .adv-inline-set-label {
   font-size: 10px;
   font-weight: 700;

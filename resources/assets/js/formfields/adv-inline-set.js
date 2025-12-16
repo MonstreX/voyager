@@ -198,6 +198,8 @@ const initRowSortable = (listEl) => {
         sort: true,
         scroll: true,
         handle: '.adv-inline-set-handle',
+        ghostClass: 'adv-inline-set-ghost',
+        dragClass: 'adv-inline-set-drag',
         onSort: () => refreshRowIds(listEl),
         onEnd: (evt) => {
             refreshRowIds(listEl);
@@ -316,4 +318,3 @@ document.addEventListener('DOMContentLoaded', () => {
         initInlineSetWrapper(wrapper);
     });
 });
-
