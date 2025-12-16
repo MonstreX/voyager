@@ -1,5 +1,14 @@
 document.addEventListener('DOMContentLoaded', function() {
     let pendingDeleteData = null;
+    let cropState = {
+        mediaId: null,
+        field: null,
+        modal: null,
+        cropper: null,
+        cropData: null,
+        shownHandler: null,
+        hiddenHandler: null,
+    };
 
     const getCsrfToken = () => {
         const tokenMeta = document.querySelector('meta[name="csrf-token"]');
@@ -13,6 +22,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         const prefix = (window.voyagerPrefix || '/admin').replace(/\/?$/, '');
         return `${prefix}/api/media/${mediaId}`;
+    };
+
+    const buildCropUrl = (mediaId) => {
+        const prefix = (window.voyagerPrefix || '/admin').replace(/\/?$/, '');
+        return `${prefix}/api/media/${mediaId}/crop`;
     };
 
     const closeModal = (modal) => {
@@ -37,6 +51,27 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
+    const destroyCropper = () => {
+        if (cropState.cropper && typeof cropState.cropper.destroy === 'function') {
+            cropState.cropper.destroy();
+        }
+        cropState.cropper = null;
+        cropState.cropData = null;
+    };
+
+    const setCropAspect = (aspectSelect) => {
+        if (!cropState.cropper || !aspectSelect) {
+            return;
+        }
+        const raw = aspectSelect.value;
+        if (raw === 'free') {
+            cropState.cropper.setAspectRatio(NaN);
+            return;
+        }
+        const ratio = parseFloat(raw);
+        cropState.cropper.setAspectRatio(Number.isFinite(ratio) ? ratio : NaN);
+    };
+
     document.addEventListener('click', function(event) {
         const removeButton = event.target.closest('.single-adv-image-remove');
         if (!removeButton) {
@@ -50,6 +85,163 @@ document.addEventListener('DOMContentLoaded', function() {
 
         pendingDeleteData = { mediaId, field, mediaDiv, modal, button: removeButton };
         openModal(modal);
+    });
+
+    document.addEventListener('click', function(event) {
+        const cropButton = event.target.closest('.single-adv-image-crop');
+        if (!cropButton) {
+            return;
+        }
+
+        const mediaId = cropButton.getAttribute('data-media-id');
+        const field = cropButton.getAttribute('data-field');
+        const mediaDiv = document.getElementById('adv-image-' + field);
+        const previewImg = mediaDiv ? mediaDiv.querySelector('img') : null;
+
+        const modal = document.getElementById('adv-image-crop-modal-' + field);
+        const modalImg = modal ? modal.querySelector('.crop-container img') : null;
+        const widthEl = modal ? modal.querySelector('.adv-image-crop-width') : null;
+        const heightEl = modal ? modal.querySelector('.adv-image-crop-height') : null;
+        const aspectSelect = modal ? modal.querySelector('.adv-image-crop-aspect') : null;
+
+        if (!mediaId || !modal || !modalImg || !previewImg) {
+            return;
+        }
+
+        // Cleanup old listeners/cropper if this modal was used before
+        if (cropState.modal && cropState.shownHandler) {
+            cropState.modal.removeEventListener('shown.bs.modal', cropState.shownHandler);
+        }
+        if (cropState.modal && cropState.hiddenHandler) {
+            cropState.modal.removeEventListener('hidden.bs.modal', cropState.hiddenHandler);
+        }
+        destroyCropper();
+
+        cropState.mediaId = mediaId;
+        cropState.field = field;
+        cropState.modal = modal;
+
+        const src = previewImg.getAttribute('src') || '';
+        modalImg.src = src ? (src.indexOf('?') >= 0 ? `${src}&t=${Date.now()}` : `${src}?t=${Date.now()}`) : '';
+
+        cropState.shownHandler = function() {
+            destroyCropper();
+            if (typeof window.Cropper === 'undefined') {
+                if (window.toastr) window.toastr.error('Cropper is not available');
+                return;
+            }
+
+            cropState.cropper = new window.Cropper(modalImg, {
+                viewMode: 1,
+                responsive: true,
+                background: false,
+                crop: function(e) {
+                    const w = Math.round(e.detail.width);
+                    const h = Math.round(e.detail.height);
+                    if (widthEl) widthEl.textContent = `${w}px`;
+                    if (heightEl) heightEl.textContent = `${h}px`;
+                    cropState.cropData = {
+                        x: Math.round(e.detail.x),
+                        y: Math.round(e.detail.y),
+                        width: w,
+                        height: h,
+                    };
+                },
+            });
+
+            setCropAspect(aspectSelect);
+
+            setTimeout(() => {
+                if (cropState.cropper && typeof cropState.cropper.resize === 'function') {
+                    cropState.cropper.resize();
+                }
+            }, 0);
+        };
+
+        cropState.hiddenHandler = function() {
+            destroyCropper();
+            cropState.mediaId = null;
+            cropState.field = null;
+            cropState.modal = null;
+            cropState.shownHandler = null;
+            cropState.hiddenHandler = null;
+        };
+
+        modal.addEventListener('shown.bs.modal', cropState.shownHandler);
+        modal.addEventListener('hidden.bs.modal', cropState.hiddenHandler);
+
+        if (aspectSelect) {
+            aspectSelect.onchange = function() {
+                setCropAspect(aspectSelect);
+            };
+        }
+
+        openModal(modal);
+    });
+
+    document.addEventListener('click', function(event) {
+        const confirmBtn = event.target.closest('.adv-image-crop-confirm');
+        if (!confirmBtn || !cropState.mediaId || !cropState.modal) {
+            return;
+        }
+        if (!cropState.cropData) {
+            closeModal(cropState.modal);
+            return;
+        }
+
+        const maxWidthEl = cropState.modal.querySelector('.adv-image-crop-max-width');
+        const maxHeightEl = cropState.modal.querySelector('.adv-image-crop-max-height');
+
+        const payload = {
+            x: cropState.cropData.x,
+            y: cropState.cropData.y,
+            width: cropState.cropData.width,
+            height: cropState.cropData.height,
+        };
+
+        if (maxWidthEl && maxWidthEl.value) {
+            const v = parseInt(maxWidthEl.value, 10);
+            if (Number.isFinite(v) && v > 0) payload.max_width = v;
+        }
+        if (maxHeightEl && maxHeightEl.value) {
+            const v = parseInt(maxHeightEl.value, 10);
+            if (Number.isFinite(v) && v > 0) payload.max_height = v;
+        }
+
+        confirmBtn.disabled = true;
+
+        fetch(buildCropUrl(cropState.mediaId), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': getCsrfToken(),
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (!data || data.status !== 'success') {
+                    throw new Error(data && data.message ? data.message : 'Crop failed');
+                }
+
+                const mediaDiv = document.getElementById('adv-image-' + cropState.field);
+                const previewImg = mediaDiv ? mediaDiv.querySelector('img') : null;
+                if (previewImg) {
+                    const current = previewImg.getAttribute('src') || '';
+                    const base = current.split('?')[0];
+                    previewImg.setAttribute('src', `${base}?t=${Date.now()}`);
+                }
+
+                if (window.toastr) window.toastr.success(data.message || 'Cropped');
+                closeModal(cropState.modal);
+            })
+            .catch(err => {
+                if (window.toastr) window.toastr.error(err.message || 'Crop failed');
+            })
+            .finally(() => {
+                confirmBtn.disabled = false;
+            });
     });
 
     document.addEventListener('click', function(event) {
