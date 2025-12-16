@@ -244,9 +244,6 @@ export const initToggleSwitches = (target) => {
                 // Safety guard against bad measurements.
                 wrapper.style.width = `${Math.min(width, 600)}px`;
             }
-
-            toggleOn.style.lineHeight = `${height}px`;
-            toggleOff.style.lineHeight = `${height}px`;
         };
 
         // Store handlers for cleanup
