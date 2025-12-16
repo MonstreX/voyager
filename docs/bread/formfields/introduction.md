@@ -6,6 +6,18 @@ To tweak your formfields you can insert JSON options which are described in the 
 
 All formfields share a handful options:
 
+## Advanced formfields (this fork)
+
+This fork includes additional `adv_*` BREAD formfields migrated from a legacy codebase.
+See:
+- `adv_image` → `adv-image.md`
+- `adv_media_files` → `adv-media-files.md`
+- `adv_inline_set` → `adv-inline-set.md`
+- `adv_related` → `adv-related.md`
+- `adv_select_dropdown_tree` → `adv-select-dropdown-tree.md`
+- `adv_json` → `adv-json.md`
+- `adv_fields_group` → `adv-fields-group.md`
+
 ## Description
 
 All types can include a description in order to help your future self or other users using your Voyager admin panel to understand exactly what a specific BREAD input field is for, this can be defined in the `Optional Details` JSON input field:

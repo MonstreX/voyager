@@ -1,7 +1,10 @@
 # Prerequisites
 
-Before installing Voyager make sure you have installed one of the following versions of Laravel:
-- Laravel 8
-- Laravel 9
+## This fork
 
-Additionally Voyager requires you to use PHP 7.3 or newer. Laravel requires you to use PHP 8 or newer when using Laravel 9.
+This fork targets modern Laravel and PHP versions:
+
+- Laravel 11 / 12
+- PHP 8.2+
+
+> If you are using older Laravel versions, use the original Voyager releases instead of this fork.

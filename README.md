@@ -125,6 +125,38 @@ php artisan vendor:publish --tag=voyager_assets --force
 The `vendor:publish` step copies the compiled files from `publishable/assets` into your application's `public/vendor/voyager` directory so that the admin panel can serve them directly.
 This path is now the only runtime source of Voyager's CSS/JS, so rerun the publish command every time you rebuild assets.
 
+## Additions in this fork
+
+This fork includes additional features migrated from a legacy `voyager-extension` codebase and a custom Media Storage subsystem (instead of Spatie Media Library).
+
+**Modernization summary (fork)**
+- Modern stack: PHP 8.2+ and Laravel 11/12
+- Build: Webpack/Mix → Vite (`publishable/assets` → publish to `public/vendor/voyager`)
+- Editors: TinyMCE → Jodit; Ace is bundled and lazy-loaded via `js/editors.js`
+- JS: native JS modules + bootstrap compatibility layer; unified confirm modals
+- Media: custom polymorphic `media` table + media API + CropperJS crop UI
+
+**Custom BREAD formfields**
+- `adv_select_dropdown_tree` (hierarchical dropdown)
+- `adv_related` (native JS autocomplete + sortable)
+- `adv_image` (single media item with props + crop)
+- `adv_media_files` (gallery/collection with props, reorder, bulk, crop)
+- `adv_inline_set` (inline sets, JSON-only storage, supports Jodit/Ace/media)
+- `adv_json`, `adv_fields_group`
+
+**Media Storage**
+- Polymorphic `media` table (`model_type/model_id`), `collection_name`, `order`, `props`, `disk`, `path`
+- Services: `TCG\\Voyager\\Services\\MediaService`, `MediaUploadService`, `PathGeneratorService`
+- Dated path strategy: `{table}/media/{Y}/{m}`
+
+For fork-specific documentation see:
+- `docs/fork/overview.md`
+- `docs/fork/media-storage.md`
+
+For implementation/migration notes (workspace):
+- `E:\\www.osp6\\voyager\\VE-MIGRATION.md`
+- `E:\\www.osp6\\voyager\\ADMIN-REVIEW.md`
+
 ## Sponsors
 
 Voyager is proudly supported by our amazing sponsors. A big thank you to:
