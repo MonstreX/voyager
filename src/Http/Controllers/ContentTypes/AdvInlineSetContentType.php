@@ -2,7 +2,6 @@
 
 namespace TCG\Voyager\Http\Controllers\ContentTypes;
 
-use Illuminate\Http\Request;
 use TCG\Voyager\Services\MediaService;
 
 class AdvInlineSetContentType extends BaseType
@@ -49,7 +48,10 @@ class AdvInlineSetContentType extends BaseType
                     $deletedIds = array_values(array_filter(array_map('intval', array_filter(explode(',', $deletedRaw)))));
 
                     if (!empty($deletedIds) && $model && method_exists($model, 'media')) {
-                        $mediaItems = $model->media()->whereIn('id', $deletedIds)->get();
+                        $mediaItems = $model->media()
+                            ->where('collection_name', $collectionName)
+                            ->whereIn('id', $deletedIds)
+                            ->get();
                         foreach ($mediaItems as $media) {
                             $mediaService->deleteMedia($media);
                         }
