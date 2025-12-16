@@ -2,7 +2,11 @@
 
 @foreach ($items as $item)
 
-    <li class="dd-item" data-id="{{ $item->id }}">
+    @php
+        $statusValue = array_key_exists('status', $item->getAttributes()) ? (int) $item->status : 1;
+        $isEnabled = $statusValue !== 0;
+    @endphp
+    <li class="dd-item{{ $isEnabled ? '' : ' unpublished-record' }}" data-id="{{ $item->id }}">
         <div class="dd-handle dd-menu-item">
             <div class="dd-menu-left">
                 @if($options->isModelTranslatable)
@@ -12,6 +16,14 @@
                         '_field_trans'        => json_encode($item->getTranslationsOf('title'))
                     ])
                 @endif
+                <span class="tree-admin-status">
+                    <span
+                        class="voyager-status-toggle {{ $isEnabled ? 'active' : 'inactive' }}"
+                        data-id="{{ $item->id }}"
+                        data-value="{{ $isEnabled ? 1 : 0 }}"
+                        title="{{ __('voyager::menu_builder.status') }}"
+                    ></span>
+                </span>
                 <span>{{ $item->title }}</span> <small class="url">{{ $item->link() }}</small>
             </div>
 
@@ -25,6 +37,7 @@
                      data-color="{{ $item->color }}"
                      data-route="{{ $item->route }}"
                      data-parameters="{{ json_encode($item->parameters) }}"
+                     data-status="{{ $isEnabled ? 1 : 0 }}"
                      title="{{ __('voyager::generic.edit') }}"
                 >
                     <i class="voyager-edit"></i>

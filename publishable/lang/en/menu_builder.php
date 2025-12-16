@@ -25,6 +25,9 @@ return [
     'successfully_deleted' => 'Successfully Deleted Menu Item.',
     'successfully_updated' => 'Successfully Updated Menu Item.',
     'updated_order'        => 'Successfully updated menu order.',
+    'status'               => 'Status',
+    'status_active'        => 'Active',
+    'status_inactive'      => 'Disabled',
     'url'                  => 'URL for the Menu Item',
     'usage_hint'           => 'You can output a menu anywhere on your site by calling|You can output this menu anywhere on your site by calling',
 ];

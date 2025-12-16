@@ -66,11 +66,33 @@
                     <input id="m_form_method" type="hidden" name="_method" value="POST">
                     {{ csrf_field() }}
                     <div class="modal-body">
-                        <div>
-                            @include('voyager::multilingual.language-selector')
-                            <label for="name">{{ __('voyager::menu_builder.item_title') }}</label>
-                            @include('voyager::multilingual.input-hidden', ['_field_name' => 'title', '_field_trans' => ''])
-                            <input type="text" class="form-control" id="m_title" name="title" placeholder="{{ __('voyager::generic.title') }}"><br>
+                        <div class="row">
+                            <div class="col-12 form-group">
+                                <label for="m_status">{{ __('voyager::menu_builder.status') }}</label><br>
+                                <input type="hidden" name="status" value="0">
+                                <input
+                                        id="m_status"
+                                        type="checkbox"
+                                        name="status"
+                                        class="toggleswitch"
+                                        value="1"
+                                        checked
+                                        data-on="{{ __('voyager::menu_builder.status_active') }}"
+                                        data-off="{{ __('voyager::menu_builder.status_inactive') }}"
+                                        data-onstyle="primary"
+                                        data-offstyle="default"
+                                >
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div>
+                                    @include('voyager::multilingual.language-selector')
+                                    <label for="name">{{ __('voyager::menu_builder.item_title') }}</label>
+                                    @include('voyager::multilingual.input-hidden', ['_field_name' => 'title', '_field_trans' => ''])
+                                    <input type="text" class="form-control" id="m_title" name="title" placeholder="{{ __('voyager::generic.title') }}"><br>
+                                </div>
+                            </div>
                         </div>
                         <label for="type">{{ __('voyager::menu_builder.link_type') }}</label>
                         <select id="m_link_type" class="form-control voyager-select" name="type">
@@ -120,35 +142,59 @@
 @section('javascript')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            window.whenAppReady(function() {
-                var csrfMeta = document.querySelector('meta[name="csrf-token"]');
-                var csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
-            var addLabel = @json(__('voyager::generic.add'));
-            var updateLabel = @json(__('voyager::generic.update'));
-            var menuModal = document.getElementById('menu_item_modal');
-            var deleteModal = document.getElementById('delete_modal');
-            var menuForm = document.getElementById('m_form');
-            var formMethodInput = document.getElementById('m_form_method');
-            var idInput = document.getElementById('m_id');
-            var titleInput = document.getElementById('m_title');
-            var titleTranslationsInput = document.getElementById('title_i18n');
-            var urlInput = document.getElementById('m_url');
-            var routeInput = document.getElementById('m_route');
-            var paramsInput = document.getElementById('m_parameters');
-            var iconInput = document.getElementById('m_icon_class');
-            var colorInput = document.getElementById('m_color');
-            var targetSelect = document.getElementById('m_target');
-            var linkTypeSelect = document.getElementById('m_link_type');
-            var urlTypeContainer = document.getElementById('m_url_type');
-            var routeTypeContainer = document.getElementById('m_route_type');
-            var addHeading = document.getElementById('m_hd_add');
-            var editHeading = document.getElementById('m_hd_edit');
-            var submitButton = menuForm ? menuForm.querySelector('input[type="submit"]') : null;
-            var deleteForm = document.getElementById('delete_form');
-            var deleteActionTemplate = deleteForm ? deleteForm.getAttribute('action') : '';
-            var deleteConfirmButton = document.getElementById('delete_confirm_button');
-            var menuOrderUrl = '{{ route('voyager.menus.order_item',['menu' => $menu->id]) }}';
-            var modalMultilingualInstance = null;
+            const appReady = (window.Voyager && window.Voyager.ready && window.Voyager.ready.app)
+                ? window.Voyager.ready.app
+                : Promise.resolve();
+
+            appReady.then(function () {
+                const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
+
+                const addLabel = @json(__('voyager::generic.add'));
+                const updateLabel = @json(__('voyager::generic.update'));
+                const menuModal = document.getElementById('menu_item_modal');
+                const deleteModal = document.getElementById('delete_modal');
+                const menuForm = document.getElementById('m_form');
+                const formMethodInput = document.getElementById('m_form_method');
+                const idInput = document.getElementById('m_id');
+                const titleInput = document.getElementById('m_title');
+                const titleTranslationsInput = document.getElementById('title_i18n');
+                const urlInput = document.getElementById('m_url');
+                const routeInput = document.getElementById('m_route');
+                const paramsInput = document.getElementById('m_parameters');
+                const iconInput = document.getElementById('m_icon_class');
+                const colorInput = document.getElementById('m_color');
+                const targetSelect = document.getElementById('m_target');
+                const statusInput = document.getElementById('m_status');
+                const linkTypeSelect = document.getElementById('m_link_type');
+                const urlTypeContainer = document.getElementById('m_url_type');
+                const routeTypeContainer = document.getElementById('m_route_type');
+                const addHeading = document.getElementById('m_hd_add');
+                const editHeading = document.getElementById('m_hd_edit');
+                const submitButton = menuForm ? menuForm.querySelector('input[type="submit"]') : null;
+                const deleteForm = document.getElementById('delete_form');
+                const deleteActionTemplate = deleteForm ? deleteForm.getAttribute('action') : '';
+                const deleteConfirmButton = document.getElementById('delete_confirm_button');
+                const menuOrderUrl = '{{ route('voyager.menus.order_item',['menu' => $menu->id]) }}';
+                const menuStatusUrlTemplate = '{{ route('voyager.menus.item.status', ['menu' => $menu->id, 'id' => '__id']) }}';
+                let modalMultilingualInstance = null;
+                let menuStatusToggleRefreshPending = false;
+
+                const scheduleStatusToggleRefresh = () => {
+                    if (!statusInput || typeof window.VoyagerRefreshToggle !== 'function') {
+                        return;
+                    }
+                    if (menuStatusToggleRefreshPending) {
+                        return;
+                    }
+                    menuStatusToggleRefreshPending = true;
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            menuStatusToggleRefreshPending = false;
+                            window.VoyagerRefreshToggle(statusInput);
+                        });
+                    });
+                };
 
             function initMultilingualSections() {
                 if (!window.VoyagerInitMultilingual) {
@@ -157,7 +203,7 @@
                 window.VoyagerInitMultilingual('.side-body', {
                     transInputs: '.dd-list input[data-i18n=true]'
                 });
-                var modalInstance = window.VoyagerInitMultilingual('#menu_item_modal', {
+                const modalInstance = window.VoyagerInitMultilingual('#menu_item_modal', {
                     form: 'form',
                     transInputs: '#menu_item_modal input[data-i18n=true]',
                     langSelectors: '#menu_item_modal .language-selector input',
@@ -253,7 +299,7 @@
                     return '';
                 }
                 try {
-                    var parsed = JSON.parse(value);
+                    const parsed = JSON.parse(value);
                     return JSON.stringify(parsed, null, 2);
                 } catch (error) {
                     return value;
@@ -288,12 +334,17 @@
                 if (submitButton) {
                     submitButton.value = addLabel;
                 }
+                if (statusInput) {
+                    statusInput.checked = true;
+                    statusInput.dispatchEvent(new Event('change', { bubbles: true }));
+                }
                 toggleModalHeading(true);
                 setLinkType('url');
                 if (targetSelect) {
                     targetSelect.value = '_self';
                 }
                 openModal(menuModal);
+                scheduleStatusToggleRefresh();
             }
 
             function openEditModal(button) {
@@ -310,7 +361,7 @@
                 }
                 toggleModalHeading(false);
 
-                var id = button.dataset.id || '';
+                const id = button.dataset.id || '';
                 if (idInput) {
                     idInput.value = id;
                 }
@@ -318,20 +369,20 @@
                     titleInput.value = button.dataset.title || '';
                 }
                 if (titleTranslationsInput) {
-                    var translationSource = document.getElementById('title' + id + '_i18n');
+                    const translationSource = document.getElementById('title' + id + '_i18n');
                     titleTranslationsInput.value = translationSource ? translationSource.value : '';
                 }
                 if (modalMultilingualInstance && typeof modalMultilingualInstance.refresh === 'function') {
                     modalMultilingualInstance.refresh();
                 }
 
-                var targetValue = button.dataset.target || '_self';
+                const targetValue = button.dataset.target || '_self';
                 if (targetSelect) {
                     targetSelect.value = targetValue;
                 }
 
-                var routeValue = button.dataset.route || '';
-                var urlValue = button.dataset.url || '';
+                const routeValue = button.dataset.route || '';
+                const urlValue = button.dataset.url || '';
                 setLinkType(routeValue ? 'route' : 'url');
                 if (urlInput) {
                     urlInput.value = urlValue;
@@ -348,15 +399,20 @@
                 if (colorInput) {
                     colorInput.value = button.dataset.color || '';
                 }
+                if (statusInput) {
+                    statusInput.checked = String(button.dataset.status || '1') !== '0';
+                    statusInput.dispatchEvent(new Event('change', { bubbles: true }));
+                }
 
                 openModal(menuModal);
+                scheduleStatusToggleRefresh();
             }
 
             function openDeleteModal(button) {
                 if (!deleteModal || !deleteForm || !deleteActionTemplate) {
                     return;
                 }
-                var id = button.dataset.id;
+                const id = button.dataset.id;
                 if (id) {
                     deleteForm.setAttribute('action', deleteActionTemplate.replace('__id', id));
                 }
@@ -371,13 +427,13 @@
             });
 
             document.addEventListener('click', function (event) {
-                var editButton = event.target.closest('.item_actions .edit');
+                const editButton = event.target.closest('.item_actions .edit');
                 if (editButton) {
                     event.preventDefault();
                     openEditModal(editButton);
                     return;
                 }
-                var deleteButton = event.target.closest('.item_actions .delete');
+                const deleteButton = event.target.closest('.item_actions .delete');
                 if (deleteButton) {
                     event.preventDefault();
                     openDeleteModal(deleteButton);
@@ -391,15 +447,99 @@
                 });
             }
 
-            var menuNestable = document.querySelector('.dd');
+            if (menuModal) {
+                menuModal.addEventListener('shown.bs.modal', function () {
+                    scheduleStatusToggleRefresh();
+                });
+            }
+
+            document.addEventListener('click', function (event) {
+                const statusToggle = event.target.closest('.tree-admin-status .voyager-status-toggle');
+                if (!statusToggle) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                const id = statusToggle.dataset.id;
+                if (!id) {
+                    return;
+                }
+
+                const currentValue = parseInt(statusToggle.dataset.value || '0', 10);
+                const newValue = currentValue ? 0 : 1;
+
+                statusToggle.dataset.value = String(newValue);
+                statusToggle.classList.toggle('active', !!newValue);
+                statusToggle.classList.toggle('inactive', !newValue);
+
+                const itemLi = statusToggle.closest('li.dd-item');
+                if (itemLi) {
+                    itemLi.classList.toggle('unpublished-record', !newValue);
+                }
+
+                const handleEl = statusToggle.closest('.dd-handle');
+                const editButton = handleEl ? handleEl.querySelector('.item_actions .edit') : null;
+                if (editButton) {
+                    editButton.dataset.status = String(newValue);
+                }
+
+                const payload = new URLSearchParams();
+                payload.append('_token', csrfToken);
+                payload.append('status', String(newValue));
+
+                fetch(menuStatusUrlTemplate.replace('__id', id), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        'Accept': 'application/json'
+                    },
+                    body: payload.toString()
+                })
+                    .then(function (response) {
+                        return response.text().then(function (text) {
+                            let json = null;
+                            try {
+                                json = text ? JSON.parse(text) : null;
+                            } catch (e) {
+                                json = null;
+                            }
+
+                            if (!response.ok || (json && json.status === 'error')) {
+                                const message = (json && json.message) ? json.message : ('Menu status update failed with status ' + response.status);
+                                throw new Error(message);
+                            }
+
+                            toastr.success("{{ __('voyager::generic.successfully_updated') }}");
+                        });
+                    })
+                    .catch(function (error) {
+                        console.error('[VoyagerMenuBuilder] status update failed', error);
+
+                        statusToggle.dataset.value = String(currentValue);
+                        statusToggle.classList.toggle('active', !!currentValue);
+                        statusToggle.classList.toggle('inactive', !currentValue);
+
+                        if (itemLi) {
+                            itemLi.classList.toggle('unpublished-record', !currentValue);
+                        }
+                        if (editButton) {
+                            editButton.dataset.status = String(currentValue);
+                        }
+
+                        toastr.error(error && error.message ? error.message : "{{ __('voyager::generic.internal_error') }}");
+                    });
+            });
+
+            const menuNestable = document.querySelector('.dd');
             if (menuNestable && window.VoyagerInitNestable) {
                 window.VoyagerInitNestable(menuNestable);
                 menuNestable.addEventListener('voyager.sortable.updated', function (event) {
-                    var structure = event.detail && event.detail.structure
+                    const structure = event.detail && event.detail.structure
                         ? event.detail.structure
                         : (window.VoyagerSerializeNestable ? window.VoyagerSerializeNestable(menuNestable) : []);
 
-                    var payload = new URLSearchParams();
+                    const payload = new URLSearchParams();
                     payload.append('order', JSON.stringify(structure));
                     payload.append('_token', csrfToken);
 
@@ -423,7 +563,7 @@
                     });
                 });
             }
-            }); // end whenAppReady
+            }); // end appReady
         });
     </script>
 @stop

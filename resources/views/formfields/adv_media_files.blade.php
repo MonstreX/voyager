@@ -6,6 +6,35 @@
     $extraFields = $row->details->extra_fields ?? [];
     $deleteUrlTemplate = route('voyager.media-api.delete', ['media' => '__MEDIA_ID__']);
     $reorderUrl = route('voyager.media-api.reorder');
+    $fileIconMap = [
+        'ai' => 'ai.svg',
+        'avi' => 'avi.svg',
+        'css' => 'css.svg',
+        'csv' => 'csv.svg',
+        'dbf' => 'dbf.svg',
+        'doc' => 'doc.svg',
+        'docx' => 'doc.svg',
+        'dwg' => 'dwg.svg',
+        'exe' => 'exe.svg',
+        'htm' => 'html.svg',
+        'html' => 'html.svg',
+        'iso' => 'iso.svg',
+        'js' => 'javascript.svg',
+        'json' => 'json-file.svg',
+        'mp3' => 'mp3.svg',
+        'mp4' => 'mp4.svg',
+        'pdf' => 'pdf.svg',
+        'png' => 'png.svg',
+        'ppt' => 'ppt.svg',
+        'psd' => 'psd.svg',
+        'rtf' => 'rtf.svg',
+        'svg' => 'svg.svg',
+        'txt' => 'txt.svg',
+        'xls' => 'xls.svg',
+        'xlsx' => 'xls.svg',
+        'xml' => 'xml.svg',
+        'zip' => 'zip.svg',
+    ];
 @endphp
 
 <div class="adv-media-files-holder">
@@ -54,7 +83,11 @@
                             @if($media->isImage())
                                 <img src="{{ $media->fullUrl() }}">
                             @else
-                                <img class="file-type" src="{{ asset('vendor/tcg/voyager/assets/icons/files/default.png') }}">
+                                @php
+                                    $extension = strtolower(pathinfo($media->file_name, PATHINFO_EXTENSION));
+                                    $icon = $fileIconMap[$extension] ?? 'file.svg';
+                                @endphp
+                                <img class="file-type" src="{{ voyager_asset('icons/files/'.$icon) }}" alt="{{ $extension }}">
                             @endif
                         </div>
                     </div>

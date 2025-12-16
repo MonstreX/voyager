@@ -4,6 +4,7 @@ namespace TCG\Voyager\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Database\QueryException;
 use TCG\Voyager\Facades\Voyager;
 
 class VoyagerMenuController extends Controller
@@ -43,9 +44,8 @@ class VoyagerMenuController extends Controller
 
         $this->authorize('add', $menu);
 
-        $data = $this->prepareParameters(
-            $request->all()
-        );
+        $data = $this->prepareParameters($request->all());
+        $data['status'] = (int) $request->input('status', 1);
 
         unset($data['id']);
         $data['order'] = Voyager::model('MenuItem')->highestOrderMenuItem();
@@ -57,7 +57,16 @@ class VoyagerMenuController extends Controller
             $trans = $this->prepareMenuTranslations($data);
         }
 
-        $menuItem = Voyager::model('MenuItem')->create($data);
+        try {
+            $menuItem = Voyager::model('MenuItem')->create($data);
+        } catch (QueryException $e) {
+            return redirect()
+                ->route('voyager.menus.builder', [$data['menu_id']])
+                ->with([
+                    'message'    => $e->getMessage(),
+                    'alert-type' => 'error',
+                ]);
+        }
 
         // Save menu translations
         if ($_isTranslatable) {
@@ -75,9 +84,8 @@ class VoyagerMenuController extends Controller
     public function update_item(Request $request)
     {
         $id = $request->input('id');
-        $data = $this->prepareParameters(
-            $request->except(['id'])
-        );
+        $data = $this->prepareParameters($request->except(['id']));
+        $data['status'] = (int) $request->input('status', 1);
 
         $menuItem = Voyager::model('MenuItem')->findOrFail($id);
 
@@ -90,7 +98,16 @@ class VoyagerMenuController extends Controller
             $menuItem->setAttributeTranslations('title', $trans, true);
         }
 
-        $menuItem->update($data);
+        try {
+            $menuItem->update($data);
+        } catch (QueryException $e) {
+            return redirect()
+                ->route('voyager.menus.builder', [$menuItem->menu_id])
+                ->with([
+                    'message'    => $e->getMessage(),
+                    'alert-type' => 'error',
+                ]);
+        }
 
         return redirect()
             ->route('voyager.menus.builder', [$menuItem->menu_id])
@@ -98,6 +115,33 @@ class VoyagerMenuController extends Controller
                 'message'    => __('voyager::menu_builder.successfully_updated'),
                 'alert-type' => 'success',
             ]);
+    }
+
+    public function update_status(Request $request, $menu, $id)
+    {
+        $item = Voyager::model('MenuItem')->findOrFail($id);
+
+        $this->authorize('edit', $item->menu);
+
+        $item->status = (int) $request->input('status', 1);
+
+        try {
+            $item->save();
+        } catch (QueryException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => __('voyager::generic.successfully_updated'),
+            'data' => [
+                'id' => $item->id,
+                'status_value' => (int) $item->status,
+            ],
+        ]);
     }
 
     public function order_item(Request $request)

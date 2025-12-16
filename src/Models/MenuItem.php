@@ -21,6 +21,14 @@ class MenuItem extends Model
 
     protected $translatable = ['title'];
 
+    protected $casts = [
+        'status' => 'integer',
+    ];
+
+    protected $attributes = [
+        'status' => 1,
+    ];
+
     public static function boot()
     {
         parent::boot();
