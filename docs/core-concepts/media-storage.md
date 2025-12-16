@@ -145,7 +145,7 @@ Advanced fields use `/admin/api/media/*` endpoints for:
 - reordering a collection
 - cropping an image
 
-See the route group in `voyager.package/routes/voyager.php` (`media-api.*`).
+See: `media-api.md`.
 
 ### Security model
 
@@ -156,4 +156,3 @@ $model->media()->whereIn('id', $ids)
 ```
 
 Additionally, `adv_inline_set` per-row deletion is restricted by `collection_name` (row-scoped).
-

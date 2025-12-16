@@ -66,9 +66,13 @@ Post-save handler used by BREAD controllers to keep controllers small:
 The exact routes are registered under `routes/voyager.php` and are used by the advanced fields and Media Manager UI.
 
 Typical actions:
-- `GET /admin/api/media/{id}`: fetch media JSON (including props)
-- `DELETE /admin/api/media/{id}`: delete media
-- `POST /admin/api/media/reorder`: persist `order` for a collection
-- `POST /admin/api/media/crop`: crop/resize an image and update file/path metadata
+- `POST /admin/api/media/upload`
+- `GET /admin/api/media/{id}`
+- `DELETE /admin/api/media/{id}`
+- `POST /admin/api/media/{id}/props`
+- `POST /admin/api/media/{id}/crop`
+- `POST /admin/api/media/reorder`
 
 If you extend advanced fields or build a new one, prefer calling these endpoints (or `MediaService`) instead of duplicating storage logic.
+
+Full reference: `../core-concepts/media-api.md`.

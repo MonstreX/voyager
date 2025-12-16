@@ -46,6 +46,7 @@
 * [Routing](core-concepts/routing.md)
 * [Media Manager](core-concepts/media-manager.md)
 * [Media Storage (this fork)](core-concepts/media-storage.md)
+* [Media API (this fork)](core-concepts/media-api.md)
 * [Menus and Menu Builder](core-concepts/menus-and-menu-builder.md)
 * [Menu Item Status (this fork)](core-concepts/menu-item-status.md)
 * [Database Manager](core-concepts/database-manager.md)
