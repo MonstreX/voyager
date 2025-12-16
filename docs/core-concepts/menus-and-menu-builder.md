@@ -56,4 +56,4 @@ This will give you a collection of menu-items.
 
 This fork adds a `status` field to menu items and exposes it in the Menu Builder UI as a toggle (enabled/disabled).
 
-See: `../fork/menu-item-status.md`.
+See: `menu-item-status.md`.

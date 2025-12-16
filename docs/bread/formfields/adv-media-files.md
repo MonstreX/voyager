@@ -2,6 +2,12 @@
 
 `adv_media_files` is a gallery/collection field built on top of Voyager's Media Storage subsystem (polymorphic `media` table). It supports uploading multiple files, reordering, bulk selection, replacing a file, editing props, and cropping images.
 
+This field is designed as a "power gallery" for admins:
+- supports mixed file types (images + documents)
+- shows file-type icons for non-images
+- persists ordering immediately on drag-and-drop
+- stores additional metadata per media item in `media.props`
+
 ## Details JSON
 
 ```json
@@ -30,6 +36,28 @@
 - Reorder is saved immediately on drag-and-drop (server-side update of `media.order`).
 - Replacing a file keeps the same media record (updates file/path/mime/size).
 - Cropping is available for image items only.
+
+## Stored data
+
+Each uploaded file becomes a row in the `media` table:
+
+- `model_type/model_id` → your model
+- `collection_name` → from details (`collection_name`) or the field name
+- `order` → list position
+- `props` → `title`, `alt`, and keys from `extra_fields`
+
+## Crop
+
+The crop modal supports:
+- aspect ratio presets (including free crop)
+- max width / max height constraints (downscale after crop)
+
+Crop is performed server-side via the media API endpoint and the preview is refreshed using cache-busting.
+
+## Notes
+
+- If you change `collection_name` later, existing media items will not move automatically; treat it as part of your data contract.
+- For JSON in `props`, always store arrays/objects; avoid invalid UTF-8 (the backend tolerates it, but it should not be a normal workflow).
 
 ## Example: field that accepts mixed files + extra meta
 

@@ -23,6 +23,7 @@
 
 * [Introduction](bread/introduction.md)
 * [Relationships](bread/relationships.md)
+* [Browse Filters](bread/browse-filters.md)
 * [Formfields](bread/formfields/introduction.md)
   * [Checkbox/Multiple Checkbox/Radio](bread/formfields/checkbox.md)
   * [Coordinates](bread/formfields/coordinates.md)
@@ -44,7 +45,9 @@
 
 * [Routing](core-concepts/routing.md)
 * [Media Manager](core-concepts/media-manager.md)
+* [Media Storage (this fork)](core-concepts/media-storage.md)
 * [Menus and Menu Builder](core-concepts/menus-and-menu-builder.md)
+* [Menu Item Status (this fork)](core-concepts/menu-item-status.md)
 * [Database Manager](core-concepts/database-manager.md)
 * [Settings](core-concepts/settings.md)
 * [Compass](core-concepts/compass.md)
@@ -57,6 +60,7 @@
 * [Overriding files](customization/overriding-files.md)
 * [Overriding Routes](customization/overriding-routes.md)
 * [Additional CSS and JS](customization/additional-css-js.md)
+* [Confirm Modals (this fork)](customization/confirm-modals.md)
 * [Enabling Soft-Delete](customization/enabling-soft-delete.md)
 * [Custom relationship attributes](customization/custom-realtionship-attributes.md)
 * [Adding custom Formfields](customization/adding-custom-formfields.md)

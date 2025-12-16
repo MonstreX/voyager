@@ -2,6 +2,8 @@
 
 This fork adds a `status` field to menu items and exposes it in the Menu Builder UI.
 
+For the full developer guide see: `../core-concepts/menu-item-status.md`.
+
 ## Behaviour
 
 - `status = 1` means the menu item is enabled (default).
@@ -16,4 +18,3 @@ The toggle is shown:
 - Stored on the `menu_items` table as an integer/boolean field.
 
 If you render menus on the frontend, you can use the `status` flag to exclude disabled items (implementation depends on your menu rendering view).
-

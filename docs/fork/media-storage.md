@@ -8,6 +8,8 @@ This fork ships a custom Media Storage subsystem used by:
 
 It replaces the Spatie Media Library dependency used in the legacy `voyager-extension` codebase.
 
+For the full developer guide see: `../core-concepts/media-storage.md`.
+
 ## Data model: `media` table
 
 Media is stored in a polymorphic table (`model_type`, `model_id`) and grouped into collections.
@@ -70,4 +72,3 @@ Typical actions:
 - `POST /admin/api/media/crop`: crop/resize an image and update file/path metadata
 
 If you extend advanced fields or build a new one, prefer calling these endpoints (or `MediaService`) instead of duplicating storage logic.
-

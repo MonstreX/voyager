@@ -85,6 +85,49 @@ When upgrading to new version of voyager the assets located in the `/vendor/tcg/
 
 By default Voyager is going to use the `public` local storage. You can additionally use any driver inside of your `config/filesystems.php`. This means you can use S3, Google Cloud Storage, or any other file storage system you would like.
 
+## Media Storage (this fork)
+
+This fork includes a Media Storage subsystem used by `adv_image`, `adv_media_files` and `adv_inline_set`.
+
+It uses the same disk setting as Voyager storage by default (`voyager.storage.disk`), but you can also customize media-manager behavior under:
+
+```php
+'media' => [
+    'allowed_mimetypes' => [
+        'image/jpeg',
+        'image/png',
+        'image/gif',
+        'video/mp4',
+    ],
+    'path' => '/',
+    'show_folders' => true,
+    'allow_upload' => true,
+    'allow_move' => true,
+    'allow_delete' => true,
+    'allow_create_folder' => true,
+    'allow_rename' => true,
+    'allow_crop' => true,
+],
+```
+
+### Optional: custom path generator for stored media files
+
+`TCG\Voyager\Services\MediaService` can read an optional config key:
+
+```php
+'media' => [
+    'path_generator' => App\\Services\\MyPathGenerator::class,
+],
+```
+
+Your generator must implement:
+
+```php
+public static function generate(array $options = []): string;
+```
+
+See: `../core-concepts/media-storage.md`.
+
 ## Database
 
 ```php

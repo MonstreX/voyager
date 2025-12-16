@@ -2,6 +2,8 @@
 
 The admin UI uses a unified confirm modal to avoid duplicated markup/scripts and inconsistent Bootstrap backdrop handling.
 
+For the full developer guide see: `../customization/confirm-modals.md`.
+
 ## Component
 
 Blade component:
@@ -29,4 +31,3 @@ The modal is wired through a small native JS helper (no jQuery dependency), whic
 - supports reusing the same modal for multiple actions by rebinding the confirm handler
 
 If you implement a new destructive action, prefer this modal instead of `window.confirm(...)`.
-

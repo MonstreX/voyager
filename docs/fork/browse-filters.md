@@ -2,6 +2,8 @@
 
 This fork includes additional filters on BREAD browse pages, migrated from a legacy implementation.
 
+For the full developer guide see: `../bread/browse-filters.md`.
+
 ## What it does
 
 - Adds a filter UI to BREAD browse tables.
@@ -26,4 +28,3 @@ Multiple filters:
 
 - Some filters use Select2 dropdowns for better UX.
 - If you customize browse views, ensure the filter component remains included so session persistence still works.
-

@@ -2,6 +2,8 @@
 
 `adv_image` stores a single uploaded image using Voyager's Media Storage subsystem (polymorphic `media` table). It supports basic image props and cropping.
 
+Use this field when you need exactly one image per record (cover, hero, thumbnail) with simple metadata.
+
 ## Details JSON
 
 ```json
@@ -20,6 +22,20 @@
 - Props are stored in `media.props` (JSON): `title`, `alt`.
 - Deleting clears the model field and removes the corresponding media record + file.
 - Crop uses the same crop API as the Media Manager (CropperJS UI).
+
+## Stored data
+
+The model column stores the selected media id:
+
+```text
+cover_image = 123
+```
+
+The actual file and metadata are stored in `media`:
+
+- `collection_name` = `cover`
+- `props.title` / `props.alt`
+
 
 ## Example: BREAD field setup
 
