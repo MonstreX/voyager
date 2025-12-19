@@ -3,10 +3,7 @@
 namespace TCG\Voyager\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use TCG\Voyager\Events\BreadDataAdded;
 use TCG\Voyager\Events\BreadDataRestored;
-use TCG\Voyager\Events\BreadDataUpdated;
 use TCG\Voyager\Facades\Voyager;
 use TCG\Voyager\Http\Controllers\Traits\BreadRelationshipParser;
 use TCG\Voyager\Services\BreadBrowseService;
@@ -17,6 +14,10 @@ use TCG\Voyager\Services\BreadRelationService;
 use TCG\Voyager\Services\BreadRemoveMediaService;
 use TCG\Voyager\Services\BreadDataResolverService;
 use TCG\Voyager\Services\BreadOrderService;
+use TCG\Voyager\Services\BreadFormViewService;
+use TCG\Voyager\Services\BreadReadViewService;
+use TCG\Voyager\Services\BreadStoreService;
+use TCG\Voyager\Services\BreadUpdateService;
 
 class VoyagerBaseController extends Controller
 {
@@ -77,37 +78,14 @@ class VoyagerBaseController extends Controller
         $slug = $this->getSlug($request);
 
         $dataType = $breadDataResolverService->getDataTypeBySlug($slug);
+        $viewData = app(BreadReadViewService::class)->buildReadViewData($request, $dataType, $id);
+        $dataTypeContent = $viewData['dataTypeContent'];
 
-        $isSoftDeleted = false;
-
-        if (strlen($dataType->model_name) != 0) {
-            $dataTypeContent = $breadDataResolverService->findOrFail($dataType, $id, true);
-            if ($dataTypeContent->deleted_at) {
-                $isSoftDeleted = true;
-            }
-        } else {
-            // If Model doest exist, get data from table name
-            $dataTypeContent = DB::table($dataType->name)->where('id', $id)->first();
-        }
-
-        // Replace relationships' keys for labels and create READ links if a slug is provided.
-        $dataTypeContent = $this->resolveRelations($dataTypeContent, $dataType);
-
-        // If a column has a relationship associated with it, we do not want to show that field
-        $this->removeRelationshipField($dataType, 'read');
-
-        // Check permission
         $this->authorize('read', $dataTypeContent);
-
-        // Check if BREAD is Translatable
-        $isModelTranslatable = is_bread_translatable($dataTypeContent);
-
-        // Eagerload Relations
-        $this->eagerLoadRelations($dataTypeContent, $dataType, 'read', $isModelTranslatable);
 
         $view = $this->resolveView($slug, 'voyager::bread.read', 'read');
 
-        return Voyager::view($view, compact('dataType', 'dataTypeContent', 'isModelTranslatable', 'isSoftDeleted'));
+        return Voyager::view($view, $viewData);
     }
 
     //***************************************
@@ -127,31 +105,14 @@ class VoyagerBaseController extends Controller
         $slug = $this->getSlug($request);
 
         $dataType = $breadDataResolverService->getDataTypeBySlug($slug);
+        $viewData = app(BreadFormViewService::class)->buildEditViewData($request, $dataType, $id);
+        $dataTypeContent = $viewData['dataTypeContent'];
 
-        if (strlen($dataType->model_name) != 0) {
-            $dataTypeContent = $breadDataResolverService->findOrFail($dataType, $id, true);
-        } else {
-            // If Model doest exist, get data from table name
-            $dataTypeContent = DB::table($dataType->name)->where('id', $id)->first();
-        }
-
-        $this->applyColWidths($dataType->editRows);
-
-        // If a column has a relationship associated with it, we do not want to show that field
-        $this->removeRelationshipField($dataType, 'edit');
-
-        // Check permission
         $this->authorize('edit', $dataTypeContent);
-
-        // Check if BREAD is Translatable
-        $isModelTranslatable = is_bread_translatable($dataTypeContent);
-
-        // Eagerload Relations
-        $this->eagerLoadRelations($dataTypeContent, $dataType, 'edit', $isModelTranslatable);
 
         $view = $this->resolveView($slug, 'voyager::bread.edit-add', 'edit-add');
 
-        return Voyager::view($view, compact('dataType', 'dataTypeContent', 'isModelTranslatable'));
+        return Voyager::view($view, $viewData);
     }
 
     // POST BR(E)AD
@@ -169,34 +130,7 @@ class VoyagerBaseController extends Controller
         // Check permission
         $this->authorize('edit', $data);
 
-        // Validate fields with ajax
-        $val = $this->validateBread($request->all(), $dataType->editRows, $dataType->name, $id)->validate();
-
-        // Get fields with images to remove before updating and make a copy of $data
-        $to_remove = $dataType->editRows->where('type', 'image')
-            ->filter(function ($item, $key) use ($request) {
-                return $request->hasFile($item->field);
-            });
-        $original_data = clone($data);
-
-        $this->insertUpdateData($request, $slug, $dataType->editRows, $data);
-
-        // Delete Images
-        $breadCleanupService->deleteBreadImages($original_data, $to_remove);
-
-        event(new BreadDataUpdated($dataType, $data));
-
-        $redirect = $this->resolveRedirectAfterSave(
-            $request,
-            $request->input('redirect_to'),
-            $dataType,
-            auth()->user()->can('browse', app($dataType->model_name))
-        );
-
-        return $redirect->with([
-            'message'    => __('voyager::generic.successfully_updated')." {$dataType->getTranslatedAttribute('display_name_singular')}",
-            'alert-type' => 'success',
-        ]);
+        return app(BreadUpdateService::class)->update($request, $slug, $dataType, $id);
     }
 
     //***************************************
@@ -220,25 +154,11 @@ class VoyagerBaseController extends Controller
 
         // Check permission
         $this->authorize('add', app($dataType->model_name));
-
-        $dataTypeContent = (strlen($dataType->model_name) != 0)
-                            ? $breadDataResolverService->newModelInstance($dataType)
-                            : false;
-
-        $this->applyColWidths($dataType->addRows);
-
-        // If a column has a relationship associated with it, we do not want to show that field
-        $this->removeRelationshipField($dataType, 'add');
-
-        // Check if BREAD is Translatable
-        $isModelTranslatable = is_bread_translatable($dataTypeContent);
-
-        // Eagerload Relations
-        $this->eagerLoadRelations($dataTypeContent, $dataType, 'add', $isModelTranslatable);
+        $viewData = app(BreadFormViewService::class)->buildCreateViewData($request, $dataType);
 
         $view = $this->resolveView($slug, 'voyager::bread.edit-add', 'edit-add');
 
-        return Voyager::view($view, compact('dataType', 'dataTypeContent', 'isModelTranslatable'));
+        return Voyager::view($view, $viewData);
     }
 
     /**
@@ -257,27 +177,7 @@ class VoyagerBaseController extends Controller
         // Check permission
         $this->authorize('add', app($dataType->model_name));
 
-        // Validate fields with ajax
-        $val = $this->validateBread($request->all(), $dataType->addRows)->validate();
-        $data = $this->insertUpdateData($request, $slug, $dataType->addRows, $breadDataResolverService->newModelInstance($dataType));
-
-        event(new BreadDataAdded($dataType, $data));
-
-        if (!$request->has('_tagging')) {
-            $redirect = $this->resolveRedirectAfterSave(
-                $request,
-                $request->input('redirect_to'),
-                $dataType,
-                auth()->user()->can('browse', $data)
-            );
-
-            return $redirect->with([
-                'message'    => __('voyager::generic.successfully_added_new')." {$dataType->getTranslatedAttribute('display_name_singular')}",
-                'alert-type' => 'success',
-            ]);
-        } else {
-            return response()->json(['success' => true, 'data' => $data]);
-        }
+        return app(BreadStoreService::class)->store($request, $slug, $dataType);
     }
 
     //***************************************
@@ -355,42 +255,6 @@ class VoyagerBaseController extends Controller
         }
 
         return redirect()->route("voyager.{$dataType->slug}.index")->with($data);
-    }
-
-    protected function resolveRedirectAfterSave(Request $request, ?string $redirectUrl, $dataType, bool $canBrowse)
-    {
-        if ($this->isSafeRedirectUrl($request, $redirectUrl)) {
-            return redirect()->to($redirectUrl);
-        }
-
-        if ($canBrowse) {
-            return redirect()->route("voyager.{$dataType->slug}.index");
-        }
-
-        return redirect()->back();
-    }
-
-    protected function isSafeRedirectUrl(Request $request, ?string $redirectUrl): bool
-    {
-        if (!$redirectUrl || !is_string($redirectUrl)) {
-            return false;
-        }
-
-        $parts = @parse_url($redirectUrl);
-
-        if ($parts === false) {
-            return false;
-        }
-
-        if (isset($parts['scheme']) && !in_array(strtolower($parts['scheme']), ['http', 'https'], true)) {
-            return false;
-        }
-
-        if (isset($parts['host']) && $parts['host'] !== $request->getHost()) {
-            return false;
-        }
-
-        return true;
     }
 
     //***************************************
