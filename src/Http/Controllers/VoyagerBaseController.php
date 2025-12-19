@@ -21,6 +21,10 @@ class VoyagerBaseController extends Controller
 {
     use BreadRelationshipParser;
 
+    public function __construct(protected BrowseFilterService $browseFilterService)
+    {
+    }
+
     //***************************************
     //               ____
     //              |  _ \
@@ -49,8 +53,7 @@ class VoyagerBaseController extends Controller
         $search = (object) ['value' => $request->get('s'), 'key' => $request->get('key'), 'filter' => $request->get('filter')];
 
         // Browse Filters - Session-based storage
-        $browseFilterService = app(BrowseFilterService::class);
-        $filters = $browseFilterService->resolve($request, $slug);
+        $filters = $this->browseFilterService->resolve($request, $slug);
 
         $searchNames = [];
         if ($dataType->server_side) {
@@ -105,7 +108,7 @@ class VoyagerBaseController extends Controller
             }
 
             // Apply browse filters to query
-            $browseFilterService->apply($query, $filters);
+            $this->browseFilterService->apply($query, $filters);
 
             $row = $dataType->rows->where('field', $orderBy)->firstWhere('type', 'relationship');
             if ($orderBy && (in_array($orderBy, $dataType->fields()) || !empty($row))) {
