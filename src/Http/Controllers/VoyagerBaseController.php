@@ -15,6 +15,7 @@ use TCG\Voyager\Events\BreadDataUpdated;
 use TCG\Voyager\Events\BreadImagesDeleted;
 use TCG\Voyager\Facades\Voyager;
 use TCG\Voyager\Http\Controllers\Traits\BreadRelationshipParser;
+use TCG\Voyager\Services\BrowseFilterService;
 
 class VoyagerBaseController extends Controller
 {
@@ -48,26 +49,8 @@ class VoyagerBaseController extends Controller
         $search = (object) ['value' => $request->get('s'), 'key' => $request->get('key'), 'filter' => $request->get('filter')];
 
         // Browse Filters - Session-based storage
-        $filters = null;
-
-        // Reset filters if slug changed
-        if ($request->session()->has('filters') && $request->session()->get('filters')['slug'] !== $slug) {
-            $request->session()->forget('filters');
-        }
-
-        // Store new filters or restore from session
-        if ($request->has('field') && $request->has('value')) {
-            $filters = [
-                'slug' => $slug,
-                'field' => $request->get('field'),
-                'value' => $request->get('value')
-            ];
-            $request->session()->put('filters', $filters);
-        } elseif ($request->session()->has('filters') && !$request->has('reset_filters')) {
-            $filters = $request->session()->get('filters');
-        } else {
-            $request->session()->forget('filters');
-        }
+        $browseFilterService = app(BrowseFilterService::class);
+        $filters = $browseFilterService->resolve($request, $slug);
 
         $searchNames = [];
         if ($dataType->server_side) {
@@ -122,11 +105,7 @@ class VoyagerBaseController extends Controller
             }
 
             // Apply browse filters to query
-            if ($filters) {
-                foreach ($filters['field'] as $key => $filter) {
-                    $query->where($filters['field'][$key], '=', $filters['value'][$key]);
-                }
-            }
+            $browseFilterService->apply($query, $filters);
 
             $row = $dataType->rows->where('field', $orderBy)->firstWhere('type', 'relationship');
             if ($orderBy && (in_array($orderBy, $dataType->fields()) || !empty($row))) {
