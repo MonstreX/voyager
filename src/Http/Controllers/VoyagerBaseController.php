@@ -20,6 +20,7 @@ use TCG\Voyager\Services\BreadCleanupService;
 use TCG\Voyager\Services\BreadDestroyService;
 use TCG\Voyager\Services\BreadRelationService;
 use TCG\Voyager\Services\BreadRemoveMediaService;
+use TCG\Voyager\Services\BreadDataResolverService;
 
 class VoyagerBaseController extends Controller
 {
@@ -226,26 +227,16 @@ class VoyagerBaseController extends Controller
     //
     //****************************************
 
-    public function show(Request $request, $id)
+    public function show(Request $request, $id, BreadDataResolverService $breadDataResolverService)
     {
         $slug = $this->getSlug($request);
 
-        $dataType = Voyager::model('DataType')->where('slug', '=', $slug)->first();
+        $dataType = $breadDataResolverService->getDataTypeBySlug($slug);
 
         $isSoftDeleted = false;
 
         if (strlen($dataType->model_name) != 0) {
-            $model = app($dataType->model_name);
-            $query = $model->query();
-
-            // Use withTrashed() if model uses SoftDeletes and if toggle is selected
-            if ($model && in_array(SoftDeletes::class, class_uses_recursive($model))) {
-                $query = $query->withTrashed();
-            }
-            if ($dataType->scope && $dataType->scope != '' && method_exists($model, 'scope'.ucfirst($dataType->scope))) {
-                $query = $query->{$dataType->scope}();
-            }
-            $dataTypeContent = call_user_func([$query, 'findOrFail'], $id);
+            $dataTypeContent = $breadDataResolverService->findOrFail($dataType, $id, true);
             if ($dataTypeContent->deleted_at) {
                 $isSoftDeleted = true;
             }
@@ -290,24 +281,14 @@ class VoyagerBaseController extends Controller
     //
     //****************************************
 
-    public function edit(Request $request, $id)
+    public function edit(Request $request, $id, BreadDataResolverService $breadDataResolverService)
     {
         $slug = $this->getSlug($request);
 
-        $dataType = Voyager::model('DataType')->where('slug', '=', $slug)->first();
+        $dataType = $breadDataResolverService->getDataTypeBySlug($slug);
 
         if (strlen($dataType->model_name) != 0) {
-            $model = app($dataType->model_name);
-            $query = $model->query();
-
-            // Use withTrashed() if model uses SoftDeletes and if toggle is selected
-            if ($model && in_array(SoftDeletes::class, class_uses_recursive($model))) {
-                $query = $query->withTrashed();
-            }
-            if ($dataType->scope && $dataType->scope != '' && method_exists($model, 'scope'.ucfirst($dataType->scope))) {
-                $query = $query->{$dataType->scope}();
-            }
-            $dataTypeContent = call_user_func([$query, 'findOrFail'], $id);
+            $dataTypeContent = $breadDataResolverService->findOrFail($dataType, $id, true);
         } else {
             // If Model doest exist, get data from table name
             $dataTypeContent = DB::table($dataType->name)->where('id', $id)->first();
@@ -339,25 +320,16 @@ class VoyagerBaseController extends Controller
     }
 
     // POST BR(E)AD
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, BreadDataResolverService $breadDataResolverService)
     {
         $slug = $this->getSlug($request);
 
-        $dataType = Voyager::model('DataType')->where('slug', '=', $slug)->first();
+        $dataType = $breadDataResolverService->getDataTypeBySlug($slug);
 
         // Compatibility with Model binding.
         $id = $id instanceof \Illuminate\Database\Eloquent\Model ? $id->{$id->getKeyName()} : $id;
 
-        $model = app($dataType->model_name);
-        $query = $model->query();
-        if ($dataType->scope && $dataType->scope != '' && method_exists($model, 'scope'.ucfirst($dataType->scope))) {
-            $query = $query->{$dataType->scope}();
-        }
-        if ($model && in_array(SoftDeletes::class, class_uses_recursive($model))) {
-            $query = $query->withTrashed();
-        }
-
-        $data = $query->findOrFail($id);
+        $data = $breadDataResolverService->findOrFail($dataType, $id, true);
 
         // Check permission
         $this->authorize('edit', $data);
@@ -524,22 +496,17 @@ class VoyagerBaseController extends Controller
         return redirect()->route("voyager.{$dataType->slug}.index")->with($data);
     }
 
-    public function restore(Request $request, $id)
+    public function restore(Request $request, $id, BreadDataResolverService $breadDataResolverService)
     {
         $slug = $this->getSlug($request);
 
-        $dataType = Voyager::model('DataType')->where('slug', '=', $slug)->first();
+        $dataType = $breadDataResolverService->getDataTypeBySlug($slug);
 
         // Check permission
         $model = app($dataType->model_name);
         $this->authorize('delete', $model);
 
-        // Get record
-        $query = $model->withTrashed();
-        if ($dataType->scope && $dataType->scope != '' && method_exists($model, 'scope'.ucfirst($dataType->scope))) {
-            $query = $query->{$dataType->scope}();
-        }
-        $data = $query->findOrFail($id);
+        $data = $breadDataResolverService->findOrFail($dataType, $id, true);
 
         $displayName = $dataType->getTranslatedAttribute('display_name_singular');
 
@@ -641,11 +608,11 @@ class VoyagerBaseController extends Controller
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function order(Request $request)
+    public function order(Request $request, BreadDataResolverService $breadDataResolverService)
     {
         $slug = $this->getSlug($request);
 
-        $dataType = Voyager::model('DataType')->where('slug', '=', $slug)->first();
+        $dataType = $breadDataResolverService->getDataTypeBySlug($slug);
 
         // Check permission
         $this->authorize('edit', app($dataType->model_name));
@@ -660,10 +627,7 @@ class VoyagerBaseController extends Controller
         }
 
         $model = app($dataType->model_name);
-        $query = $model->query();
-        if ($model && in_array(SoftDeletes::class, class_uses_recursive($model))) {
-            $query = $query->withTrashed();
-        }
+        $query = $breadDataResolverService->query($model, $dataType, true);
         $results = $query->orderBy($dataType->order_column, $dataType->order_direction)->get();
 
         $display_column = $dataType->order_display_column;
@@ -684,11 +648,11 @@ class VoyagerBaseController extends Controller
         ));
     }
 
-    public function update_order(Request $request)
+    public function update_order(Request $request, BreadDataResolverService $breadDataResolverService)
     {
         $slug = $this->getSlug($request);
 
-        $dataType = Voyager::model('DataType')->where('slug', '=', $slug)->first();
+        $dataType = $breadDataResolverService->getDataTypeBySlug($slug);
 
         // Check permission
         $this->authorize('edit', app($dataType->model_name));
@@ -698,11 +662,7 @@ class VoyagerBaseController extends Controller
         $order = json_decode($request->input('order'));
         $column = $dataType->order_column;
         foreach ($order as $key => $item) {
-            if ($model && in_array(SoftDeletes::class, class_uses_recursive($model))) {
-                $i = $model->withTrashed()->findOrFail($item->id);
-            } else {
-                $i = $model->findOrFail($item->id);
-            }
+            $i = $breadDataResolverService->query($model, $dataType, true)->findOrFail($item->id);
             $i->$column = ($key + 1);
             $i->save();
         }
