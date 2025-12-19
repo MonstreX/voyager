@@ -36,7 +36,20 @@ if (!function_exists('voyager_asset')) {
             $publicRelativePath = 'vendor/voyager';
         }
 
-        return asset($publicRelativePath, $secure);
+        $url = asset($publicRelativePath, $secure);
+
+        // Cache-bust published assets (JS/CSS/images/fonts) using mtime when a file path is provided.
+        // Important: do NOT append to base directory URLs like voyager_asset().
+        if ($cleanPath !== '') {
+            $filePath = public_path(str_replace('/', DIRECTORY_SEPARATOR, $publicRelativePath));
+            if (is_file($filePath)) {
+                $version = (string) filemtime($filePath);
+                $separator = str_contains($url, '?') ? '&' : '?';
+                $url .= $separator.'v='.$version;
+            }
+        }
+
+        return $url;
     }
 }
 
