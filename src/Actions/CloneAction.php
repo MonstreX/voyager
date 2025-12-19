@@ -21,10 +21,15 @@ class CloneAction extends AbstractAction
 
     public function getAttributes()
     {
+        $id = $this->data->{$this->data->getKeyName()};
+
         return [
-            'class'   => 'btn btn-sm btn-success clone',
-            'data-id' => $this->data->{$this->data->getKeyName()},
-            'id'      => 'clone-'.$this->data->{$this->data->getKeyName()},
+            'class'                   => 'btn btn-sm btn-success clone',
+            'data-id'                 => $id,
+            'data-confirm-target'     => '#clone_modal',
+            'data-confirm-form'       => '#clone_form',
+            'data-confirm-form-action'=> route('voyager.'.$this->dataType->slug.'.clone', ['id' => $id]),
+            'id'                      => 'clone-'.$id,
         ];
     }
 

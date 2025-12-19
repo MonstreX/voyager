@@ -1,4 +1,7 @@
-<a class="btn btn-danger" id="bulk_delete_btn">
+<a class="btn btn-danger"
+   id="bulk_delete_btn"
+   data-confirm-target="#bulk_delete_modal"
+   data-confirm-form="#bulk_delete_form">
     <i class="voyager-trash"></i> <span>{{ __('voyager::generic.bulk_delete') }}</span>
 </a>
 
@@ -25,39 +28,20 @@ window.addEventListener('load', function () {
     const bulkDeleteCount = document.getElementById('bulk_delete_count');
     const bulkDeleteDisplayName = document.getElementById('bulk_delete_display_name');
     const bulkDeleteInput = document.getElementById('bulk_delete_input');
-    const bulkDeleteConfirmButton = document.getElementById('bulk_delete_confirm');
-    const bulkDeleteForm = document.getElementById('bulk_delete_form');
-    const bootstrapCompat = window.VoyagerBootstrapCompat;
-
-    const showModal = (modal) => {
-        if (!modal) {
-            return;
-        }
-        if (bootstrapCompat && typeof bootstrapCompat.showModal === 'function') {
-            bootstrapCompat.showModal(modal);
-            return;
-        }
-        modal.classList.add('in');
-        modal.style.display = 'block';
-        modal.setAttribute('aria-hidden', 'false');
-        const backdrop = document.createElement('div');
-        backdrop.className = 'modal-backdrop fade in';
-        backdrop.dataset.modalTarget = modal.id;
-        document.body.appendChild(backdrop);
-        document.body.classList.add('modal-open');
-    };
 
     if (bulkDeleteModal && bulkDeleteModal.parentElement !== document.body) {
         document.body.appendChild(bulkDeleteModal);
     }
 
     if (bulkDeleteBtn) {
-        bulkDeleteBtn.addEventListener('click', function () {
+        bulkDeleteBtn.addEventListener('click', function (event) {
             const ids = [];
             const checkedBoxes = Array.from(document.querySelectorAll('#dataTable input[type="checkbox"]:checked'))
                 .filter((checkbox) => !checkbox.classList.contains('select_all'));
             const count = checkedBoxes.length;
             if (!count) {
+                event.preventDefault();
+                event.stopPropagation();
                 toastr.warning('{{ __('voyager::generic.bulk_delete_nothing') }}');
                 return;
             }
@@ -78,15 +62,7 @@ window.addEventListener('load', function () {
             if (bulkDeleteInput) {
                 bulkDeleteInput.value = ids.join(',');
             }
-            showModal(bulkDeleteModal);
-        });
-    }
-
-    if (bulkDeleteConfirmButton) {
-        bulkDeleteConfirmButton.addEventListener('click', () => {
-            if (!bulkDeleteForm) return;
-            bulkDeleteForm.submit();
-        });
+        }, true);
     }
 });
 </script>

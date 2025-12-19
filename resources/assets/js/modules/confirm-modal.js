@@ -42,11 +42,14 @@ export function attachConfirmDelegates() {
         const trigger = event.target.closest('[data-confirm-target]');
         if (!trigger) return;
 
+        event.preventDefault();
+
         const modalId = trigger.getAttribute('data-confirm-target');
         const modal = document.querySelector(modalId);
         if (!modal) return;
 
         const acceptButton = modal.querySelector('[data-voyager-confirm-accept]');
+        if (!acceptButton) return;
         const payload = trigger.dataset || {};
 
         // Sync name into modal body if placeholder present
@@ -60,10 +63,24 @@ export function attachConfirmDelegates() {
             acceptButton.removeAttribute('data-confirm-method');
             acceptButton.removeAttribute('data-confirm-field');
             acceptButton.removeAttribute('data-confirm-value');
+            acceptButton.removeAttribute('data-confirm-form');
+            acceptButton.removeAttribute('data-confirm-form-action');
             acceptButton.removeEventListener('click', acceptHandler);
         };
 
         const acceptHandler = () => {
+            if (payload.confirmForm) {
+                const form = document.querySelector(payload.confirmForm);
+                if (form) {
+                    if (payload.confirmFormAction) {
+                        form.setAttribute('action', payload.confirmFormAction);
+                    }
+                    cleanup();
+                    form.submit();
+                    return;
+                }
+            }
+
             if (payload.confirmUrl) {
                 const method = payload.confirmMethod || 'POST';
                 const headers = { 'X-CSRF-TOKEN': payload.csrf || '' };

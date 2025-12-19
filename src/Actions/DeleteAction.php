@@ -21,10 +21,15 @@ class DeleteAction extends AbstractAction
 
     public function getAttributes()
     {
+        $id = $this->data->{$this->data->getKeyName()};
+
         return [
-            'class'   => 'btn btn-sm btn-danger delete',
-            'data-id' => $this->data->{$this->data->getKeyName()},
-            'id'      => 'delete-'.$this->data->{$this->data->getKeyName()},
+            'class'                   => 'btn btn-sm btn-danger delete',
+            'data-id'                 => $id,
+            'data-confirm-target'     => '#delete_modal',
+            'data-confirm-form'       => '#delete_form',
+            'data-confirm-form-action'=> route('voyager.'.$this->dataType->slug.'.destroy', ['id' => $id]),
+            'id'                      => 'delete-'.$id,
         ];
     }
 

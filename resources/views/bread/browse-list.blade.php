@@ -487,23 +487,19 @@
     </form>
 
     {{-- Clone record modal --}}
-    <div class="modal modal-warning fade" tabindex="-1" id="clone_modal" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title"><i class="voyager-documentation"></i> {{ __('voyager::generic.clone_confirm') }}</h4>
-                </div>
-                <div class="modal-footer">
-                    <form action="#" id="clone_form" method="POST">
-                        {{ csrf_field() }}
-                        <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
-                        <input type="submit" class="btn btn-warning clone-confirm" value="{{ __('voyager::generic.yes_please') }}">
-                    </form>
-                </div>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
+    @include('voyager::components.modal-confirm', [
+        'id' => 'clone_modal',
+        'title' => __('voyager::generic.clone_confirm'),
+        'message' => '',
+        'confirmText' => __('voyager::generic.yes_please'),
+        'confirmClass' => 'btn-warning clone-confirm',
+        'confirmButtonId' => 'clone_confirm_button',
+        'icon' => 'voyager-documentation',
+        'modalClass' => 'modal-warning'
+    ])
+    <form action="#" id="clone_form" method="POST" style="display:none">
+        {{ csrf_field() }}
+    </form>
 
     {{-- Group Fields Inline Edit Modal --}}
     <div class="modal modal-info fade" tabindex="-1" id="group_inline_edit_modal" role="dialog">
@@ -557,75 +553,6 @@
                     });
                 });
             }
-
-            const deleteModal = document.getElementById('delete_modal');
-            const deleteForm = document.getElementById('delete_form');
-            const deleteConfirmButton = deleteModal ? deleteModal.querySelector('#delete_confirm_button') : null;
-            const deleteActionTemplate = '{{ route("voyager.".$dataType->slug.".destroy", ["id" => "__id"]) }}';
-            const bootstrapCompat = window.VoyagerBootstrapCompat;
-
-            const openDeleteModal = (button) => {
-                if (!deleteModal || !deleteForm || !deleteActionTemplate) {
-                    return;
-                }
-                const id = button.dataset.id;
-                if (id) {
-                    deleteForm.setAttribute('action', deleteActionTemplate.replace('__id', id));
-                }
-                showModal(deleteModal);
-            };
-
-            const showModal = (modal) => {
-                if (bootstrapCompat && typeof bootstrapCompat.showModal === 'function') {
-                    bootstrapCompat.showModal(modal);
-                    return;
-                }
-                modal.classList.add('in');
-                modal.style.display = 'block';
-                modal.setAttribute('aria-hidden', 'false');
-                const backdrop = document.createElement('div');
-                backdrop.className = 'modal-backdrop fade in';
-                backdrop.dataset.modalTarget = modal.id;
-                document.body.appendChild(backdrop);
-                document.body.classList.add('modal-open');
-            };
-
-            // Clone Record Handler - defined before delete to ensure showModal is accessible
-            const cloneModal = document.getElementById('clone_modal');
-            const cloneForm = document.getElementById('clone_form');
-
-            const openCloneModal = (button) => {
-                if (!cloneModal || !cloneForm) {
-                    return;
-                }
-                const id = button.dataset.id;
-                if (id) {
-                    const cloneUrl = '{{ route("voyager.".$dataType->slug.".clone", ["id" => "__id"]) }}'.replace('__id', id);
-                    cloneForm.setAttribute('action', cloneUrl);
-                }
-                showModal(cloneModal);
-            };
-
-            document.querySelectorAll('td .clone').forEach((button) => {
-                button.addEventListener('click', (event) => {
-                    event.preventDefault();
-                    openCloneModal(event.currentTarget);
-                });
-            });
-
-            if (deleteConfirmButton) {
-                deleteConfirmButton.addEventListener('click', () => {
-                    if (!deleteForm) return;
-                    deleteForm.submit();
-                });
-            }
-
-            document.querySelectorAll('td .delete').forEach((button) => {
-                button.addEventListener('click', (event) => {
-                    event.preventDefault();
-                    openDeleteModal(event.currentTarget);
-                });
-            });
 
             @if($usesSoftDeletes)
                 const softDeleteToggle = document.getElementById('show_soft_deletes');

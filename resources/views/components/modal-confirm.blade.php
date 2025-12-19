@@ -7,9 +7,10 @@
     $confirmClass = trim(($confirmClass ?? 'btn-danger').' '.($confirmButtonClass ?? ''));
     $confirmButtonId = $confirmButtonId ?? null;
     $icon = $icon ?? 'voyager-trash';
+    $modalClass = $modalClass ?? 'modal-danger';
 @endphp
 
-<div class="modal fade modal-danger"
+<div class="modal fade {{ $modalClass }}"
      @if(!empty($bindId))
          :id="{{ $bindId }}"
      @else

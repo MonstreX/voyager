@@ -69,23 +69,19 @@
     </form>
 
     {{-- Clone record modal --}}
-    <div class="modal modal-warning fade" tabindex="-1" id="clone_modal" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title"><i class="voyager-documentation"></i> {{ __('voyager::generic.clone_confirm') }}</h4>
-                </div>
-                <div class="modal-footer">
-                    <form action="#" id="clone_form" method="POST">
-                        {{ csrf_field() }}
-                        <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
-                        <input type="submit" class="btn btn-warning clone-confirm" value="{{ __('voyager::generic.yes_please') }}">
-                    </form>
-                </div>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
+    @include('voyager::components.modal-confirm', [
+        'id' => 'clone_modal',
+        'title' => __('voyager::generic.clone_confirm'),
+        'message' => '',
+        'confirmText' => __('voyager::generic.yes_please'),
+        'confirmClass' => 'btn-warning clone-confirm',
+        'confirmButtonId' => 'clone_confirm_button',
+        'icon' => 'voyager-documentation',
+        'modalClass' => 'modal-warning'
+    ])
+    <form action="#" id="clone_form" method="POST" style="display:none">
+        {{ csrf_field() }}
+    </form>
 @stop
 
 @section('javascript')
@@ -162,77 +158,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
-    // Delete Modal Logic
-    let deleteFormAction;
-    const deleteModal = document.getElementById('delete_modal');
-    const deleteForm = document.getElementById('delete_form');
-    const deleteConfirmButton = deleteModal ? deleteModal.querySelector('#delete_confirm_button') : null;
-    const cloneModal = document.getElementById('clone_modal');
-    const cloneForm = document.getElementById('clone_form');
-
-    // Vanilla JS delegation for .delete buttons
-    document.addEventListener('click', (e) => {
-        const target = e.target.closest('.delete');
-        if (target && document.querySelector('.dd').contains(target)) {
-            e.preventDefault();
-            deleteFormAction = target.getAttribute('data-action') || target.getAttribute('href');
-
-            // If the button is a link (href), use that as action, otherwise construct standard route
-            if (!deleteFormAction || deleteFormAction === 'javascript:;') {
-                const id = target.getAttribute('data-id');
-                // Default Voyager route: /admin/slug/id
-                deleteFormAction = '{{ route('voyager.'.$dataType->slug.'.destroy', ['id' => '__id']) }}'.replace('__id', id);
-            }
-
-            deleteForm.action = deleteFormAction;
-
-            // Show modal using Voyager's bootstrap compatibility or fallback
-            if (window.VoyagerBootstrapCompat && typeof window.VoyagerBootstrapCompat.showModal === 'function') {
-                window.VoyagerBootstrapCompat.showModal(deleteModal);
-            } else if (window.Voyager && window.Voyager.bootstrap && window.Voyager.bootstrap.showModal) {
-                window.Voyager.bootstrap.showModal(deleteModal);
-            } else {
-                deleteModal.classList.add('in');
-                deleteModal.style.display = 'block';
-                const backdrop = document.createElement('div');
-                backdrop.className = 'modal-backdrop fade in';
-                document.body.appendChild(backdrop);
-            }
-        }
-    });
-
-    if (deleteConfirmButton) {
-        deleteConfirmButton.addEventListener('click', () => {
-            if (!deleteForm) return;
-            deleteForm.submit();
-        });
-    }
-
-    // Vanilla JS delegation for .clone buttons
-    document.addEventListener('click', (e) => {
-        const cloneBtn = e.target.closest('.clone');
-        if (cloneBtn && document.querySelector('.dd').contains(cloneBtn)) {
-            e.preventDefault();
-            const id = cloneBtn.dataset.id;
-            if (id) {
-                const cloneUrl = '{{ route("voyager.".$dataType->slug.".clone", ["id" => "__id"]) }}'.replace('__id', id);
-                cloneForm.setAttribute('action', cloneUrl);
-            }
-
-            // Show modal using Voyager's bootstrap compatibility or standard jQuery
-            if (window.Voyager && window.Voyager.bootstrap && window.Voyager.bootstrap.showModal) {
-                window.Voyager.bootstrap.showModal(cloneModal);
-            } else {
-                // Vanilla fallback if no helpers
-                cloneModal.classList.add('in');
-                cloneModal.style.display = 'block';
-                const backdrop = document.createElement('div');
-                backdrop.className = 'modal-backdrop fade in';
-                document.body.appendChild(backdrop);
-            }
-        }
-    });
 
     // Inline Status Toggle Logic
     document.addEventListener('click', (e) => {
