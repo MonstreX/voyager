@@ -38,13 +38,13 @@ class VoyagerBaseController extends Controller
     //
     //****************************************
 
-    public function index(Request $request, BrowseFilterService $browseFilterService)
+    public function index(Request $request, BrowseFilterService $browseFilterService, BreadDataResolverService $breadDataResolverService)
     {
         // GET THE SLUG, ex. 'posts', 'pages', etc.
         $slug = $this->getSlug($request);
 
         // GET THE DataType based on the slug
-        $dataType = Voyager::model('DataType')->where('slug', '=', $slug)->first();
+        $dataType = $breadDataResolverService->getDataTypeBySlug($slug);
 
         // Check permission
         $this->authorize('browse', app($dataType->model_name));
@@ -70,7 +70,7 @@ class VoyagerBaseController extends Controller
 
         // Next Get or Paginate the actual content from the MODEL that corresponds to the slug DataType
         if (strlen($dataType->model_name) != 0) {
-            $model = app($dataType->model_name);
+            $model = $breadDataResolverService->newModelInstance($dataType);
 
             $query = $model::select($dataType->name.'.*');
 
@@ -79,7 +79,7 @@ class VoyagerBaseController extends Controller
             }
 
             // Use withTrashed() if model uses SoftDeletes and if toggle is selected
-            if ($model && in_array(SoftDeletes::class, class_uses_recursive($model)) && Auth::user()->can('delete', app($dataType->model_name))) {
+            if ($model && $breadDataResolverService->modelUsesSoftDeletes($model) && Auth::user()->can('delete', app($dataType->model_name))) {
                 $usesSoftDeletes = true;
 
                 if ($request->get('showSoftDeleted')) {
