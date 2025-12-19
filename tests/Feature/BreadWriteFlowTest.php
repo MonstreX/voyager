@@ -45,4 +45,20 @@ class BreadWriteFlowTest extends TestCase
         $this->assertEquals('New Category', $category->name);
         $this->assertEquals('new-category', $category->slug);
     }
+
+    public function testCanDeleteCategoryViaBreadDestroy()
+    {
+        Auth::loginUsingId(1);
+
+        $category = Category::create([
+            'name' => 'Delete Me',
+            'slug' => 'delete-me',
+            'order' => 1,
+        ]);
+
+        $response = $this->call('DELETE', route('voyager.categories.destroy', [$category->id]));
+
+        $this->assertEquals(302, $response->status());
+        $this->assertFalse(Category::where('id', $category->id)->exists());
+    }
 }

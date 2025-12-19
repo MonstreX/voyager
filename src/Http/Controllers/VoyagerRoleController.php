@@ -4,6 +4,8 @@ namespace TCG\Voyager\Http\Controllers;
 
 use Illuminate\Http\Request;
 use TCG\Voyager\Facades\Voyager;
+use TCG\Voyager\Services\BreadValidationService;
+use TCG\Voyager\Services\BreadWriteService;
 
 class VoyagerRoleController extends VoyagerBaseController
 {
@@ -18,10 +20,10 @@ class VoyagerRoleController extends VoyagerBaseController
         $this->authorize('edit', app($dataType->model_name));
 
         //Validate fields
-        $val = $this->validateBread($request->all(), $dataType->editRows, $dataType->name, $id)->validate();
+        app(BreadValidationService::class)->validateBread($request->all(), $dataType->editRows, $dataType->name, (int) $id)->validate();
 
         $data = call_user_func([$dataType->model_name, 'findOrFail'], $id);
-        $this->insertUpdateData($request, $slug, $dataType->editRows, $data);
+        app(BreadWriteService::class)->persist($request, $slug, $dataType->editRows, $data);
 
         $data->permissions()->sync($request->input('permissions', []));
 
@@ -44,10 +46,10 @@ class VoyagerRoleController extends VoyagerBaseController
         $this->authorize('add', app($dataType->model_name));
 
         //Validate fields
-        $val = $this->validateBread($request->all(), $dataType->addRows)->validate();
+        app(BreadValidationService::class)->validateBread($request->all(), $dataType->addRows)->validate();
 
         $data = new $dataType->model_name();
-        $this->insertUpdateData($request, $slug, $dataType->addRows, $data);
+        app(BreadWriteService::class)->persist($request, $slug, $dataType->addRows, $data);
 
         $data->permissions()->sync($request->input('permissions', []));
 

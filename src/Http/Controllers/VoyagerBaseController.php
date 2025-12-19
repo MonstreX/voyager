@@ -10,12 +10,14 @@ use TCG\Voyager\Services\BreadBrowseService;
 use TCG\Voyager\Services\BreadCleanupService;
 use TCG\Voyager\Services\BreadActionService;
 use TCG\Voyager\Services\BreadDestroyService;
+use TCG\Voyager\Services\BreadDestroyActionService;
 use TCG\Voyager\Services\BreadRelationService;
 use TCG\Voyager\Services\BreadRemoveMediaService;
 use TCG\Voyager\Services\BreadDataResolverService;
 use TCG\Voyager\Services\BreadOrderService;
 use TCG\Voyager\Services\BreadFormViewService;
 use TCG\Voyager\Services\BreadReadViewService;
+use TCG\Voyager\Services\BreadRestoreService;
 use TCG\Voyager\Services\BreadStoreService;
 use TCG\Voyager\Services\BreadUpdateService;
 
@@ -198,31 +200,7 @@ class VoyagerBaseController extends Controller
 
         $dataType = $breadDataResolverService->getDataTypeBySlug($slug);
 
-        // Init array of IDs
-        $ids = [];
-        if (empty($id)) {
-            // Bulk delete, get IDs from POST
-            $ids = explode(',', $request->ids);
-        } else {
-            // Single item delete, get ID from URL
-            $ids[] = $id;
-        }
-
-        $affected = $breadDestroyService->destroy($dataType, $ids);
-
-        $displayName = $affected > 1 ? $dataType->getTranslatedAttribute('display_name_plural') : $dataType->getTranslatedAttribute('display_name_singular');
-
-        $data = $affected
-            ? [
-                'message'    => __('voyager::generic.successfully_deleted')." {$displayName}",
-                'alert-type' => 'success',
-            ]
-            : [
-                'message'    => __('voyager::generic.error_deleting')." {$displayName}",
-                'alert-type' => 'error',
-            ];
-
-        return redirect()->route("voyager.{$dataType->slug}.index")->with($data);
+        return app(BreadDestroyActionService::class)->destroy($request, $dataType, $id);
     }
 
     public function restore(Request $request, $id, BreadDataResolverService $breadDataResolverService)
@@ -235,26 +213,7 @@ class VoyagerBaseController extends Controller
         $model = app($dataType->model_name);
         $this->authorize('delete', $model);
 
-        $data = $breadDataResolverService->findOrFail($dataType, $id, true);
-
-        $displayName = $dataType->getTranslatedAttribute('display_name_singular');
-
-        $res = $data->restore($id);
-        $data = $res
-            ? [
-                'message'    => __('voyager::generic.successfully_restored')." {$displayName}",
-                'alert-type' => 'success',
-            ]
-            : [
-                'message'    => __('voyager::generic.error_restoring')." {$displayName}",
-                'alert-type' => 'error',
-            ];
-
-        if ($res) {
-            event(new BreadDataRestored($dataType, $data));
-        }
-
-        return redirect()->route("voyager.{$dataType->slug}.index")->with($data);
+        return app(BreadRestoreService::class)->restore($request, $slug, $dataType, $id);
     }
 
     //***************************************
