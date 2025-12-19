@@ -245,6 +245,39 @@ return [
         'allow_delete'        => true,
         'allow_create_folder' => true,
         'allow_rename'        => true,
+
+        /*
+        |--------------------------------------------------------------------------
+        | Media model lifecycle
+        |--------------------------------------------------------------------------
+        |
+        | When a model uses SoftDeletes, Laravel triggers the `deleting` event for
+        | both soft-delete and force-delete. By default Voyager deletes media on
+        | any delete (legacy behaviour). You can disable it for soft-deletes:
+        |
+        | - true: delete media on soft-delete and force-delete (legacy)
+        | - false: delete media only on force-delete
+        |
+        */
+        'delete_on_soft_delete' => env('VOYAGER_MEDIA_DELETE_ON_SOFT_DELETE', true),
+
+        /*
+        |--------------------------------------------------------------------------
+        | Media API (admin/api/media/*)
+        |--------------------------------------------------------------------------
+        |
+        | Security hardening for `model_type` input.
+        |
+        | - allowed_model_types: if non-empty, only these FQCNs are accepted
+        | - require_has_media_trait: require TCG\\Voyager\\Traits\\HasMedia on model
+        | - expose_exception_messages: if null, falls back to app.debug
+        |
+        */
+        'api' => [
+            'allowed_model_types' => [],
+            'require_has_media_trait' => true,
+            'expose_exception_messages' => env('VOYAGER_MEDIA_API_EXPOSE_EXCEPTION_MESSAGES', null),
+        ],
         /*'watermark'           => [
             'source'         => 'watermark.png',
             'position'       => 'bottom-left',

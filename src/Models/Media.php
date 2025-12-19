@@ -41,6 +41,21 @@ class Media extends Model
         return $this->url();
     }
 
+    public function cacheBustedUrl(): string
+    {
+        $url = (string) $this->url();
+
+        $version = $this->updated_at ? $this->updated_at->getTimestamp() : $this->id;
+        $glue = str_contains($url, '?') ? '&' : '?';
+
+        return $url.$glue.'v='.$version;
+    }
+
+    public function cacheBustedFullUrl(): string
+    {
+        return $this->cacheBustedUrl();
+    }
+
     public function fileName()
     {
         return $this->file_name;

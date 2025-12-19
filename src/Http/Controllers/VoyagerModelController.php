@@ -5,6 +5,7 @@ namespace TCG\Voyager\Http\Controllers;
 use Illuminate\Http\Request;
 use TCG\Voyager\Facades\Voyager;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class VoyagerModelController extends Controller
 {
@@ -40,9 +41,9 @@ class VoyagerModelController extends Controller
 
         try {
             $this->orderTree($itemsOrder, null, $model);
-        } catch (\Exception $e) {
+        } catch (Throwable $e) {
             Log::error("Voyager Tree Order Error: " . $e->getMessage());
-            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+            return $this->apiErrorResponse($e, __('voyager::generic.internal_error'), 500);
         }
 
         return response()->json(['status' => 'success', 'message' => __('voyager::bread.updated_order')]);
@@ -193,12 +194,15 @@ class VoyagerModelController extends Controller
                 return redirect()
                     ->route("voyager.{$dataType->slug}.index")
                     ->with(['message' => __('voyager::generic.successfully_cloned', ['type' => $dataType->display_name_singular]), 'alert-type' => 'success']);
-            } else {
-                return redirect()->back()->with(['message' => __('voyager::generic.error_cloning', ['type' => $dataType->display_name_singular]), 'alert-type' => 'error']);
             }
-        } catch (\Exception $e) {
+
+            return redirect()->back()->with(['message' => __('voyager::generic.error_cloning', ['type' => $dataType->display_name_singular]), 'alert-type' => 'error']);
+        } catch (Throwable $e) {
             Log::error("Voyager Clone Error: " . $e->getMessage());
-            return redirect()->back()->with(['message' => __('voyager::generic.error_cloning', ['type' => 'Record']) . ' - ' . $e->getMessage(), 'alert-type' => 'error']);
+            return redirect()->back()->with([
+                'message' => $this->apiExceptionMessage($e, __('voyager::generic.error_cloning', ['type' => 'Record'])),
+                'alert-type' => 'error',
+            ]);
         }
     }
 }

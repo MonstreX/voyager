@@ -81,7 +81,7 @@
 
                         <div class="adv-media-files-file">
                             @if($media->isImage())
-                                <img src="{{ $media->fullUrl() }}">
+                                <img src="{{ $media->cacheBustedFullUrl() }}">
                             @else
                                 @php
                                     $extension = strtolower(pathinfo($media->file_name, PATHINFO_EXTENSION));

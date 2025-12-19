@@ -13,7 +13,7 @@
 
     @if ($media)
         <div class="adv-image" id="adv-image-{{ $row->field }}">
-            <img src="{{ $media->fullUrl() }}" alt="{{ $media->prop('alt', $media->fileName()) }}" class="img-responsive">
+            <img src="{{ $media->cacheBustedFullUrl() }}" alt="{{ $media->prop('alt', $media->fileName()) }}" class="img-responsive">
             <div class="adv-image-fields">
                 <div class="adv-image-file">
                     <span class="adv-image-file-name">{{ $media->fileName() }}</span>

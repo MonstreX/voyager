@@ -149,7 +149,7 @@
                     <div v-else-if="selected_files.length == 1 && selected_file" class="right_details">
                         <div class="detail_img">
                             <div v-if="fileIs(selected_file, 'image')">
-                                <img :src="selected_file.path" />
+                                <img :src="resolvePreviewPath(selected_file.path, buildCacheBust(selected_file.last_modified || selected_file.lastModified))" />
                             </div>
                             <div v-else-if="fileIs(selected_file, 'video')">
                                 <video width="100%" height="auto" ref="videoplayer" controls>
@@ -232,7 +232,7 @@
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 </div>
                 <div class="modal-body">
-                    <img :src="selected_file.path" class="img img-responsive" style="margin: 0 auto;">
+                    <img :src="resolvePreviewPath(selected_file.path, buildCacheBust(selected_file.last_modified || selected_file.lastModified))" class="img img-responsive" style="margin: 0 auto;">
                 </div>
 
                 <div class="modal-footer text-left">
@@ -321,7 +321,7 @@
 
                 <div class="modal-body">
                     <div class="crop-container">
-                        <img :id="'cropping-image_'+uid" v-if="selected_files.length == 1 && fileIs(selected_file, 'image')" class="img img-responsive" :src="selected_file.path + '?' + selected_file.last_modified" />
+                        <img :id="'cropping-image_'+uid" v-if="selected_files.length == 1 && fileIs(selected_file, 'image')" class="img img-responsive" :src="resolvePreviewPath(selected_file.path, buildCacheBust(selected_file.last_modified || selected_file.lastModified))" />
                     </div>
                     <div class="new-image-info">
                         {{ __('voyager::media.width') }} <span :id="'new-image-width_'+uid"></span>, {{ __('voyager::media.height') }}<span :id="'new-image-height_'+uid"></span>
@@ -466,6 +466,7 @@
         data: function() {
             return {
                 uid: Math.random().toString(36).slice(2),
+                previewBust: 0,
                 current_folder: this.basePath,
 		  		selected_files: [],
                 files: [],
@@ -970,6 +971,7 @@
 				this.sendRequest('{{ route('voyager.media.crop') }}', postData).then(function(data) {
 					if (data.success) {
 						toastr.success(data.message);
+                        vm.previewBust = Date.now();
 						vm.getFiles();
 					} else {
 						toastr.error(data.error, "{{ __('voyager::generic.whoopsie') }}");
@@ -1029,9 +1031,19 @@
                     ? (fileOrPath.last_modified || fileOrPath.lastModified || null)
                     : null;
 
-                path = this.resolvePreviewPath(path, lastModified);
+                path = this.resolvePreviewPath(path, this.buildCacheBust(lastModified));
 				return 'background-size: cover; background-image: url("' + path + '"); background-repeat:no-repeat; background-position:center center;display:inline-block; width:100%; height:100%;';
 			},
+            buildCacheBust: function(lastModified) {
+                var parts = [];
+                if (lastModified) {
+                    parts.push('v=' + encodeURIComponent(lastModified));
+                }
+                if (this.previewBust) {
+                    parts.push('b=' + encodeURIComponent(this.previewBust));
+                }
+                return parts.join('&');
+            },
             resolvePreviewPath: function(path, cacheBust) {
                 if (!path) {
                     return '';

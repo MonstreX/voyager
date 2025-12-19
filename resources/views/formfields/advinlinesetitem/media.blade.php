@@ -36,7 +36,7 @@
                         <i class="voyager-x"></i>
                     </div>
                     @if($media->isImage())
-                        <img src="{{ $media->fullUrl() }}" alt="">
+                        <img src="{{ $media->cacheBustedFullUrl() }}" alt="">
                     @else
                         @php
                             $extension = strtolower(pathinfo($media->file_name, PATHINFO_EXTENSION));

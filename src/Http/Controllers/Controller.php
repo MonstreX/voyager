@@ -2,6 +2,7 @@
 
 namespace TCG\Voyager\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -29,6 +30,7 @@ use TCG\Voyager\Services\BreadBelongsToManySyncService;
 use TCG\Voyager\Services\BreadTranslationService;
 use TCG\Voyager\Services\BreadRowFillService;
 use Validator;
+use Throwable;
 
 abstract class Controller extends BaseController
 {
@@ -46,6 +48,41 @@ abstract class Controller extends BaseController
         }
 
         return $slug;
+    }
+
+    protected function voyagerJsonFlags(): int
+    {
+        $flags = JSON_UNESCAPED_UNICODE;
+        if (defined('JSON_INVALID_UTF8_SUBSTITUTE')) {
+            $flags |= JSON_INVALID_UTF8_SUBSTITUTE;
+        }
+
+        return $flags;
+    }
+
+    protected function shouldExposeApiExceptionMessages(): bool
+    {
+        $configured = config('voyager.media.api.expose_exception_messages');
+        if (!is_null($configured)) {
+            return (bool) $configured;
+        }
+
+        return (bool) config('app.debug', false);
+    }
+
+    protected function apiExceptionMessage(Throwable $e, string $fallback): string
+    {
+        return $this->shouldExposeApiExceptionMessages() ? (string) $e->getMessage() : $fallback;
+    }
+
+    protected function apiErrorResponse(Throwable $e, string $fallbackMessage, int $statusCode = 500, array $extra = []): JsonResponse
+    {
+        $payload = ['status' => 'error', 'message' => $this->apiExceptionMessage($e, $fallbackMessage)];
+        if ($extra) {
+            $payload = $payload + $extra;
+        }
+
+        return response()->json($payload, $statusCode, [], $this->voyagerJsonFlags());
     }
 
     public function insertUpdateData($request, $slug, $rows, $data)

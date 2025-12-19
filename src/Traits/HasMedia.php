@@ -2,6 +2,7 @@
 
 namespace TCG\Voyager\Traits;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
 use TCG\Voyager\Models\Media;
 use TCG\Voyager\Services\MediaService;
 
@@ -12,6 +13,13 @@ trait HasMedia
         static::deleting(function ($model) {
             if (!method_exists($model, 'media')) {
                 return;
+            }
+
+            $usesSoftDeletes = in_array(SoftDeletes::class, class_uses_recursive(get_class($model)), true);
+            if ($usesSoftDeletes && method_exists($model, 'isForceDeleting') && !$model->isForceDeleting()) {
+                if (!config('voyager.media.delete_on_soft_delete', true)) {
+                    return;
+                }
             }
 
             $mediaItems = $model->media()->get();
