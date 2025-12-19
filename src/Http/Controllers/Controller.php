@@ -46,153 +46,217 @@ abstract class Controller extends BaseController
 
     public function insertUpdateData($request, $slug, $rows, $data)
     {
-        $multi_select = [];
-        $creating = !$data->exists;
+        $multiSelect = [];
+        $isCreating = !$data->exists;
 
         $request->attributes->set('voyagerModel', $data);
 
         // Pass $rows so that we avoid checking unused fields
         $request->attributes->add(['breadRows' => $rows->pluck('field')->toArray()]);
 
-        /*
-         * Prepare Translations and Transform data
-         */
-        $translations = is_bread_translatable($data)
-                        ? $data->prepareTranslations($request)
-                        : [];
+        $translations = $this->prepareTranslations($data, $request);
 
-        foreach ($rows as $row) {
-            // if the field for this row is absent from the request, continue
-            // checkboxes will be absent when unchecked, thus they are the exception
-            if (!$request->hasFile($row->field) && !$request->has($row->field) && $row->type !== 'checkbox') {
-                // if the field is a belongsToMany relationship, don't remove it
-                // if no content is provided, that means the relationships need to be removed
-                if (isset($row->details->type) && $row->details->type !== 'belongsToMany') {
-                    continue;
-                }
-            }
-
-            // Value is saved from $row->details->column row
-            if ($row->type == 'relationship' && $row->details->type == 'belongsTo') {
-                continue;
-            }
-
-            $content = $this->getContentBasedOnType($request, $slug, $row, $row->details);
-
-            if ($row->type == 'relationship' && $row->details->type != 'belongsToMany') {
-                $row->field = @$row->details->column;
-            }
-
-            /*
-             * merge ex_images/files and upload images/files
-             */
-            if (in_array($row->type, ['multiple_images', 'file']) && !is_null($content)) {
-                if (isset($data->{$row->field})) {
-                    $ex_files = json_decode($data->{$row->field}, true);
-                    if (!is_null($ex_files)) {
-                        $content = json_encode(array_merge($ex_files, json_decode($content)));
-                    }
-                }
-            }
-
-            if (is_null($content)) {
-
-                // If the image upload is null and it has a current image keep the current image
-                if ($row->type == 'image' && is_null($request->input($row->field)) && isset($data->{$row->field})) {
-                    $content = $data->{$row->field};
-                }
-
-                // If the multiple_images upload is null and it has a current image keep the current image
-                if ($row->type == 'multiple_images' && is_null($request->input($row->field)) && isset($data->{$row->field})) {
-                    $content = $data->{$row->field};
-                }
-
-                // If the file upload is null and it has a current file keep the current file
-                if ($row->type == 'file') {
-                    $content = $data->{$row->field};
-                    if (!$content) {
-                        $content = json_encode([]);
-                    }
-                }
-
-                if ($row->type == 'password') {
-                    $content = $data->{$row->field};
-                }
-            }
-
-            if ($row->type == 'relationship' && $row->details->type == 'belongsToMany') {
-                // Only if select_multiple is working with a relationship
-                $multi_select[] = [
-                    'model'           => $row->details->model,
-                    'content'         => $content,
-                    'table'           => $row->details->pivot_table,
-                    'foreignPivotKey' => $row->details->foreign_pivot_key ?? null,
-                    'relatedPivotKey' => $row->details->related_pivot_key ?? null,
-                    'parentKey'       => $row->details->parent_key ?? null,
-                    'relatedKey'      => $row->details->key,
-                ];
-            } else {
-                $data->{$row->field} = $content;
-            }
-        }
-
-        if (isset($data->additional_attributes)) {
-            foreach ($data->additional_attributes as $attr) {
-                if ($request->has($attr)) {
-                    $data->{$attr} = $request->{$attr};
-                }
-            }
-        }
+        $this->fillModelFromRows($request, $slug, $rows, $data, $multiSelect);
+        $this->fillAdditionalAttributes($request, $data);
 
         $this->handleAdvImageUploads($request, $rows, $data);
 
         $data->save();
 
-        if ($creating) {
+        if ($isCreating) {
             $this->handleAdvInlineSetUploads($request, $rows, $data);
         }
 
         $this->handleAdvMediaFilesUploads($request, $rows, $data);
 
-        // Save translations
+        $this->persistTranslations($data, $translations);
+        $this->syncBelongsToManyRelations($data, $multiSelect);
+        $this->renameMediaPickerFoldersIfNeeded($request, $slug, $rows, $data);
+
+        return $data;
+    }
+
+    protected function prepareTranslations($data, Request $request): array
+    {
+        return is_bread_translatable($data) ? $data->prepareTranslations($request) : [];
+    }
+
+    protected function fillModelFromRows(Request $request, string $slug, $rows, $data, array &$multiSelect): void
+    {
+        foreach ($rows as $row) {
+            if ($this->shouldSkipRowForRequest($request, $row)) {
+                continue;
+            }
+
+            if ($this->isBelongsToRelationshipRow($row)) {
+                continue;
+            }
+
+            $content = $this->getContentBasedOnType($request, $slug, $row, $row->details);
+
+            if ($this->isNonBelongsToManyRelationshipRow($row)) {
+                $row->field = @$row->details->column;
+            }
+
+            $content = $this->mergeExistingMultipleFieldContentIfNeeded($row, $data, $content);
+            $content = $this->applyNullContentFallbacks($request, $row, $data, $content);
+
+            if ($this->isBelongsToManyRelationshipRow($row)) {
+                $multiSelect[] = $this->buildBelongsToManySyncPayload($row, $content);
+                continue;
+            }
+
+            $data->{$row->field} = $content;
+        }
+    }
+
+    protected function shouldSkipRowForRequest(Request $request, $row): bool
+    {
+        if ($request->hasFile($row->field) || $request->has($row->field) || $row->type === 'checkbox') {
+            return false;
+        }
+
+        if (isset($row->details->type) && $row->details->type !== 'belongsToMany') {
+            return true;
+        }
+
+        return false;
+    }
+
+    protected function isBelongsToRelationshipRow($row): bool
+    {
+        return $row->type == 'relationship' && $row->details->type == 'belongsTo';
+    }
+
+    protected function isBelongsToManyRelationshipRow($row): bool
+    {
+        return $row->type == 'relationship' && $row->details->type == 'belongsToMany';
+    }
+
+    protected function isNonBelongsToManyRelationshipRow($row): bool
+    {
+        return $row->type == 'relationship' && $row->details->type != 'belongsToMany';
+    }
+
+    protected function mergeExistingMultipleFieldContentIfNeeded($row, $data, $content)
+    {
+        if (!in_array($row->type, ['multiple_images', 'file'], true) || is_null($content)) {
+            return $content;
+        }
+
+        if (!isset($data->{$row->field})) {
+            return $content;
+        }
+
+        $existingFiles = json_decode($data->{$row->field}, true);
+        if (is_null($existingFiles)) {
+            return $content;
+        }
+
+        return json_encode(array_merge($existingFiles, json_decode($content)));
+    }
+
+    protected function applyNullContentFallbacks(Request $request, $row, $data, $content)
+    {
+        if (!is_null($content)) {
+            return $content;
+        }
+
+        if ($row->type == 'image' && is_null($request->input($row->field)) && isset($data->{$row->field})) {
+            return $data->{$row->field};
+        }
+
+        if ($row->type == 'multiple_images' && is_null($request->input($row->field)) && isset($data->{$row->field})) {
+            return $data->{$row->field};
+        }
+
+        if ($row->type == 'file') {
+            $current = $data->{$row->field};
+            return $current ? $current : json_encode([]);
+        }
+
+        if ($row->type == 'password') {
+            return $data->{$row->field};
+        }
+
+        return $content;
+    }
+
+    protected function buildBelongsToManySyncPayload($row, $content): array
+    {
+        return [
+            'model'           => $row->details->model,
+            'content'         => $content,
+            'table'           => $row->details->pivot_table,
+            'foreignPivotKey' => $row->details->foreign_pivot_key ?? null,
+            'relatedPivotKey' => $row->details->related_pivot_key ?? null,
+            'parentKey'       => $row->details->parent_key ?? null,
+            'relatedKey'      => $row->details->key,
+        ];
+    }
+
+    protected function fillAdditionalAttributes(Request $request, $data): void
+    {
+        if (!isset($data->additional_attributes)) {
+            return;
+        }
+
+        foreach ($data->additional_attributes as $attr) {
+            if ($request->has($attr)) {
+                $data->{$attr} = $request->{$attr};
+            }
+        }
+    }
+
+    protected function persistTranslations($data, array $translations): void
+    {
         if (count($translations) > 0) {
             $data->saveTranslations($translations);
         }
+    }
 
-        foreach ($multi_select as $sync_data) {
+    protected function syncBelongsToManyRelations($data, array $multiSelect): void
+    {
+        foreach ($multiSelect as $syncData) {
             $data->belongsToMany(
-                $sync_data['model'],
-                $sync_data['table'],
-                $sync_data['foreignPivotKey'],
-                $sync_data['relatedPivotKey'],
-                $sync_data['parentKey'],
-                $sync_data['relatedKey']
-            )->sync($sync_data['content']);
+                $syncData['model'],
+                $syncData['table'],
+                $syncData['foreignPivotKey'],
+                $syncData['relatedPivotKey'],
+                $syncData['parentKey'],
+                $syncData['relatedKey']
+            )->sync($syncData['content']);
+        }
+    }
+
+    protected function renameMediaPickerFoldersIfNeeded(Request $request, string $slug, $rows, $data): void
+    {
+        if (!$request->session()->has($slug.'_path') && !$request->session()->has($slug.'_uuid')) {
+            return;
         }
 
-        // Rename folders for newly created data through media-picker
-        if ($request->session()->has($slug.'_path') || $request->session()->has($slug.'_uuid')) {
-            $old_path = $request->session()->get($slug.'_path');
-            $uuid = $request->session()->get($slug.'_uuid');
-            $new_path = str_replace($uuid, $data->getKey(), $old_path);
-            $folder_path = substr($old_path, 0, strpos($old_path, $uuid)).$uuid;
+        $oldPath = $request->session()->get($slug.'_path');
+        $uuid = $request->session()->get($slug.'_uuid');
+        $newPath = str_replace($uuid, $data->getKey(), $oldPath);
+        $folderPath = substr($oldPath, 0, strpos($oldPath, $uuid)).$uuid;
 
-            $rows->where('type', 'media_picker')->each(function ($row) use ($data, $uuid) {
-                $data->{$row->field} = str_replace($uuid, $data->getKey(), $data->{$row->field});
-            });
-            $data->save();
-            if ($old_path != $new_path && 
-                !Storage::disk(config('voyager.storage.disk'))->exists($new_path) && 
-                Storage::disk(config('voyager.storage.disk'))->exists($old_path)
-                ) 
-            {
-                $request->session()->forget([$slug.'_path', $slug.'_uuid']);
-                Storage::disk(config('voyager.storage.disk'))->move($old_path, $new_path);
-                Storage::disk(config('voyager.storage.disk'))->deleteDirectory($folder_path);
-            }
+        $rows->where('type', 'media_picker')->each(function ($row) use ($data, $uuid) {
+            $data->{$row->field} = str_replace($uuid, $data->getKey(), $data->{$row->field});
+        });
+
+        $data->save();
+
+        $disk = Storage::disk(config('voyager.storage.disk'));
+
+        if (
+            $oldPath != $newPath &&
+            !$disk->exists($newPath) &&
+            $disk->exists($oldPath)
+        ) {
+            $request->session()->forget([$slug.'_path', $slug.'_uuid']);
+            $disk->move($oldPath, $newPath);
+            $disk->deleteDirectory($folderPath);
         }
-
-        return $data;
     }
 
     protected function handleAdvInlineSetUploads($request, $rows, $data)
@@ -275,49 +339,59 @@ abstract class Controller extends BaseController
 
     public function getContentBasedOnType(Request $request, $slug, $row, $options = null)
     {
-        switch ($row->type) {
+        $contentType = $this->resolveContentTypeHandler($row->type);
+        if (!$contentType) {
+            return null;
+        }
+
+        return (new $contentType($request, $slug, $row, $options))->handle();
+    }
+
+    protected function resolveContentTypeHandler(string $type): ?string
+    {
+        switch ($type) {
             /********** PASSWORD TYPE **********/
             case 'password':
-                return (new Password($request, $slug, $row, $options))->handle();
+                return Password::class;
             /********** CHECKBOX TYPE **********/
             case 'checkbox':
-                return (new Checkbox($request, $slug, $row, $options))->handle();
+                return Checkbox::class;
             /********** MULTIPLE CHECKBOX TYPE **********/
             case 'multiple_checkbox':
-                return (new MultipleCheckbox($request, $slug, $row, $options))->handle();
+                return MultipleCheckbox::class;
             /********** FILE TYPE **********/
             case 'file':
-                return (new File($request, $slug, $row, $options))->handle();
+                return File::class;
             /********** MULTIPLE IMAGES TYPE **********/
             case 'multiple_images':
-                return (new MultipleImage($request, $slug, $row, $options))->handle();
+                return MultipleImage::class;
             /********** SELECT MULTIPLE TYPE **********/
             case 'select_multiple':
-                return (new SelectMultiple($request, $slug, $row, $options))->handle();
+                return SelectMultiple::class;
             /********** IMAGE TYPE **********/
             case 'image':
-                return (new ContentImage($request, $slug, $row, $options))->handle();
+                return ContentImage::class;
             /********** DATE TYPE **********/
             case 'date':
             /********** TIMESTAMP TYPE **********/
             case 'timestamp':
-                return (new Timestamp($request, $slug, $row, $options))->handle();
+                return Timestamp::class;
             /********** COORDINATES TYPE **********/
             case 'coordinates':
-                return (new Coordinates($request, $slug, $row, $options))->handle();
+                return Coordinates::class;
             /********** RELATIONSHIPS TYPE **********/
             case 'relationship':
-                return (new Relationship($request, $slug, $row, $options))->handle();
+                return Relationship::class;
             /********** ADV FIELDS GROUP TYPE **********/
             case 'adv_fields_group':
-                return (new \TCG\Voyager\Http\Controllers\ContentTypes\AdvFieldsGroupContentType($request, $slug, $row, $options))->handle();
+                return \TCG\Voyager\Http\Controllers\ContentTypes\AdvFieldsGroupContentType::class;
             case 'adv_inline_set':
-                return (new AdvInlineSetContentType($request, $slug, $row, $options))->handle();
+                return AdvInlineSetContentType::class;
             case 'adv_media_files':
                 return null;
             /********** ALL OTHER TEXT TYPE **********/
             default:
-                return (new Text($request, $slug, $row, $options))->handle();
+                return Text::class;
         }
     }
 
