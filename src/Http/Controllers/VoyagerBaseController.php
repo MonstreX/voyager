@@ -155,7 +155,7 @@ class VoyagerBaseController extends Controller
     }
 
     // POST BR(E)AD
-    public function update(Request $request, $id, BreadDataResolverService $breadDataResolverService)
+    public function update(Request $request, $id, BreadDataResolverService $breadDataResolverService, BreadCleanupService $breadCleanupService)
     {
         $slug = $this->getSlug($request);
 
@@ -182,7 +182,7 @@ class VoyagerBaseController extends Controller
         $this->insertUpdateData($request, $slug, $dataType->editRows, $data);
 
         // Delete Images
-        $this->deleteBreadImages($original_data, $to_remove);
+        $breadCleanupService->deleteBreadImages($original_data, $to_remove);
 
         event(new BreadDataUpdated($dataType, $data));
 
