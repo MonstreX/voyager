@@ -16,14 +16,12 @@ use TCG\Voyager\Events\BreadImagesDeleted;
 use TCG\Voyager\Facades\Voyager;
 use TCG\Voyager\Http\Controllers\Traits\BreadRelationshipParser;
 use TCG\Voyager\Services\BrowseFilterService;
+use TCG\Voyager\Services\BreadCleanupService;
+use TCG\Voyager\Services\BreadDestroyService;
 
 class VoyagerBaseController extends Controller
 {
     use BreadRelationshipParser;
-
-    public function __construct(protected BrowseFilterService $browseFilterService)
-    {
-    }
 
     //***************************************
     //               ____
@@ -37,7 +35,7 @@ class VoyagerBaseController extends Controller
     //
     //****************************************
 
-    public function index(Request $request)
+    public function index(Request $request, BrowseFilterService $browseFilterService)
     {
         // GET THE SLUG, ex. 'posts', 'pages', etc.
         $slug = $this->getSlug($request);
@@ -53,7 +51,7 @@ class VoyagerBaseController extends Controller
         $search = (object) ['value' => $request->get('s'), 'key' => $request->get('key'), 'filter' => $request->get('filter')];
 
         // Browse Filters - Session-based storage
-        $filters = $this->browseFilterService->resolve($request, $slug);
+        $filters = $browseFilterService->resolve($request, $slug);
 
         $searchNames = [];
         if ($dataType->server_side) {
@@ -108,7 +106,7 @@ class VoyagerBaseController extends Controller
             }
 
             // Apply browse filters to query
-            $this->browseFilterService->apply($query, $filters);
+            $browseFilterService->apply($query, $filters);
 
             $row = $dataType->rows->where('field', $orderBy)->firstWhere('type', 'relationship');
             if ($orderBy && (in_array($orderBy, $dataType->fields()) || !empty($row))) {
@@ -491,7 +489,7 @@ class VoyagerBaseController extends Controller
     //
     //****************************************
 
-    public function destroy(Request $request, $id)
+    public function destroy(Request $request, $id, BreadDestroyService $breadDestroyService)
     {
         $slug = $this->getSlug($request);
 
@@ -507,27 +505,7 @@ class VoyagerBaseController extends Controller
             $ids[] = $id;
         }
 
-        $affected = 0;
-        
-        foreach ($ids as $id) {
-            $data = call_user_func([$dataType->model_name, 'findOrFail'], $id);
-
-            // Check permission
-            $this->authorize('delete', $data);
-
-            $model = app($dataType->model_name);
-            if (!($model && in_array(SoftDeletes::class, class_uses_recursive($model)))) {
-                $this->cleanup($dataType, $data);
-            }
-
-            $res = $data->delete();
-
-            if ($res) {
-                $affected++;
-
-                event(new BreadDataDeleted($dataType, $data));
-            }
-        }
+        $affected = $breadDestroyService->destroy($dataType, $ids);
 
         $displayName = $affected > 1 ? $dataType->getTranslatedAttribute('display_name_plural') : $dataType->getTranslatedAttribute('display_name_singular');
 
@@ -756,39 +734,7 @@ class VoyagerBaseController extends Controller
      */
     protected function cleanup($dataType, $data)
     {
-        // Delete Translations, if present
-        if (is_bread_translatable($data)) {
-            $data->deleteAttributeTranslations($data->getTranslatableAttributes());
-        }
-
-        // Delete Images
-        $this->deleteBreadImages($data, $dataType->deleteRows->whereIn('type', ['image', 'multiple_images']));
-
-        // Delete Files
-        foreach ($dataType->deleteRows->where('type', 'file') as $row) {
-            if (isset($data->{$row->field})) {
-                foreach (json_decode($data->{$row->field}) as $file) {
-                    $this->deleteFileIfExists($file->download_link);
-                }
-            }
-        }
-
-        // Delete media-picker files
-        $dataType->rows->where('type', 'media_picker')->where('details.delete_files', true)->each(function ($row) use ($data) {
-            $content = $data->{$row->field};
-            if (isset($content)) {
-                if (!is_array($content)) {
-                    $content = json_decode($content);
-                }
-                if (is_array($content)) {
-                    foreach ($content as $file) {
-                        $this->deleteFileIfExists($file);
-                    }
-                } else {
-                    $this->deleteFileIfExists($content);
-                }
-            }
-        });
+        app(BreadCleanupService::class)->cleanup($dataType, $data);
     }
 
     /**
@@ -801,40 +747,7 @@ class VoyagerBaseController extends Controller
      */
     public function deleteBreadImages($data, $rows, $single_image = null)
     {
-        $imagesDeleted = false;
-
-        foreach ($rows as $row) {
-            if ($row->type == 'multiple_images') {
-                $images_to_remove = json_decode($data->getOriginal($row->field), true) ?? [];
-            } else {
-                $images_to_remove = [$data->getOriginal($row->field)];
-            }
-
-            foreach ($images_to_remove as $image) {
-                // Remove only $single_image if we are removing from bread edit
-                if ($image != config('voyager.user.default_avatar') && (is_null($single_image) || $single_image == $image)) {
-                    $this->deleteFileIfExists($image);
-                    $imagesDeleted = true;
-
-                    if (isset($row->details->thumbnails)) {
-                        foreach ($row->details->thumbnails as $thumbnail) {
-                            $ext = explode('.', $image);
-                            $extension = '.'.$ext[count($ext) - 1];
-
-                            $path = str_replace($extension, '', $image);
-
-                            $thumb_name = $thumbnail->name;
-
-                            $this->deleteFileIfExists($path.'-'.$thumb_name.$extension);
-                        }
-                    }
-                }
-            }
-        }
-
-        if ($imagesDeleted) {
-            event(new BreadImagesDeleted($data, $rows));
-        }
+        app(BreadCleanupService::class)->deleteBreadImages($data, $rows, $single_image);
     }
 
     /**
