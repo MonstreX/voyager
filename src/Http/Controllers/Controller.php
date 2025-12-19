@@ -24,6 +24,9 @@ use TCG\Voyager\Http\Controllers\ContentTypes\Text;
 use TCG\Voyager\Http\Controllers\ContentTypes\Timestamp;
 use TCG\Voyager\Traits\AlertsMessages;
 use TCG\Voyager\Services\BreadFieldUploadService;
+use TCG\Voyager\Services\BreadMediaPickerPathService;
+use TCG\Voyager\Services\BreadBelongsToManySyncService;
+use TCG\Voyager\Services\BreadTranslationService;
 use Validator;
 
 abstract class Controller extends BaseController
@@ -54,7 +57,7 @@ abstract class Controller extends BaseController
         // Pass $rows so that we avoid checking unused fields
         $request->attributes->add(['breadRows' => $rows->pluck('field')->toArray()]);
 
-        $translations = $this->prepareTranslations($data, $request);
+        $translations = app(BreadTranslationService::class)->prepare($data, $request);
 
         $this->fillModelFromRows($request, $slug, $rows, $data, $multiSelect);
         $this->fillAdditionalAttributes($request, $data);
@@ -69,16 +72,11 @@ abstract class Controller extends BaseController
 
         $this->handleAdvMediaFilesUploads($request, $rows, $data);
 
-        $this->persistTranslations($data, $translations);
-        $this->syncBelongsToManyRelations($data, $multiSelect);
-        $this->renameMediaPickerFoldersIfNeeded($request, $slug, $rows, $data);
+        app(BreadTranslationService::class)->persist($data, $translations);
+        app(BreadBelongsToManySyncService::class)->sync($data, $multiSelect);
+        app(BreadMediaPickerPathService::class)->renameFoldersIfNeeded($request, $slug, $rows, $data);
 
         return $data;
-    }
-
-    protected function prepareTranslations($data, Request $request): array
-    {
-        return is_bread_translatable($data) ? $data->prepareTranslations($request) : [];
     }
 
     protected function fillModelFromRows(Request $request, string $slug, $rows, $data, array &$multiSelect): void
@@ -208,56 +206,11 @@ abstract class Controller extends BaseController
         }
     }
 
-    protected function persistTranslations($data, array $translations): void
-    {
-        if (count($translations) > 0) {
-            $data->saveTranslations($translations);
-        }
-    }
+    // translation logic moved to BreadTranslationService
 
-    protected function syncBelongsToManyRelations($data, array $multiSelect): void
-    {
-        foreach ($multiSelect as $syncData) {
-            $data->belongsToMany(
-                $syncData['model'],
-                $syncData['table'],
-                $syncData['foreignPivotKey'],
-                $syncData['relatedPivotKey'],
-                $syncData['parentKey'],
-                $syncData['relatedKey']
-            )->sync($syncData['content']);
-        }
-    }
+    // belongsToMany sync logic moved to BreadBelongsToManySyncService
 
-    protected function renameMediaPickerFoldersIfNeeded(Request $request, string $slug, $rows, $data): void
-    {
-        if (!$request->session()->has($slug.'_path') && !$request->session()->has($slug.'_uuid')) {
-            return;
-        }
-
-        $oldPath = $request->session()->get($slug.'_path');
-        $uuid = $request->session()->get($slug.'_uuid');
-        $newPath = str_replace($uuid, $data->getKey(), $oldPath);
-        $folderPath = substr($oldPath, 0, strpos($oldPath, $uuid)).$uuid;
-
-        $rows->where('type', 'media_picker')->each(function ($row) use ($data, $uuid) {
-            $data->{$row->field} = str_replace($uuid, $data->getKey(), $data->{$row->field});
-        });
-
-        $data->save();
-
-        $disk = Storage::disk(config('voyager.storage.disk'));
-
-        if (
-            $oldPath != $newPath &&
-            !$disk->exists($newPath) &&
-            $disk->exists($oldPath)
-        ) {
-            $request->session()->forget([$slug.'_path', $slug.'_uuid']);
-            $disk->move($oldPath, $newPath);
-            $disk->deleteDirectory($folderPath);
-        }
-    }
+    // media-picker rename logic moved to BreadMediaPickerPathService
 
     protected function handleAdvInlineSetUploads($request, $rows, $data)
     {
