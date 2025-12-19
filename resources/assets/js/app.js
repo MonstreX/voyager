@@ -33,6 +33,9 @@ import './formfields/adv-image';
 import './formfields/adv-media-files';
 import './formfields/adv-inline-set';
 import { attachConfirmDelegates } from './modules/confirm-modal';
+import { initBreadBrowseList, subscribeToEvents as subscribeBreadBrowseList } from './pages/bread-browse-list';
+import { initBreadBrowseTree, subscribeToEvents as subscribeBreadBrowseTree } from './pages/bread-browse-tree';
+import { initBreadBulkDelete, subscribeToEvents as subscribeBreadBulkDelete } from './pages/bread-bulk-delete';
 
 // Voyager namespace and ready Promises are initialized in master.blade.php <head>
 // Get the resolvers that were created there
@@ -274,6 +277,9 @@ subscribeMatchHeight(voyagerEvents);
 subscribeMarkdown(voyagerEvents);
 subscribeSlugify(voyagerEvents);
 subscribeStickyPanel(voyagerEvents);
+subscribeBreadBrowseList(voyagerEvents);
+subscribeBreadBrowseTree(voyagerEvents);
+subscribeBreadBulkDelete(voyagerEvents);
 
 // Legacy Global Exports (keep for backward compatibility)
 window.VoyagerBootstrapCompat = { init: initBootstrapCompat, showModal, hideModal };
@@ -312,6 +318,11 @@ document.addEventListener('DOMContentLoaded', () => {
     initMatchHeight();
     initMarkdownEditor();
     initStickyActionPanels();
+
+    // BREAD pages (kept separate from core bootstrap init)
+    initBreadBrowseList();
+    initBreadBrowseTree();
+    initBreadBulkDelete();
 
     // Init Modules
     if (window.VoyagerInitSlugify) {

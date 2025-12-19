@@ -526,7 +526,20 @@
 @stop
 
 @section('javascript')
-    <script>
+    @php
+        $browseListConfig = [
+            'serverSide' => (bool) $dataType->server_side,
+            'isModelTranslatable' => (bool) $isModelTranslatable,
+            'usesSoftDeletes' => (bool) $usesSoftDeletes,
+            'softDeleteUrls' => $usesSoftDeletes ? [
+                'on' => route('voyager.'.$dataType->slug.'.index', array_merge($params, ['showSoftDeleted' => 1]), true),
+                'off' => route('voyager.'.$dataType->slug.'.index', array_merge($params, ['showSoftDeleted' => 0]), true),
+            ] : null,
+            'updateFieldUrlTemplate' => route('voyager.'.$dataType->slug.'.update-field', ['id' => '__id']),
+        ];
+    @endphp
+    <script type="application/json" id="voyager-browse-list-config">@json($browseListConfig)</script>
+    {{-- <script>
         document.addEventListener('DOMContentLoaded', () => {
             @if ($dataType->server_side)
                 document.querySelectorAll('#search-input select').forEach((select) => {
@@ -985,5 +998,5 @@
             });
         }
 
-    </script>
+    </script> --}}
 @stop
