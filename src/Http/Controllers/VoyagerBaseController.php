@@ -18,6 +18,7 @@ use TCG\Voyager\Http\Controllers\Traits\BreadRelationshipParser;
 use TCG\Voyager\Services\BrowseFilterService;
 use TCG\Voyager\Services\BreadCleanupService;
 use TCG\Voyager\Services\BreadDestroyService;
+use TCG\Voyager\Services\BreadRelationService;
 
 class VoyagerBaseController extends Controller
 {
@@ -845,107 +846,11 @@ class VoyagerBaseController extends Controller
      *
      * @return mixed
      */
-    public function relation(Request $request)
+    public function relation(Request $request, BreadRelationService $breadRelationService)
     {
         $slug = $this->getSlug($request);
-        $page = $request->input('page');
-        $on_page = 50;
-        $search = $request->input('search', false);
         $dataType = Voyager::model('DataType')->where('slug', '=', $slug)->first();
-
-        $method = $request->input('method', 'add');
-
-        $model = app($dataType->model_name);
-        if ($method != 'add') {
-            $model = $model->find($request->input('id'));
-        }
-
-        $this->authorize($method, $model);
-
-        $rows = $dataType->{$method.'Rows'};
-        foreach ($rows as $key => $row) {
-            if ($row->field === $request->input('type')) {
-                $options = $row->details;
-                $model = app($options->model);
-                $skip = $on_page * ($page - 1);
-
-                $additional_attributes = $model->additional_attributes ?? [];
-
-                // Apply local scope if it is defined in the relationship-options
-                if (isset($options->scope) && $options->scope != '' && method_exists($model, 'scope'.ucfirst($options->scope))) {
-                    $model = $model->{$options->scope}();
-                }
-
-                // If search query, use LIKE to filter results depending on field label
-                if ($search) {
-                    // If we are using additional_attribute as label
-                    if (in_array($options->label, $additional_attributes)) {
-                        $relationshipOptions = $model;
-                        $relationshipOptions = $relationshipOptions->filter(function ($model) use ($search, $options) {
-                            return stripos($model->{$options->label}, $search) !== false;
-                        });
-                        $total_count = $relationshipOptions->count();
-                    } else {
-                        $total_count = $model->where($options->label, 'LIKE', '%' . $search . '%')->count();
-                        $relationshipOptions = $model->where($options->label, 'LIKE', '%' . $search . '%');
-                    }
-                } else {
-                    $total_count = $model->count();
-                    $relationshipOptions = $model;
-                }
-
-                // Sort results
-                if (!empty($options->sort->field)) {
-                    $sort = SORT_REGULAR;
-                    if (!empty($options->sort->flag)) {
-                        $sort = str_replace('"', '', $options->sort->flag);
-                    }
-                    if (!empty($options->sort->direction)) {
-                        $relationshipOptions = $relationshipOptions->orderBy($options->sort->field, $options->sort->direction);
-                    }
-                }
-
-				$relationshipOptions = $relationshipOptions->get()
-				->skip($skip)
-				->take($on_page);
-
-
-                $results = [];
-
-                if (!$row->required && !$search && $page == 1) {
-                    $results[] = [
-                        'id'   => '',
-                        'text' => __('voyager::generic.none'),
-                    ];
-                }
-
-                // Sort results
-                if (!empty($options->sort->field)) {
-                    if (!empty($options->sort->direction) && strtolower($options->sort->direction) == 'desc') {
-                        $relationshipOptions = $relationshipOptions->sortByDesc($options->sort->field);
-                    } else {
-                        $relationshipOptions = $relationshipOptions->sortBy($options->sort->field);
-                    }
-                }
-
-                foreach ($relationshipOptions as $relationshipOption) {
-                    $results[] = [
-                        'id'   => $relationshipOption->{$options->key},
-                        'text' => $relationshipOption->{$options->label},
-                    ];
-                }
-
-                return response()->json([
-                    'results'    => $results,
-                    'pagination' => [
-                        'more' => ($total_count > ($skip + $on_page)),
-                    ],
-                ]);
-            }
-        }
-
-        // No result found, return empty array
-        return response()->json([], 404);
+        return $breadRelationService->relation($request, $dataType);
     }
 
     protected function findSearchableRelationshipRow($relationshipRows, $searchKey)
