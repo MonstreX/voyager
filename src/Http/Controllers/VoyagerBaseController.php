@@ -16,6 +16,7 @@ use TCG\Voyager\Services\BreadDestroyService;
 use TCG\Voyager\Services\BreadRelationService;
 use TCG\Voyager\Services\BreadRemoveMediaService;
 use TCG\Voyager\Services\BreadDataResolverService;
+use TCG\Voyager\Services\BreadOrderService;
 
 class VoyagerBaseController extends Controller
 {
@@ -443,16 +444,17 @@ class VoyagerBaseController extends Controller
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function order(Request $request, BreadDataResolverService $breadDataResolverService)
+    public function order(Request $request, BreadOrderService $breadOrderService)
     {
         $slug = $this->getSlug($request);
 
-        $dataType = $breadDataResolverService->getDataTypeBySlug($slug);
+        $viewData = $breadOrderService->buildOrderViewData($slug);
+        $dataType = $viewData['dataType'];
 
         // Check permission
         $this->authorize('edit', app($dataType->model_name));
 
-        if (empty($dataType->order_column) || empty($dataType->order_display_column)) {
+        if (!empty($viewData['invalid'])) {
             return redirect()
             ->route("voyager.{$dataType->slug}.index")
             ->with([
@@ -461,46 +463,25 @@ class VoyagerBaseController extends Controller
             ]);
         }
 
-        $model = app($dataType->model_name);
-        $query = $breadDataResolverService->query($model, $dataType, true);
-        $results = $query->orderBy($dataType->order_column, $dataType->order_direction)->get();
-
-        $display_column = $dataType->order_display_column;
-
-        $dataRow = Voyager::model('DataRow')->whereDataTypeId($dataType->id)->whereField($display_column)->first();
-
         $view = 'voyager::bread.order';
 
         if (view()->exists("voyager::$slug.order")) {
             $view = "voyager::$slug.order";
         }
 
-        return Voyager::view($view, compact(
-            'dataType',
-            'display_column',
-            'dataRow',
-            'results'
-        ));
+        return Voyager::view($view, $viewData);
     }
 
-    public function update_order(Request $request, BreadDataResolverService $breadDataResolverService)
+    public function update_order(Request $request, BreadOrderService $breadOrderService)
     {
         $slug = $this->getSlug($request);
 
-        $dataType = $breadDataResolverService->getDataTypeBySlug($slug);
+        $dataType = $breadOrderService->buildOrderViewData($slug)['dataType'];
 
         // Check permission
         $this->authorize('edit', app($dataType->model_name));
 
-        $model = app($dataType->model_name);
-
-        $order = json_decode($request->input('order'));
-        $column = $dataType->order_column;
-        foreach ($order as $key => $item) {
-            $i = $breadDataResolverService->query($model, $dataType, true)->findOrFail($item->id);
-            $i->$column = ($key + 1);
-            $i->save();
-        }
+        $breadOrderService->updateOrder($slug, $request);
     }
 
     public function action(Request $request, BreadActionService $breadActionService, BreadDataResolverService $breadDataResolverService)
