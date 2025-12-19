@@ -22,6 +22,19 @@ class VoyagerBaseController extends Controller
 {
     use BreadRelationshipParser;
 
+    private function resolveView(string $slug, string $defaultView, string $suffix): string
+    {
+        $customView = "voyager::$slug.$suffix";
+        return view()->exists($customView) ? $customView : $defaultView;
+    }
+
+    private function applyColWidths($rows, int $defaultWidth = 100): void
+    {
+        foreach ($rows as $key => $row) {
+            $rows[$key]['col_width'] = isset($row->details->width) ? $row->details->width : $defaultWidth;
+        }
+    }
+
     //***************************************
     //               ____
     //              |  _ \
@@ -42,11 +55,7 @@ class VoyagerBaseController extends Controller
 
         $viewData = $breadBrowseService->buildBrowseViewDataForDataType($request, $slug, $dataType);
 
-        $view = 'voyager::bread.browse';
-
-        if (view()->exists("voyager::$slug.browse")) {
-            $view = "voyager::$slug.browse";
-        }
+        $view = $this->resolveView($slug, 'voyager::bread.browse', 'browse');
 
         return Voyager::view($view, $viewData);
     }
@@ -96,11 +105,7 @@ class VoyagerBaseController extends Controller
         // Eagerload Relations
         $this->eagerLoadRelations($dataTypeContent, $dataType, 'read', $isModelTranslatable);
 
-        $view = 'voyager::bread.read';
-
-        if (view()->exists("voyager::$slug.read")) {
-            $view = "voyager::$slug.read";
-        }
+        $view = $this->resolveView($slug, 'voyager::bread.read', 'read');
 
         return Voyager::view($view, compact('dataType', 'dataTypeContent', 'isModelTranslatable', 'isSoftDeleted'));
     }
@@ -130,9 +135,7 @@ class VoyagerBaseController extends Controller
             $dataTypeContent = DB::table($dataType->name)->where('id', $id)->first();
         }
 
-        foreach ($dataType->editRows as $key => $row) {
-            $dataType->editRows[$key]['col_width'] = isset($row->details->width) ? $row->details->width : 100;
-        }
+        $this->applyColWidths($dataType->editRows);
 
         // If a column has a relationship associated with it, we do not want to show that field
         $this->removeRelationshipField($dataType, 'edit');
@@ -146,11 +149,7 @@ class VoyagerBaseController extends Controller
         // Eagerload Relations
         $this->eagerLoadRelations($dataTypeContent, $dataType, 'edit', $isModelTranslatable);
 
-        $view = 'voyager::bread.edit-add';
-
-        if (view()->exists("voyager::$slug.edit-add")) {
-            $view = "voyager::$slug.edit-add";
-        }
+        $view = $this->resolveView($slug, 'voyager::bread.edit-add', 'edit-add');
 
         return Voyager::view($view, compact('dataType', 'dataTypeContent', 'isModelTranslatable'));
     }
@@ -226,9 +225,7 @@ class VoyagerBaseController extends Controller
                             ? $breadDataResolverService->newModelInstance($dataType)
                             : false;
 
-        foreach ($dataType->addRows as $key => $row) {
-            $dataType->addRows[$key]['col_width'] = $row->details->width ?? 100;
-        }
+        $this->applyColWidths($dataType->addRows);
 
         // If a column has a relationship associated with it, we do not want to show that field
         $this->removeRelationshipField($dataType, 'add');
@@ -239,11 +236,7 @@ class VoyagerBaseController extends Controller
         // Eagerload Relations
         $this->eagerLoadRelations($dataTypeContent, $dataType, 'add', $isModelTranslatable);
 
-        $view = 'voyager::bread.edit-add';
-
-        if (view()->exists("voyager::$slug.edit-add")) {
-            $view = "voyager::$slug.edit-add";
-        }
+        $view = $this->resolveView($slug, 'voyager::bread.edit-add', 'edit-add');
 
         return Voyager::view($view, compact('dataType', 'dataTypeContent', 'isModelTranslatable'));
     }
@@ -463,11 +456,7 @@ class VoyagerBaseController extends Controller
             ]);
         }
 
-        $view = 'voyager::bread.order';
-
-        if (view()->exists("voyager::$slug.order")) {
-            $view = "voyager::$slug.order";
-        }
+        $view = $this->resolveView($slug, 'voyager::bread.order', 'order');
 
         return Voyager::view($view, $viewData);
     }
