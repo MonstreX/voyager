@@ -85,10 +85,13 @@
 @stop
 
 @section('javascript')
-    <script type="application/json" id="voyager-browse-tree-config">@json([
-        'slug' => $dataType->slug,
-        'isModelTranslatable' => (bool) $isModelTranslatable,
-        'treeOrderUrl' => route('voyager.'.$dataType->slug.'.tree-order'),
-        'updateFieldUrlTemplate' => route('voyager.'.$dataType->slug.'.update-field', ['id' => '__id']),
-    ])</script>
+    @php
+        $browseTreeConfig = [
+            'slug' => $dataType->slug,
+            'isModelTranslatable' => (bool) $isModelTranslatable,
+            'treeOrderUrl' => route('voyager.'.$dataType->slug.'.tree-order'),
+            'updateFieldUrlTemplate' => route('voyager.'.$dataType->slug.'.update-field', ['id' => '__id']),
+        ];
+    @endphp
+    <script type="application/json" id="voyager-browse-tree-config">@json($browseTreeConfig)</script>
 @stop
