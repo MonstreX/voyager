@@ -28,6 +28,51 @@ const parseJsonConfig = () => {
     }
 };
 
+const ensureTableInfoVueMounted = (tableInfoRoot) => {
+    if (!tableInfoRoot) return Promise.resolve();
+    if (tableInfoRoot.dataset.voyagerVueMounted === '1') return Promise.resolve();
+    if (!window.Voyager || typeof window.Voyager.withVue !== 'function') return Promise.resolve();
+
+    if (!window.__voyagerDbTableInfoState) {
+        window.__voyagerDbTableInfoState = {
+            table: {
+                name: '',
+                rows: []
+            }
+        };
+    }
+
+    return window.Voyager.withVue(function (Vue) {
+        const app = Vue.createApp({
+            data: function () {
+                return {
+                    table: window.__voyagerDbTableInfoState.table,
+                };
+            },
+        }).mount('#table_info');
+
+        window.__voyagerDbTableInfoState.table = app.table;
+        tableInfoRoot.dataset.voyagerVueMounted = '1';
+    }).catch((error) => {
+        console.error('[VoyagerToolsDatabase] failed to mount table info Vue', error);
+    });
+};
+
+const normalizeTableInfoRows = (data) => {
+    if (!data) return [];
+    if (Array.isArray(data)) return data;
+    if (typeof data !== 'object') return [];
+
+    const candidates = ['rows', 'data', 'columns'];
+    for (const key of candidates) {
+        if (Array.isArray(data[key])) {
+            return data[key];
+        }
+    }
+
+    return Object.values(data);
+};
+
 export const initToolsDatabaseIndex = () => {
     if (typeof document === 'undefined') return;
     const config = parseJsonConfig();
@@ -52,38 +97,41 @@ export const initToolsDatabaseIndex = () => {
             const href = descLink.getAttribute('href');
             if (!href) return;
 
-            const state = window.__voyagerDbTableInfoState;
-            if (!state) return;
+            ensureTableInfoVueMounted(tableInfoRoot).finally(() => {
+                const state = window.__voyagerDbTableInfoState;
+                if (!state) return;
 
-            state.table.name = descLink.dataset.name || '';
-            state.table.rows = [];
+                state.table.name = descLink.dataset.name || '';
+                state.table.rows = [];
 
-            fetch(href, { headers: { Accept: 'application/json' } })
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch table info');
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    state.table.rows = Object.keys(data || {}).map((key) => {
-                        const val = data[key] || {};
-                        return {
-                            Field: val.field ?? val.Field,
-                            Type: val.type ?? val.Type,
-                            Null: val.null ?? val.Null,
-                            Key: val.key ?? val.Key,
-                            Default: val.default ?? val.Default,
-                            Extra: val.extra ?? val.Extra,
-                        };
+                fetch(href, { headers: { Accept: 'application/json' } })
+                    .then((response) => {
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch table info');
+                        }
+                        return response.json();
+                    })
+                    .then((data) => {
+                        const rows = normalizeTableInfoRows(data);
+                        state.table.rows = rows.map((val) => {
+                            const candidate = val || {};
+                            return {
+                                Field: candidate.field ?? candidate.Field,
+                                Type: candidate.type ?? candidate.Type,
+                                Null: candidate.null ?? candidate.Null,
+                                Key: candidate.key ?? candidate.Key,
+                                Default: candidate.default ?? candidate.Default,
+                                Extra: candidate.extra ?? candidate.Extra,
+                            };
+                        });
+                        showModal(tableInfoRoot);
+                    })
+                    .catch((error) => {
+                        console.error('[VoyagerToolsDatabase] table info fetch failed', error);
+                        const toastr = getToastr();
+                        toastr && toastr.error(config.i18n && config.i18n.internalError ? config.i18n.internalError : 'Internal error');
                     });
-                    showModal(tableInfoRoot);
-                })
-                .catch((error) => {
-                    console.error('[VoyagerToolsDatabase] table info fetch failed', error);
-                    const toastr = getToastr();
-                    toastr && toastr.error(config.i18n && config.i18n.internalError ? config.i18n.internalError : 'Internal error');
-                });
+            });
         });
 
         document.addEventListener('click', (event) => {
@@ -136,30 +184,7 @@ export const initToolsDatabaseIndex = () => {
         }
     }
 
-    if (tableInfoRoot && window.Voyager && typeof window.Voyager.withVue === 'function') {
-        if (!window.__voyagerDbTableInfoState) {
-            window.__voyagerDbTableInfoState = {
-                table: {
-                    name: '',
-                    rows: []
-                }
-            };
-        }
-
-        if (tableInfoRoot.dataset.voyagerVueMounted !== '1') {
-            window.Voyager.withVue(function (Vue) {
-                const app = Vue.createApp({
-                    data: function () {
-                        return {
-                            table: window.__voyagerDbTableInfoState.table,
-                        };
-                    },
-                }).mount('#table_info');
-                window.__voyagerDbTableInfoState.table = app.table;
-                tableInfoRoot.dataset.voyagerVueMounted = '1';
-            });
-        }
-    }
+    ensureTableInfoVueMounted(tableInfoRoot);
 };
 
 export const subscribeToEvents = (events) => {

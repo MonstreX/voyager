@@ -86,7 +86,7 @@
     {{-- Delete BREAD Modal --}}
     @include('voyager::components.modal-confirm', [
         'id' => 'delete_bread_modal',
-        'title' => '<i class="voyager-trash"></i> ' . __('voyager::bread.delete_bread_quest', ['table' => '<span id="delete_bread_name"></span>']),
+        'title' => __('voyager::bread.delete_bread_quest', ['table' => '<span id="delete_bread_name"></span>']),
         'message' => '',
         'confirmText' => __('voyager::bread.delete_bread_conf'),
         'confirmClass' => 'btn-danger',
@@ -100,7 +100,7 @@
 
     @include('voyager::components.modal-confirm', [
         'id' => 'delete_modal',
-        'title' => '<i class="voyager-trash"></i> ' . __('voyager::database.delete_table_question', ['table' => '<span id="delete_table_name"></span>']),
+        'title' => __('voyager::database.delete_table_question', ['table' => '<span id="delete_table_name"></span>']),
         'message' => '',
         'confirmText' => __('voyager::database.delete_table_confirm'),
         'confirmClass' => 'btn-danger',
