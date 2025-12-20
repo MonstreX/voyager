@@ -282,10 +282,25 @@
                                             Markdown editor is temporarily disabled while we replace EasyMDE. Please edit the raw markdown below.
                                         </div>
                                         <textarea class="form-control easymde" name="{{ $setting->key }}">{{ $setting->value ?? '' }}</textarea>
-                                    @elseif($setting->type == "code_editor")
-                                        <?php $options = json_decode($setting->details); ?>
-                                        <div id="{{ $setting->key }}" data-theme="{{ @$options->theme }}" data-language="{{ @$options->language }}" class="ace_editor min_height_400" name="{{ $setting->key }}">{{ $setting->value ?? '' }}</div>
-                                        <textarea name="{{ $setting->key }}" id="{{ $setting->key }}_textarea" class="hidden">{{ $setting->value ?? '' }}</textarea>
+	                                    @elseif($setting->type == "code_editor")
+	                                        <?php $options = json_decode($setting->details); ?>
+	                                        @php
+	                                            $aceRawValue = $setting->value ?? '';
+	                                            $aceLanguage = isset($options->language) ? (string) $options->language : '';
+	                                            $aceDisplayValue = $aceRawValue;
+	                                            if ($aceLanguage === 'json' && is_string($aceRawValue)) {
+	                                                try {
+	                                                    $decoded = json_decode($aceRawValue, true);
+	                                                    if (json_last_error() === JSON_ERROR_NONE) {
+	                                                        $aceDisplayValue = json_encode($decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+	                                                    }
+	                                                } catch (\Throwable $e) {
+	                                                    // Keep raw
+	                                                }
+	                                            }
+	                                        @endphp
+	                                        <div id="{{ $setting->key }}" data-theme="{{ @$options->theme }}" data-language="{{ @$options->language }}" class="ace_editor min_height_400" name="{{ $setting->key }}">{{ $aceDisplayValue }}</div>
+	                                        <textarea name="{{ $setting->key }}" id="{{ $setting->key }}_textarea" class="hidden">{{ $aceDisplayValue }}</textarea>
                                     @elseif($setting->type == "image" || $setting->type == "file")
                                         @if(isset( $setting->value ) && !empty( $setting->value ) && Storage::disk(config('voyager.storage.disk'))->exists($setting->value))
                                             <div class="img_settings_container">
