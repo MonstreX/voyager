@@ -364,12 +364,13 @@
 @endsection
 
 <script>
+    const voyagerMediaCsrfMeta = document.querySelector('meta[name="csrf-token"]');
+    const voyagerMediaCsrfToken = voyagerMediaCsrfMeta ? voyagerMediaCsrfMeta.getAttribute('content') : '';
+
     const voyagerMediaRequest = (url, payload = {}) => {
         if (window.Voyager && window.Voyager.http && typeof window.Voyager.http.postJson === 'function') {
             return window.Voyager.http.postJson(url, payload);
         }
-        const voyagerMediaCsrfMeta = document.querySelector('meta[name="csrf-token"]');
-        const voyagerMediaCsrfToken = voyagerMediaCsrfMeta ? voyagerMediaCsrfMeta.getAttribute('content') : '';
         return fetch(url, {
             method: 'POST',
             headers: {
