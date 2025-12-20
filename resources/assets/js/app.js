@@ -41,6 +41,7 @@ import { initBreadBrowseTree, subscribeToEvents as subscribeBreadBrowseTree } fr
 import { initBreadBulkDelete, subscribeToEvents as subscribeBreadBulkDelete } from './pages/bread-bulk-delete';
 import { initBreadEditAdd, subscribeToEvents as subscribeBreadEditAdd } from './pages/bread-edit-add';
 import { initBreadRead, subscribeToEvents as subscribeBreadRead } from './pages/bread-read';
+import { initCompass, subscribeToEvents as subscribeCompass } from './pages/compass';
 import { initMediaManager, subscribeToEvents as subscribeMediaManager } from './pages/media-manager';
 import { initMenusBuilder, subscribeToEvents as subscribeMenusBuilder } from './pages/menus-builder';
 import { initToolsDatabaseIndex, subscribeToEvents as subscribeToolsDatabaseIndex } from './pages/tools-database-index';
@@ -302,6 +303,7 @@ subscribeBreadBrowseTree(voyagerEvents);
 subscribeBreadBulkDelete(voyagerEvents);
 subscribeBreadEditAdd(voyagerEvents);
 subscribeBreadRead(voyagerEvents);
+subscribeCompass(voyagerEvents);
 subscribeMediaManager(voyagerEvents);
 subscribeMenusBuilder(voyagerEvents);
 subscribeToolsDatabaseIndex(voyagerEvents);
@@ -359,6 +361,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initBreadBulkDelete();
     initBreadEditAdd();
     initBreadRead();
+    initCompass();
     initMediaManager();
     initMenusBuilder();
     initToolsDatabaseIndex();

@@ -1,4 +1,5 @@
 import { getCsrfToken } from '../modules/csrf';
+import { showModal, hideModal } from '../core/bootstrap-compat';
 
 let listenersAttached = false;
 
@@ -13,36 +14,6 @@ const getMenuBuilderConfig = () => {
     } catch (error) {
         console.error('[VoyagerMenuBuilder] Failed to parse config', error);
         return null;
-    }
-};
-
-const getBootstrap = () => (window.Voyager && window.Voyager.bootstrap) || window.VoyagerBootstrapCompat || null;
-
-const showModal = (modal) => {
-    const bootstrap = getBootstrap();
-    if (bootstrap && typeof bootstrap.showModal === 'function') {
-        bootstrap.showModal(modal);
-        return;
-    }
-    if (!modal) return;
-    modal.classList.add('in');
-    modal.style.display = 'block';
-    modal.setAttribute('aria-hidden', 'false');
-    document.body.classList.add('modal-open');
-};
-
-const hideModal = (modal) => {
-    const bootstrap = getBootstrap();
-    if (bootstrap && typeof bootstrap.hideModal === 'function') {
-        bootstrap.hideModal(modal);
-        return;
-    }
-    if (!modal) return;
-    modal.classList.remove('in');
-    modal.style.display = 'none';
-    modal.setAttribute('aria-hidden', 'true');
-    if (!document.querySelector('.modal.in')) {
-        document.body.classList.remove('modal-open');
     }
 };
 

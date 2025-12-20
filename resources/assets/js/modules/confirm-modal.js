@@ -109,6 +109,16 @@ export function attachConfirmDelegates() {
                 }
             }
 
+            if (payload.confirmHref) {
+                const href = payload.confirmHref;
+                cleanupModalHandler(modal);
+                hideConfirmModal(modal);
+                if (href) {
+                    window.location.href = href;
+                }
+                return;
+            }
+
             if (payload.confirmUrl) {
                 const method = payload.confirmMethod || 'POST';
                 const headers = { 'X-CSRF-TOKEN': payload.csrf || '' };

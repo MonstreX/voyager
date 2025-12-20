@@ -2,7 +2,7 @@
 <form role="form" action="{{ route('voyager.bread.relationship') }}" method="POST">
 	<div class="modal fade modal-danger modal-relationships" id="new_relationship_modal">
 		<div class="modal-dialog relationship-panel">
-		    <div class="model-content">
+		    <div class="modal-content">
 		        <div class="modal-header">
 	                <button type="button" class="close" data-dismiss="modal"
 	                        aria-hidden="true">&times;</button>

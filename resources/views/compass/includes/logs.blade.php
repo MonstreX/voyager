@@ -66,11 +66,20 @@
       <a href="?download={{ base64_encode($current_file) }}"><span class="glyphicon glyphicon-download-alt"></span>
         {{ __('voyager::compass.logs.download_file') }}</a>
       -
-      <a id="delete-log" href="?del={{ base64_encode($current_file) }}"><span
-            class="glyphicon glyphicon-trash"></span> {{ __('voyager::compass.logs.delete_file') }}</a>
+      <a id="delete-log"
+         href="?del={{ base64_encode($current_file) }}"
+         data-confirm-target="#compass_delete_logs_modal"
+         data-confirm-href="?del={{ base64_encode($current_file) }}">
+          <span class="glyphicon glyphicon-trash"></span> {{ __('voyager::compass.logs.delete_file') }}
+      </a>
       @if(count($files) > 1)
         -
-        <a id="delete-all-log" href="?delall=true"><span class="glyphicon glyphicon-trash"></span> {{ __('voyager::compass.logs.delete_all_files') }}</a>
+        <a id="delete-all-log"
+           href="?delall=true"
+           data-confirm-target="#compass_delete_logs_modal"
+           data-confirm-href="?delall=true">
+            <span class="glyphicon glyphicon-trash"></span> {{ __('voyager::compass.logs.delete_all_files') }}
+        </a>
       @endif
     @endif
   </div>
