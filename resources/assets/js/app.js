@@ -36,6 +36,7 @@ import './formfields/adv-inline-set';
 import { initRichTextBoxes, subscribeToEvents as subscribeRichTextBoxes } from './formfields/rich-text-box';
 import { initCoordinatesFields, subscribeToEvents as subscribeCoordinatesFields } from './formfields/coordinates';
 import { attachConfirmDelegates } from './modules/confirm-modal';
+import { initSessionAlerts } from './modules/session-alerts';
 import { initBreadBrowseList, subscribeToEvents as subscribeBreadBrowseList } from './pages/bread-browse-list';
 import { initBreadBrowseTree, subscribeToEvents as subscribeBreadBrowseTree } from './pages/bread-browse-tree';
 import { initBreadBulkDelete, subscribeToEvents as subscribeBreadBulkDelete } from './pages/bread-bulk-delete';
@@ -380,6 +381,8 @@ document.addEventListener('DOMContentLoaded', () => {
         window.VoyagerInitSlugify('.side-body input[data-slug-origin]');
     }
 
+    initSessionAlerts();
+
     // Auto-switch to tab with error
     const firstError = document.querySelector('.form-group.has-error');
     if (firstError) {
@@ -393,8 +396,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Autoload Vue bundle when admin Vue hooks are present
-    if (document.querySelector('#adminmenu, [data-voyager-vue-root]')) {
-        window.Voyager.loadVue().catch(() => {});
+    const vueRoots = document.querySelectorAll('[data-voyager-vue-root]');
+    const shouldLoadVue = document.getElementById('adminmenu') || vueRoots.length > 0;
+    if (shouldLoadVue) {
+        window.Voyager.loadVue()
+            .then(() => {
+                if (vueRoots.length && typeof window.VueMountApp === 'function') {
+                    window.VueMountApp(vueRoots);
+                }
+            })
+            .catch(() => {});
     }
 
     // Emit dom:updated event for initial page load

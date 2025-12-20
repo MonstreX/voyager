@@ -21,6 +21,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         app: 'resources/assets/js/app.js',
+        auth: 'resources/assets/js/auth.js',
         'vue-bundle': 'resources/assets/js/vue-bundle.js',
         editors: 'resources/assets/js/editors.js',
         ga: 'resources/assets/js/ga.js'

@@ -77,5 +77,6 @@
     </div> <!-- .row -->
 </div> <!-- .container-fluid -->
 @yield('post_js')
+<script type="module" src="{{ voyager_asset('js/auth.js') }}"></script>
 </body>
 </html>

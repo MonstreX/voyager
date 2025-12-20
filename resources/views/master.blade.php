@@ -234,40 +234,15 @@ if (\Illuminate\Support\Str::startsWith(Auth::user()->avatar, 'http://') || \Ill
 <!-- Load app bundle (core functionality) -->
 <script type="module" src="{{ voyager_asset('js/app.js') }}"></script>
 
-<script>
-    // Display Laravel session alerts and messages
-    window.Voyager.ready.app.then(function() {
-        @if(Session::has('alerts'))
-            let alerts = {!! json_encode(Session::get('alerts')) !!};
-            helpers.displayAlerts(alerts, toastr);
-        @endif
-
-        @if(Session::has('message'))
-        // TODO: change Controllers to use AlertsMessages trait... then remove this
-        var alertType = {!! json_encode(Session::get('alert-type', 'info')) !!};
-        var alertMessage = {!! json_encode(Session::get('message')) !!};
-        var alerter = toastr[alertType];
-
-        if (alerter) {
-            alerter(alertMessage);
-        } else {
-            toastr.error("toastr alert-type " + alertType + " is unknown");
-        }
-        @endif
-    });
-</script>
+@php
+    $voyagerSessionAlerts = [
+        'alerts' => Session::has('alerts') ? Session::get('alerts') : null,
+        'message' => Session::has('message') ? Session::get('message') : null,
+        'alertType' => Session::has('message') ? Session::get('alert-type', 'info') : null,
+    ];
+@endphp
+<script type="application/json" id="voyager-session-alerts">@json($voyagerSessionAlerts)</script>
 @include('voyager::media.manager')
-<script>
-// Mount any declarative Vue roots (if present)
-const autoVueRoots = document.querySelectorAll('[data-voyager-vue-root]');
-if (autoVueRoots.length && window.Voyager && typeof window.Voyager.loadVue === 'function') {
-    window.Voyager.loadVue().then(() => {
-        if (window.VueMountApp) {
-            window.VueMountApp(autoVueRoots);
-        }
-    }).catch(() => {});
-}
-</script>
 @yield('javascript')
 @stack('javascript')
 @if(!empty(config('voyager.additional_js')))<!-- Additional Javascript -->
