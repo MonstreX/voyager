@@ -67,7 +67,12 @@
                                                 </a>
                                             @endcan
                                             @can('delete', $data)
-                                                <a href="javascript:;" class="btn btn-sm btn-danger delete" data-id="{{ $data->{$data->getKeyName()} }}" title="{{ __('voyager::generic.delete') }}">
+                                                <a href="#"
+                                                   class="btn btn-sm btn-danger"
+                                                   data-confirm-target="#delete_menu_modal"
+                                                   data-confirm-form="#delete_menu_form"
+                                                   data-confirm-form-action="{{ route('voyager.'.$dataType->slug.'.destroy', $data->{$data->getKeyName()}) }}"
+                                                   title="{{ __('voyager::generic.delete') }}">
                                                     <i class="voyager-trash"></i>
                                                 </a>
                                             @endcan
@@ -83,66 +88,16 @@
         </div>
     </div>
 
-    <div class="modal modal-danger fade" tabindex="-1" id="delete_modal" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    <h4 class="modal-title">
-                        <i class="voyager-trash"></i> {{ __('voyager::generic.delete_question') }} {{ $dataType->getTranslatedAttribute('display_name_singular') }}?
-                    </h4>
-                </div>
-                <div class="modal-footer">
-                    <form action="#" id="delete_form" method="POST">
-                        {{ method_field("DELETE") }}
-                        {{ csrf_field() }}
-                        <input type="submit" class="btn btn-danger pull-right delete-confirm" value="{{ __('voyager::generic.delete_this_confirm') }} {{ $dataType->getTranslatedAttribute('display_name_singular') }}">
-                    </form>
-                    <button type="button" class="btn btn-default pull-right" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
-                </div>
-            </div>
-        </div>
-    </div>
-@stop
-
-@section('javascript')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const deleteModal = document.getElementById('delete_modal');
-            const deleteForm = document.getElementById('delete_form');
-            const deleteActionTemplate = '{{ route('voyager.'.$dataType->slug.'.destroy', ['id' => '__menu']) }}';
-            const bootstrapCompat = window.VoyagerBootstrapCompat;
-
-            const showModal = (modal) => {
-                if (!modal) {
-                    return;
-                }
-                if (bootstrapCompat && typeof bootstrapCompat.showModal === 'function') {
-                    bootstrapCompat.showModal(modal);
-                    return;
-                }
-                modal.classList.add('in');
-                modal.style.display = 'block';
-                modal.setAttribute('aria-hidden', 'false');
-                const backdrop = document.createElement('div');
-                backdrop.className = 'modal-backdrop fade in';
-                backdrop.dataset.modalTarget = modal.id;
-                document.body.appendChild(backdrop);
-                document.body.classList.add('modal-open');
-            };
-
-            document.querySelectorAll('td .delete').forEach((button) => {
-                button.addEventListener('click', (event) => {
-                    event.preventDefault();
-                    if (!deleteForm) {
-                        return;
-                    }
-                    deleteForm.action = deleteActionTemplate.replace('__menu', button.dataset.id || '');
-                    showModal(deleteModal);
-                });
-            });
-        });
-    </script>
+    @include('voyager::components.modal-confirm', [
+        'id' => 'delete_menu_modal',
+        'title' => __('voyager::generic.delete_question').' '.$dataType->getTranslatedAttribute('display_name_singular').'?'.'',
+        'message' => '',
+        'confirmText' => __('voyager::generic.delete_this_confirm').' '.$dataType->getTranslatedAttribute('display_name_singular'),
+        'confirmClass' => 'btn-danger',
+        'icon' => 'voyager-trash'
+    ])
+    <form action="#" id="delete_menu_form" method="POST" style="display:none">
+        {{ method_field("DELETE") }}
+        {{ csrf_field() }}
+    </form>
 @stop
