@@ -354,7 +354,7 @@ export const initMenusBuilder = () => {
 
         const menuNestable = document.querySelector('.dd');
         if (menuNestable && window.VoyagerInitNestable) {
-            window.VoyagerInitNestable(menuNestable);
+            window.VoyagerInitNestable(menuNestable, { handle: '.dd-tree-handle' });
             menuNestable.addEventListener('voyager.sortable.updated', (event) => {
                 const structure = event.detail && event.detail.structure
                     ? event.detail.structure
@@ -378,6 +378,35 @@ export const initMenusBuilder = () => {
                         toastr && toastr.error(config.i18n.internalError || 'Internal error');
                     });
             });
+
+            if (!menuNestable.dataset.voyagerCollapseInitialized) {
+                menuNestable.dataset.voyagerCollapseInitialized = 'true';
+                menuNestable.addEventListener('click', (event) => {
+                    const button = event.target.closest('button[data-action]');
+                    if (!button) return;
+
+                    const action = button.getAttribute('data-action');
+                    if (action !== 'collapse' && action !== 'expand') return;
+
+                    const item = button.closest('li.dd-item');
+                    if (!item) return;
+
+                    event.preventDefault();
+
+                    const shouldCollapse = action === 'collapse';
+                    item.classList.toggle('dd-collapsed', shouldCollapse);
+
+                    const collapseButton = item.querySelector(':scope > button[data-action="collapse"]');
+                    const expandButton = item.querySelector(':scope > button[data-action="expand"]');
+
+                    if (collapseButton) {
+                        collapseButton.style.display = shouldCollapse ? 'none' : '';
+                    }
+                    if (expandButton) {
+                        expandButton.style.display = shouldCollapse ? '' : 'none';
+                    }
+                });
+            }
         }
     }
 };
@@ -386,4 +415,3 @@ export const subscribeToEvents = (events) => {
     if (!events || typeof events.on !== 'function') return;
     events.on('dom:updated', () => initMenusBuilder());
 };
-
