@@ -1,4 +1,11 @@
+import { showModal, hideModal } from '../core/bootstrap-compat';
+
+let listenersAttached = false;
+
 document.addEventListener('DOMContentLoaded', function() {
+    if (listenersAttached) return;
+    listenersAttached = true;
+
     let pendingDeleteData = null;
     let cropState = {
         mediaId: null,
@@ -30,25 +37,13 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     const closeModal = (modal) => {
-        if (!modal) {
-            return;
-        }
-        if (window.VoyagerBootstrapCompat && typeof window.VoyagerBootstrapCompat.hideModal === 'function') {
-            window.VoyagerBootstrapCompat.hideModal(modal);
-        } else if (window.Voyager && window.Voyager.bootstrap && typeof window.Voyager.bootstrap.hideModal === 'function') {
-            window.Voyager.bootstrap.hideModal(modal);
-        }
+        if (!modal) return;
+        hideModal(modal);
     };
 
     const openModal = (modal) => {
-        if (!modal) {
-            return;
-        }
-        if (window.VoyagerBootstrapCompat && typeof window.VoyagerBootstrapCompat.showModal === 'function') {
-            window.VoyagerBootstrapCompat.showModal(modal);
-        } else if (window.Voyager && window.Voyager.bootstrap && typeof window.Voyager.bootstrap.showModal === 'function') {
-            window.Voyager.bootstrap.showModal(modal);
-        }
+        if (!modal) return;
+        showModal(modal);
     };
 
     const destroyCropper = () => {
