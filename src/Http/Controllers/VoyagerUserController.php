@@ -4,6 +4,8 @@ namespace TCG\Voyager\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use TCG\Voyager\Services\BreadCleanupService;
+use TCG\Voyager\Services\BreadDataResolverService;
 use TCG\Voyager\Facades\Voyager;
 
 class VoyagerUserController extends VoyagerBaseController
@@ -22,7 +24,7 @@ class VoyagerUserController extends VoyagerBaseController
     }
 
     // POST BR(E)AD
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, BreadDataResolverService $breadDataResolverService, BreadCleanupService $breadCleanupService)
     {
         if (Auth::user()->getKey() == $id) {
             $request->merge([
@@ -31,6 +33,6 @@ class VoyagerUserController extends VoyagerBaseController
             ]);
         }
 
-        return parent::update($request, $id);
+        return parent::update($request, $id, $breadDataResolverService, $breadCleanupService);
     }
 }
