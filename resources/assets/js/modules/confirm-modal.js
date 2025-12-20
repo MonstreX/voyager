@@ -1,5 +1,7 @@
 const getBootstrapCompat = () => window.VoyagerBootstrapCompat || (window.Voyager && window.Voyager.bootstrap);
 
+const activeHandlers = new WeakMap();
+
 export function showConfirmModal(modal) {
     const compat = getBootstrapCompat();
     if (!modal) return;
@@ -37,6 +39,28 @@ export function hideConfirmModal(modal) {
     }
 }
 
+const cleanupModalHandler = (modal) => {
+    if (!modal) return;
+    const active = activeHandlers.get(modal);
+    if (!active) return;
+
+    const { acceptButton, acceptHandler } = active;
+    if (acceptButton && acceptHandler) {
+        acceptButton.removeEventListener('click', acceptHandler);
+    }
+
+    if (acceptButton) {
+        acceptButton.removeAttribute('data-confirm-url');
+        acceptButton.removeAttribute('data-confirm-method');
+        acceptButton.removeAttribute('data-confirm-field');
+        acceptButton.removeAttribute('data-confirm-value');
+        acceptButton.removeAttribute('data-confirm-form');
+        acceptButton.removeAttribute('data-confirm-form-action');
+    }
+
+    activeHandlers.delete(modal);
+};
+
 export function attachConfirmDelegates() {
     document.addEventListener('click', (event) => {
         const trigger = event.target.closest('[data-confirm-target]');
@@ -52,21 +76,25 @@ export function attachConfirmDelegates() {
         if (!acceptButton) return;
         const payload = trigger.dataset || {};
 
+        cleanupModalHandler(modal);
+
+        if (!modal.dataset.voyagerConfirmCleanupInit) {
+            modal.dataset.voyagerConfirmCleanupInit = '1';
+
+            modal.addEventListener('click', (e) => {
+                if (e.target.closest('[data-dismiss="modal"]')) {
+                    cleanupModalHandler(modal);
+                }
+            });
+
+            modal.addEventListener('hidden.bs.modal', () => cleanupModalHandler(modal));
+        }
+
         // Sync name into modal body if placeholder present
         const nameSpan = modal.querySelector('.confirm_delete_name');
         if (nameSpan && payload.confirmName) {
             nameSpan.textContent = payload.confirmName;
         }
-
-        const cleanup = () => {
-            acceptButton.removeAttribute('data-confirm-url');
-            acceptButton.removeAttribute('data-confirm-method');
-            acceptButton.removeAttribute('data-confirm-field');
-            acceptButton.removeAttribute('data-confirm-value');
-            acceptButton.removeAttribute('data-confirm-form');
-            acceptButton.removeAttribute('data-confirm-form-action');
-            acceptButton.removeEventListener('click', acceptHandler);
-        };
 
         const acceptHandler = () => {
             if (payload.confirmForm) {
@@ -75,7 +103,7 @@ export function attachConfirmDelegates() {
                     if (payload.confirmFormAction) {
                         form.setAttribute('action', payload.confirmFormAction);
                     }
-                    cleanup();
+                    cleanupModalHandler(modal);
                     form.submit();
                     return;
                 }
@@ -95,10 +123,11 @@ export function attachConfirmDelegates() {
             } else {
                 hideConfirmModal(modal);
             }
-            cleanup();
+            cleanupModalHandler(modal);
         };
 
         acceptButton.addEventListener('click', acceptHandler);
+        activeHandlers.set(modal, { acceptButton, acceptHandler });
         showConfirmModal(modal);
     });
 }
