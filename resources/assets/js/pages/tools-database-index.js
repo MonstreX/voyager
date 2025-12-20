@@ -69,12 +69,12 @@ export const initToolsDatabaseIndex = () => {
                     state.table.rows = Object.keys(data || {}).map((key) => {
                         const val = data[key] || {};
                         return {
-                            Field: val.field,
-                            Type: val.type,
-                            Null: val.null,
-                            Key: val.key,
-                            Default: val.default,
-                            Extra: val.extra,
+                            Field: val.field ?? val.Field,
+                            Type: val.type ?? val.Type,
+                            Null: val.null ?? val.Null,
+                            Key: val.key ?? val.Key,
+                            Default: val.default ?? val.Default,
+                            Extra: val.extra ?? val.Extra,
                         };
                     });
                     showModal(tableInfoRoot);
@@ -166,4 +166,3 @@ export const subscribeToEvents = (events) => {
     if (!events || typeof events.on !== 'function') return;
     events.on('dom:updated', () => initToolsDatabaseIndex());
 };
-

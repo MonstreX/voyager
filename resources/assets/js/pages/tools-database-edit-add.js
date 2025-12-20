@@ -18,7 +18,11 @@ const parseJson = (elementId) => {
 const getTemplate = (elementId) => {
     if (typeof document === 'undefined') return '';
     const el = document.getElementById(elementId);
-    return el ? (el.innerHTML || '').trim() : '';
+    if (!el) return '';
+    if (el.tagName === 'SCRIPT') {
+        return (el.textContent || '').trim();
+    }
+    return (el.innerHTML || '').trim();
 };
 
 const deepClone = (value) => {
@@ -468,4 +472,3 @@ export const subscribeToEvents = (events) => {
     if (!events || typeof events.on !== 'function') return;
     events.on('dom:updated', () => initToolsDatabaseEditAdd());
 };
-
