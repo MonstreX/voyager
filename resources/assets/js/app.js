@@ -3,6 +3,7 @@ import '../sass/app.scss';
 
 // Core
 import { initBootstrapCompat, showModal, hideModal, initTooltips } from './core/bootstrap-compat';
+import { postJson, postFormUrlEncoded } from './core/http';
 import { initGlobalEvents } from './core/events';
 import { voyagerEvents } from './core/event-bus';
 
@@ -263,6 +264,11 @@ window.Voyager.bootstrap = {
     init: initBootstrapCompat,
     showModal,
     hideModal
+};
+
+window.Voyager.http = {
+    postJson,
+    postFormUrlEncoded
 };
 
 // Other utilities
