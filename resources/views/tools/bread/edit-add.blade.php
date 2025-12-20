@@ -414,14 +414,16 @@
 
                             </div>
 
-                        </div><!-- .panel-body -->
-                        @if(!$stickyPanelEnabled)
-                        <div class="panel-footer">
-                             <div class="btn btn-new-relationship"><i class="voyager-heart"></i> <span>
-                             {{ __('voyager::database.relationship.create') }}</span></div>
-                        </div>
-                        @endif
-                    </div><!-- .panel -->
+	                        </div><!-- .panel-body -->
+	                        @if (isset($dataType->id))
+	                            <div class="panel-footer">
+	                                <button type="button" class="btn btn-new-relationship">
+	                                    <i class="voyager-heart"></i>
+	                                    <span>{{ __('voyager::database.relationship.create') }}</span>
+	                                </button>
+	                            </div>
+	                        @endif
+	                    </div><!-- .panel -->
 
                     @section('submit-buttons')
                         <button type="submit" class="btn btn-primary save">{{ __('voyager::generic.submit') }}</button>
@@ -431,17 +433,14 @@
                         <div class="text-right action-panel">
                             @yield('submit-buttons')
                         </div>
-                    @else
-                        <div class="float-action-panel{{ $stickyPanelAutohide ? '' : ' locked' }}" data-autohide="{{ $stickyPanelAutohide ? 'true' : 'false' }}">
-                            <div class="btn btn-new-relationship">
-                                <i class="voyager-heart"></i> <span>{{ __('voyager::database.relationship.create') }}</span>
-                            </div>
-                            @if (isset($dataType->id))
-                                <button type="button" class="btn btn-success btn-save-and-continue">{{ __('voyager::generic.save_and_continue') }}</button>
-                            @endif
-                            @yield('submit-buttons')
-                        </div>
-                    @endif
+	                    @else
+	                        <div class="float-action-panel{{ $stickyPanelAutohide ? '' : ' locked' }}" data-autohide="{{ $stickyPanelAutohide ? 'true' : 'false' }}">
+	                            @if (isset($dataType->id))
+	                                <button type="button" class="btn btn-success btn-save-and-continue">{{ __('voyager::generic.save_and_continue') }}</button>
+	                            @endif
+	                            @yield('submit-buttons')
+	                        </div>
+	                    @endif
 
                 </form>
             </div><!-- .col-md-12 -->
