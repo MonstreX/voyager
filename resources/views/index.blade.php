@@ -86,6 +86,28 @@
 
 @section('javascript')
 
+    @php
+        $voyagerAnalyticsConfig = [
+            'enabled' => (bool) (isset($google_analytics_client_id) && !empty($google_analytics_client_id)),
+            'clientId' => isset($google_analytics_client_id) ? $google_analytics_client_id : null,
+            'i18n' => [
+                'noResults' => __('voyager::generic.no_results'),
+            ],
+            'labels' => [
+                'lastWeek' => __('voyager::date.last_week'),
+                'thisWeek' => __('voyager::date.this_week'),
+                'lastYear' => __('voyager::date.last_year'),
+                'thisYear' => __('voyager::date.this_year'),
+            ],
+        ];
+    @endphp
+
+    <script type="application/json" id="voyager-analytics-config">@json($voyagerAnalyticsConfig)</script>
+    @if($voyagerAnalyticsConfig['enabled'])
+        <script type="module" src="{{ voyager_asset('js/ga.js') }}"></script>
+    @endif
+
+    {{-- Legacy inline GA scripts moved to `resources/assets/js/ga.js`.
     @if(isset($google_analytics_client_id) && !empty($google_analytics_client_id))
         <script>
             (function (w, d, s, g, js, fs) {
@@ -815,6 +837,7 @@
         </script>
 
     @endif
+    --}}
 
 @stop
 
