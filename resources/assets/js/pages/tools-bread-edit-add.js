@@ -1,4 +1,5 @@
 let globalListenersAttached = false;
+let isDraggingBreadRow = false;
 
 const getToastr = () => window.toastr || (window.Voyager && window.Voyager.toastr) || null;
 const getBootstrap = () => (window.Voyager && window.Voyager.bootstrap) || window.VoyagerBootstrapCompat || null;
@@ -68,12 +69,31 @@ const initBreadItemsSortable = () => {
         return;
     }
 
-    if (!container.dataset.voyagerSortableInitialized) {
-        container.dataset.voyagerSortableInitialized = 'true';
+    if (!container._voyagerSortable) {
         container.style.userSelect = 'none';
         container.setAttribute('unselectable', 'on');
 
-        window.Sortable.create(container, {
+        const hiddenEditors = new WeakMap();
+
+        const hideEditorsInItem = (item) => {
+            if (!item) return;
+            const editors = Array.from(item.querySelectorAll('.ace_editor'));
+            if (!editors.length) return;
+            editors.forEach((node) => {
+                hiddenEditors.set(node, node.style.display || '');
+                node.style.display = 'none';
+            });
+        };
+
+        const restoreEditorsInItem = (item) => {
+            if (!item) return;
+            item.querySelectorAll('.ace_editor').forEach((node) => {
+                const prev = hiddenEditors.get(node);
+                node.style.display = prev !== undefined ? prev : '';
+            });
+        };
+
+        container._voyagerSortable = window.Sortable.create(container, {
             handle: '.handler',
             animation: 150,
             ghostClass: 'bread-sortable-ghost',
@@ -85,7 +105,19 @@ const initBreadItemsSortable = () => {
             scrollSpeed: 18,
             bubbleScroll: true,
             forceAutoScrollFallback: true,
-            onEnd: () => updateRowOrders(),
+            onChoose: ({ item }) => {
+                isDraggingBreadRow = true;
+                hideEditorsInItem(item);
+            },
+            onUnchoose: ({ item }) => {
+                restoreEditorsInItem(item);
+                isDraggingBreadRow = false;
+            },
+            onEnd: ({ item }) => {
+                restoreEditorsInItem(item);
+                isDraggingBreadRow = false;
+                updateRowOrders();
+            },
         });
     }
 
@@ -389,6 +421,7 @@ const initRelationshipControls = (config) => {
 
 export const initToolsBreadEditAdd = () => {
     if (typeof document === 'undefined') return;
+    if (isDraggingBreadRow) return;
     const config = parseJsonConfig();
     if (!config) return;
 
@@ -431,4 +464,3 @@ export const subscribeToEvents = (events) => {
     if (!events || typeof events.on !== 'function') return;
     events.on('dom:updated', () => initToolsBreadEditAdd());
 };
-
