@@ -243,27 +243,31 @@
 
                     <div class="tab-content">
                         @foreach($settings as $group => $group_settings)
-                        <div id="{{ \Illuminate\Support\Str::slug($group) }}" class="tab-pane fade in @if($group == $active) active @endif">
-                            @foreach($group_settings as $setting)
-                            <div class="panel-heading">
-                                <h3 class="panel-title">
-                                    {{ $setting->display_name }} @if(config('voyager.show_dev_tips'))<code>setting('{{ $setting->key }}')</code>@endif
-                                </h3>
-                                <div class="panel-actions">
-                                    <a href="{{ route('voyager.settings.move_up', $setting->id) }}">
-                                        <i class="sort-icons voyager-sort-asc"></i>
-                                    </a>
-                                    <a href="{{ route('voyager.settings.move_down', $setting->id) }}">
-                                        <i class="sort-icons voyager-sort-desc"></i>
-                                    </a>
-                                    @can('delete', Voyager::model('Setting'))
-                                    <i class="voyager-trash"
-                                       data-id="{{ $setting->id }}"
-                                       data-display-key="{{ $setting->key }}"
-                                       data-display-name="{{ $setting->display_name }}"></i>
-                                    @endcan
-                                </div>
-                            </div>
+	                            <div id="{{ \Illuminate\Support\Str::slug($group) }}" class="tab-pane fade in @if($group == $active) active @endif">
+	                            @foreach($group_settings as $setting)
+	                            <div class="panel-heading">
+	                                <h3 class="panel-title">
+	                                    {{ $setting->display_name }} @if(config('voyager.show_dev_tips'))<code>setting('{{ $setting->key }}')</code>@endif
+	                                </h3>
+	                                <div class="panel-actions">
+	                                    <a href="{{ route('voyager.settings.move_up', $setting->id) }}">
+	                                        <i class="sort-icons voyager-sort-asc"></i>
+	                                    </a>
+	                                    <a href="{{ route('voyager.settings.move_down', $setting->id) }}">
+	                                        <i class="sort-icons voyager-sort-desc"></i>
+	                                    </a>
+	                                    @can('delete', Voyager::model('Setting'))
+	                                    <i class="voyager-trash"
+	                                       data-id="{{ $setting->id }}"
+	                                       data-display-key="{{ $setting->key }}"
+	                                       data-display-name="{{ $setting->display_name }}"
+	                                       data-confirm-target="#delete_setting_modal"
+	                                       data-confirm-form="#delete_setting_form"
+	                                       data-confirm-form-action="{{ route('voyager.settings.delete', $setting->id) }}"
+	                                       data-confirm-name="{{ $setting->display_name }}/{{ $setting->key }}"></i>
+	                                    @endcan
+	                                </div>
+	                            </div>
 
                             <div class="panel-body row">
                                 <div class="col-md-10 no-padding-left-right">
@@ -428,178 +432,39 @@
         @endcan
     </div>
 
-    @can('delete', Voyager::model('Setting'))
-    <div class="modal modal-danger fade" tabindex="-1" id="delete_modal" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    <h4 class="modal-title">
-                        <i class="voyager-trash"></i> {!! __('voyager::settings.delete_question', ['setting' => '<span id="delete_setting_title"></span>']) !!}
-                    </h4>
-                </div>
-                <div class="modal-footer">
-                    <form action="#" id="delete_form" method="POST">
-                        {{ method_field("DELETE") }}
-                        {{ csrf_field() }}
-                        <input type="submit" class="btn btn-danger pull-right delete-confirm" value="{{ __('voyager::settings.delete_confirm') }}">
-                    </form>
-                    <button type="button" class="btn btn-default pull-right" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    @endcan
+	    @can('delete', Voyager::model('Setting'))
+	    @include('voyager::components.modal-confirm', [
+	        'id' => 'delete_setting_modal',
+	        'title' => __('voyager::settings.delete_question', ['setting' => '<span class="confirm_delete_name"></span>']),
+	        'message' => '',
+	        'confirmText' => __('voyager::settings.delete_confirm'),
+	        'confirmClass' => 'btn-danger',
+	        'icon' => 'voyager-trash'
+	    ])
+	    <form action="#" id="delete_setting_form" method="POST" style="display:none">
+	        {{ method_field("DELETE") }}
+	        {{ csrf_field() }}
+	    </form>
+	    @endcan
 
 @stop
 
 @include('voyager::partials.editors-assets')
 
 @section('javascript')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const toggleOptions = document.getElementById('toggle_options');
-            const optionsSections = document.querySelectorAll('.new-settings-options');
-            const bootstrapCompat = window.VoyagerBootstrapCompat;
-            let optionsEditorInstance = null;
+	    @php
+	        $voyagerSettingsIndexConfig = [
+	            'i18n' => [
+	                'selectGroup' => __('voyager::generic.select_group'),
+	                'editorsInitFailed' => __('voyager::generic.internal_error'),
+	            ],
+	        ];
+	    @endphp
 
-            const ensureOptionsEditor = () => {
-                const editorContainer = document.getElementById('options_editor');
-                const optionsTextarea = document.getElementById('options_textarea');
-                if (!editorContainer || !optionsTextarea) {
-                    return;
-                }
-                if (!window.Voyager || typeof window.Voyager.loadEditors !== 'function') {
-                    return;
-                }
-
-                window.Voyager.loadEditors()
-                    .then((module) => {
-                        const initAceEditors = module && typeof module.initAceEditors === 'function'
-                            ? module.initAceEditors
-                            : (window.Voyager.editors && window.Voyager.editors.initAceEditors);
-
-                        if (!optionsEditorInstance && typeof initAceEditors === 'function') {
-                            initAceEditors(editorContainer.parentElement || document);
-                            optionsEditorInstance = ace.edit('options_editor');
-                            optionsEditorInstance.getSession().setMode('ace/mode/json');
-                            optionsEditorInstance.getSession().on('change', function () {
-                                optionsTextarea.value = optionsEditorInstance.getValue();
-                            });
-                        }
-
-                        if (optionsEditorInstance) {
-                            // Ensure Ace redraws when the options panel toggles visibility
-                            optionsEditorInstance.resize(true);
-                        }
-                    })
-                    .catch(function (error) {
-                        console.error('[Voyager] Failed to initialize settings editor', error);
-                    });
-            };
-
-            const showModal = (modal) => {
-                if (!modal) {
-                    return;
-                }
-                if (bootstrapCompat && typeof bootstrapCompat.showModal === 'function') {
-                    bootstrapCompat.showModal(modal);
-                    return;
-                }
-                modal.classList.add('in');
-                modal.style.display = 'block';
-                modal.setAttribute('aria-hidden', 'false');
-                const backdrop = document.createElement('div');
-                backdrop.className = 'modal-backdrop fade in';
-                backdrop.dataset.modalTarget = modal.id;
-                document.body.appendChild(backdrop);
-                document.body.classList.add('modal-open');
-            };
-
-            if (toggleOptions) {
-                toggleOptions.addEventListener('click', function () {
-                    optionsSections.forEach((section) => {
-                        const isHidden = window.getComputedStyle(section).display === 'none';
-                        section.style.display = isHidden ? 'block' : 'none';
-                    });
-                    const icon = toggleOptions.querySelector('.voyager-double-down, .voyager-double-up');
-                    if (icon) {
-                        icon.classList.toggle('voyager-double-down');
-                        icon.classList.toggle('voyager-double-up');
-                    }
-                    ensureOptionsEditor();
-                });
-            }
-            ensureOptionsEditor();
-
-            @can('delete', Voyager::model('Setting'))
-            (function registerDeleteHandlers() {
-                const deleteModal = document.getElementById('delete_modal');
-                const deleteForm = document.getElementById('delete_form');
-                const deleteTitle = document.getElementById('delete_setting_title');
-                const deleteActionTemplate = '{{ route('voyager.settings.delete', [ 'id' => '__id' ]) }}';
-
-                document.querySelectorAll('.panel-actions .voyager-trash').forEach((button) => {
-                    button.addEventListener('click', () => {
-                        const display = `${button.dataset.displayName || ''}/${button.dataset.displayKey || ''}`;
-                        if (deleteTitle) {
-                            deleteTitle.textContent = display;
-                        }
-                        if (deleteForm) {
-                            deleteForm.action = deleteActionTemplate.replace('__id', button.dataset.id || '');
-                        }
-                        showModal(deleteModal);
-                    });
-                });
-            })();
-            @endcan
-
-            if (typeof window.VoyagerInitToggles === 'function') {
-                window.VoyagerInitToggles();
-            }
-
-            document.querySelectorAll('[data-toggle="tab"]').forEach((tabButton) => {
-                tabButton.addEventListener('click', function () {
-                    const label = tabButton.textContent || '';
-                    document.querySelectorAll('.setting_tab').forEach((input) => {
-                        input.value = label.trim();
-                    });
-                });
-            });
-
-            document.querySelectorAll('.delete_value').forEach((link) => {
-                link.addEventListener('click', function (event) {
-                    event.preventDefault();
-                    const form = link.closest('form');
-                    if (!form) {
-                        return;
-                    }
-                    form.setAttribute('action', link.getAttribute('href'));
-                    form.submit();
-                });
-            });
-        });
-    </script>
-    <script type="text/javascript">
-    document.querySelectorAll('.group_select').forEach(function (select) {
-        select.dataset.voyagerTaggable = 'true';
-        if (window.VoyagerSelectRefresh) {
-            window.VoyagerSelectRefresh(select);
-        }
-    });
-    document.querySelectorAll('.group_select_new').forEach(function (select) {
-        select.dataset.placeholder = '{{ __("voyager::generic.select_group") }}';
-        select.value = '';
-        if (window.VoyagerSelectRefresh) {
-            window.VoyagerSelectRefresh(select);
-        }
-    });
-    </script>
-    <div style="display:none">
-        <input type="hidden" id="upload_url" value="{{ route('voyager.upload') }}">
-        <input type="hidden" id="upload_type_slug" value="settings">
-    </div>
+	    <script type="application/json" id="voyager-settings-index-config">@json($voyagerSettingsIndexConfig)</script>
+	    <div style="display:none">
+	        <input type="hidden" id="upload_url" value="{{ route('voyager.upload') }}">
+	        <input type="hidden" id="upload_type_slug" value="settings">
+	    </div>
 
 @stop
