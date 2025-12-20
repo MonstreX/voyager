@@ -9,7 +9,7 @@
 @stop
 
 @section('content')
-<div class="page-content container-fluid">
+<div class="page-content container-fluid bread-order">
     <div class="row">
         <div class="col-md-12">
             <div class="panel panel-bordered">
@@ -18,11 +18,19 @@
                 </div>
 
                 <div class="panel-body" style="padding:30px;">
-                    <div class="dd">
+                    <div class="dd" data-voyager-bread-order-root>
                         <ol class="dd-list">
                             @foreach ($results as $result)
                             <li class="dd-item" data-id="{{ $result->getKey() }}">
-                                <div class="dd-handle" style="height:inherit">
+                                <div class="dd-tree-handle">
+                                    <div class="dd-tree-move">
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                    </div>
+                                </div>
+
+                                <div class="dd-handle">
                                     @if (isset($dataRow->details->view_order))
                                         @include($dataRow->details->view_order, ['row' => $dataRow, 'dataType' => $dataType, 'dataTypeContent' => $result, 'view' => 'order', 'content' => $result->{$display_column}])
                                     @elseif (isset($dataRow->details->view))
@@ -48,48 +56,15 @@
 @stop
 
 @section('javascript')
+@php
+    $breadOrderConfig = [
+        'orderUrl' => route('voyager.'.$dataType->slug.'.order'),
+        'i18n' => [
+            'updatedOrder' => __('voyager::bread.updated_order'),
+            'internalError' => __('voyager::generic.internal_error'),
+        ],
+    ];
+@endphp
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    var breadNestable = document.querySelector('.dd');
-    var csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-    var orderUrl = '{{ route('voyager.'.$dataType->slug.'.order') }}';
-
-    if (breadNestable && window.VoyagerInitNestable) {
-        window.VoyagerInitNestable(breadNestable);
-        breadNestable.addEventListener('voyager.sortable.updated', function (event) {
-            var structure = event.detail && event.detail.structure
-                ? event.detail.structure
-                : (window.VoyagerSerializeNestable ? window.VoyagerSerializeNestable(breadNestable) : []);
-
-            var payload = new URLSearchParams();
-            payload.append('order', JSON.stringify(structure));
-            payload.append('_token', csrfToken);
-
-            fetch(orderUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                    'Accept': 'application/json'
-                },
-                body: payload.toString()
-            })
-            .then(function (response) {
-                if (!response.ok) {
-                    throw new Error('Order update failed with status ' + response.status);
-                }
-                if (window.toastr && typeof window.toastr.success === 'function') {
-                    toastr.success("{{ __('voyager::bread.updated_order') }}");
-                }
-            })
-            .catch(function (error) {
-                console.error('[VoyagerNestable:BreadOrder] order update failed', error);
-                if (window.toastr && typeof window.toastr.error === 'function') {
-                    toastr.error("{{ __('voyager::generic.internal_error') }}");
-                }
-            });
-        });
-    }
-});
-</script>
+<script type="application/json" id="voyager-bread-order-config">@json($breadOrderConfig)</script>
 @stop

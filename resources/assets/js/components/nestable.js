@@ -139,7 +139,9 @@ const refreshNestableLists = (state) => {
         updateListPlaceholderState(list);
         state.pendingLists.add(list);
     });
-    rootElement.querySelectorAll('.dd-item').forEach((item) => ensureChildList(item, state));
+    if (state.allowChildren !== false) {
+        rootElement.querySelectorAll('.dd-item').forEach((item) => ensureChildList(item, state));
+    }
 };
 
 const dispatchNestableUpdated = (state) => {
@@ -231,6 +233,7 @@ const initNestableContainer = (container, options = {}) => {
         groupId: options.group || `voyager-nestable-${Math.random().toString(36).slice(2)}`,
         handleSelector: options.handle || '.dd-handle',
         draggableSelector: options.draggable || '.dd-item',
+        allowChildren: options.allowChildren !== false,
         animation: typeof options.animation === 'number' ? options.animation : 150,
         sortables: new Map(),
         pendingLists: new Set(),

@@ -47,6 +47,7 @@ import { initToolsBreadEditAdd, subscribeToEvents as subscribeToolsBreadEditAdd 
 import { initSettingsIndex, subscribeToEvents as subscribeSettingsIndex } from './pages/settings-index';
 import { initUsersEditAdd, subscribeToEvents as subscribeUsersEditAdd } from './pages/users-edit-add';
 import { initRolesEditAdd, subscribeToEvents as subscribeRolesEditAdd } from './pages/roles-edit-add';
+import { initBreadOrder, subscribeToEvents as subscribeBreadOrder } from './pages/bread-order';
 
 // Voyager namespace and ready Promises are initialized in master.blade.php <head>
 // Get the resolvers that were created there
@@ -306,6 +307,7 @@ subscribeToolsBreadEditAdd(voyagerEvents);
 subscribeSettingsIndex(voyagerEvents);
 subscribeUsersEditAdd(voyagerEvents);
 subscribeRolesEditAdd(voyagerEvents);
+subscribeBreadOrder(voyagerEvents);
 
 // Legacy Global Exports (keep for backward compatibility)
 window.VoyagerBootstrapCompat = { init: initBootstrapCompat, showModal, hideModal };
@@ -359,6 +361,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initSettingsIndex();
     initUsersEditAdd();
     initRolesEditAdd();
+    initBreadOrder();
 
     // Init Modules
     if (window.VoyagerInitSlugify) {

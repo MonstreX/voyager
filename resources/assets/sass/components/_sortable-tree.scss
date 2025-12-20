@@ -256,6 +256,31 @@
     align-items: center;
 }
 
+/* Flat order list (BREAD order) */
+.bread-order {
+    .dd-handle {
+        height: auto;
+        min-height: 42px;
+        padding: 10px 10px 10px 50px;
+        display: flex;
+        align-items: center;
+        font-weight: 600;
+    }
+
+    .dd-tree-handle {
+        height: 100%;
+    }
+
+    .dd-item > .dd-list.dd-empty[data-voyager-placeholder="true"] {
+        display: none;
+    }
+
+    .dd-handle img {
+        max-height: 100px;
+        width: auto;
+    }
+}
+
 .bread-actions a {
     float: none;
 }
