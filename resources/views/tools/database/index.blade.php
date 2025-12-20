@@ -118,7 +118,7 @@
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span
                                 aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title"><i class="voyager-data"></i> @{{ table.name }}</h4>
+                    <h4 class="modal-title"><i class="voyager-data"></i> <span id="table_info_title"></span></h4>
                 </div>
                 <div class="modal-body" style="overflow:scroll">
                     <table class="table table-striped">
@@ -132,16 +132,7 @@
                             <th>{{ __('voyager::database.extra') }}</th>
                         </tr>
                         </thead>
-                        <tbody>
-                        <tr v-for="row in table.rows">
-                            <td><strong>@{{ row.Field }}</strong></td>
-                            <td>@{{ row.Type }}</td>
-                            <td>@{{ row.Null }}</td>
-                            <td>@{{ row.Key }}</td>
-                            <td>@{{ row.Default }}</td>
-                            <td>@{{ row.Extra }}</td>
-                        </tr>
-                        </tbody>
+                        <tbody id="table_info_rows"></tbody>
                     </table>
                 </div>
                 <div class="modal-footer">
