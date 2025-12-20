@@ -229,7 +229,7 @@ const initBreadAceEditors = (config) => {
             const value = session.getValue();
             if (value) {
                 try {
-                    textarea.value = JSON.stringify(JSON.parse(value));
+                    textarea.value = JSON.stringify(JSON.parse(value), null, 4);
                 } catch {
                     textarea.value = value;
                 }
