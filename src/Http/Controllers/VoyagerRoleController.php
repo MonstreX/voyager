@@ -4,13 +4,15 @@ namespace TCG\Voyager\Http\Controllers;
 
 use Illuminate\Http\Request;
 use TCG\Voyager\Facades\Voyager;
+use TCG\Voyager\Services\BreadCleanupService;
+use TCG\Voyager\Services\BreadDataResolverService;
 use TCG\Voyager\Services\BreadValidationService;
 use TCG\Voyager\Services\BreadWriteService;
 
 class VoyagerRoleController extends VoyagerBaseController
 {
     // POST BR(E)AD
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, BreadDataResolverService $breadDataResolverService, BreadCleanupService $breadCleanupService)
     {
         $slug = $this->getSlug($request);
 
@@ -36,7 +38,7 @@ class VoyagerRoleController extends VoyagerBaseController
     }
 
     // POST BRE(A)D
-    public function store(Request $request)
+    public function store(Request $request, BreadDataResolverService $breadDataResolverService)
     {
         $slug = $this->getSlug($request);
 
