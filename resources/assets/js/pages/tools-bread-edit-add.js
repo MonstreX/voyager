@@ -69,7 +69,12 @@ const initBreadItemsSortable = () => {
         return;
     }
 
+    const rows = () => Array.from(container.querySelectorAll('div.row.row-dd'));
+
     if (!container._voyagerSortable) {
+        // Initial sort based on pre-existing order values (one-time).
+        sortBreadItems();
+
         container.style.userSelect = 'none';
         container.setAttribute('unselectable', 'on');
 
@@ -119,10 +124,19 @@ const initBreadItemsSortable = () => {
                 updateRowOrders();
             },
         });
+
+        container.dataset.voyagerBreadRowsCount = String(rows().length);
+        updateRowOrders();
+        return;
     }
 
-    sortBreadItems();
-    updateRowOrders();
+    // Avoid reordering on every dom:updated (can create an infinite loop with MutationObserver).
+    const prevCount = parseInt(container.dataset.voyagerBreadRowsCount || '0', 10);
+    const nextCount = rows().length;
+    if (prevCount !== nextCount) {
+        container.dataset.voyagerBreadRowsCount = String(nextCount);
+        updateRowOrders();
+    }
 };
 
 const initBreadAceEditors = (config) => {
