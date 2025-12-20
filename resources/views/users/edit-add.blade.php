@@ -127,11 +127,5 @@
 @stop
 
 @section('javascript')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            if (window.VoyagerInitToggles) {
-                window.VoyagerInitToggles();
-            }
-        });
-    </script>
+    <script type="application/json" id="voyager-users-edit-add-config">@json((object) [])</script>
 @stop
