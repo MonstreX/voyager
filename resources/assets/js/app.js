@@ -42,6 +42,7 @@ import { initMediaManager, subscribeToEvents as subscribeMediaManager } from './
 import { initMenusBuilder, subscribeToEvents as subscribeMenusBuilder } from './pages/menus-builder';
 import { initToolsDatabaseIndex, subscribeToEvents as subscribeToolsDatabaseIndex } from './pages/tools-database-index';
 import { initToolsDatabaseEditAdd, subscribeToEvents as subscribeToolsDatabaseEditAdd } from './pages/tools-database-edit-add';
+import { initToolsBreadIndex, subscribeToEvents as subscribeToolsBreadIndex } from './pages/tools-bread-index';
 
 // Voyager namespace and ready Promises are initialized in master.blade.php <head>
 // Get the resolvers that were created there
@@ -296,6 +297,7 @@ subscribeMediaManager(voyagerEvents);
 subscribeMenusBuilder(voyagerEvents);
 subscribeToolsDatabaseIndex(voyagerEvents);
 subscribeToolsDatabaseEditAdd(voyagerEvents);
+subscribeToolsBreadIndex(voyagerEvents);
 
 // Legacy Global Exports (keep for backward compatibility)
 window.VoyagerBootstrapCompat = { init: initBootstrapCompat, showModal, hideModal };
@@ -344,6 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initMenusBuilder();
     initToolsDatabaseIndex();
     initToolsDatabaseEditAdd();
+    initToolsBreadIndex();
 
     // Init Modules
     if (window.VoyagerInitSlugify) {

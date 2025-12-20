@@ -47,8 +47,12 @@
                                    class="btn btn-primary btn-sm edit">
                                     <i class="voyager-edit"></i> {{ __('voyager::generic.edit') }}
                                 </a>
-                                <a href="#delete-bread" data-id="{{ $table->dataTypeId }}" data-name="{{ $table->name }}"
-                                     class="btn btn-danger btn-sm delete">
+                                <a href="#"
+                                     class="btn btn-danger btn-sm"
+                                     data-confirm-target="#delete_bread_modal"
+                                     data-confirm-form="#delete_bread_form"
+                                     data-confirm-form-action="{{ route('voyager.bread.delete', $table->dataTypeId) }}"
+                                     data-confirm-name="{{ $table->name }}">
                                     <i class="voyager-trash"></i> {{ __('voyager::generic.delete') }}
                                 </a>
                             @else
@@ -65,25 +69,18 @@
         </div>
     </div>
     {{-- Delete BREAD Modal --}}
-    <div class="modal modal-danger fade" tabindex="-1" id="delete_builder_modal" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span
-                                aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title"><i class="voyager-trash"></i>  {!! __('voyager::bread.delete_bread_quest', ['table' => '<span id="delete_builder_name"></span>']) !!}</h4>
-                </div>
-                <div class="modal-footer">
-                    <form action="#" id="delete_builder_form" method="POST">
-                        {{ method_field('DELETE') }}
-                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                        <input type="submit" class="btn btn-danger" value="{{ __('voyager::bread.delete_bread_conf') }}">
-                    </form>
-                    <button type="button" class="btn btn-outline pull-right" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
-                </div>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
+    @include('voyager::components.modal-confirm', [
+        'id' => 'delete_bread_modal',
+        'title' => __('voyager::bread.delete_bread_quest', ['table' => '<span class="confirm_delete_name"></span>']),
+        'message' => '',
+        'confirmText' => __('voyager::bread.delete_bread_conf'),
+        'confirmClass' => 'btn-danger',
+        'icon' => 'voyager-trash',
+    ])
+    <form action="#" id="delete_bread_form" method="POST" style="display:none">
+        {{ method_field('DELETE') }}
+        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+    </form>
 
     <div class="modal modal-info fade" tabindex="-1" id="table_info" role="dialog">
         <div class="modal-dialog">
@@ -91,7 +88,7 @@
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span
                                 aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title"><i class="voyager-data"></i> @{{ table.name }}</h4>
+                    <h4 class="modal-title"><i class="voyager-data"></i> <span id="table_info_title"></span></h4>
                 </div>
                 <div class="modal-body" style="overflow:scroll">
                     <table class="table table-striped">
@@ -105,16 +102,7 @@
                             <th>{{ __('voyager::database.extra') }}</th>
                         </tr>
                         </thead>
-                        <tbody>
-                        <tr v-for="row in table.rows">
-                            <td><strong>@{{ row.Field }}</strong></td>
-                            <td>@{{ row.Type }}</td>
-                            <td>@{{ row.Null }}</td>
-                            <td>@{{ row.Key }}</td>
-                            <td>@{{ row.Default }}</td>
-                            <td>@{{ row.Extra }}</td>
-                        </tr>
-                        </tbody>
+                        <tbody id="table_info_rows"></tbody>
                     </table>
                 </div>
                 <div class="modal-footer">
@@ -127,107 +115,14 @@
 @stop
 
 @section('javascript')
+    @php
+        $voyagerToolsBreadIndexConfig = [
+            'i18n' => [
+                'internalError' => __('voyager::generic.internal_error'),
+            ],
+        ];
+    @endphp
 
-    <script>
-
-        var table = {
-            name: '',
-            rows: []
-        };
-
-        window.Voyager.withVue(function(Vue) {
-            const app = Vue.createApp({
-                data() {
-                    return {
-                        table: table,
-                    };
-                },
-            }).mount('#table_info');
-            table = app.table;
-        });
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const bootstrapCompat = window.VoyagerBootstrapCompat;
-            const deleteModal = document.getElementById('delete_builder_modal');
-            const deleteForm = document.getElementById('delete_builder_form');
-            const deleteTitle = document.getElementById('delete_builder_name');
-            const deleteActionTemplate = '{{ route('voyager.bread.delete', ['__id']) }}';
-            const tableInfoModal = document.getElementById('table_info');
-
-            const showModal = (modal) => {
-                if (!modal) {
-                    return;
-                }
-                if (bootstrapCompat && typeof bootstrapCompat.showModal === 'function') {
-                    bootstrapCompat.showModal(modal);
-                    return;
-                }
-                modal.classList.add('in');
-                modal.style.display = 'block';
-                modal.setAttribute('aria-hidden', 'false');
-                const backdrop = document.createElement('div');
-                backdrop.className = 'modal-backdrop fade in';
-                backdrop.dataset.modalTarget = modal.id;
-                document.body.appendChild(backdrop);
-                document.body.classList.add('modal-open');
-            };
-
-            document.querySelectorAll('table .actions .delete').forEach((button) => {
-                button.addEventListener('click', function (event) {
-                    event.preventDefault();
-                    const id = button.dataset.id || '';
-                    const name = button.dataset.name || '';
-                    if (deleteTitle) {
-                        deleteTitle.textContent = name;
-                    }
-                    if (deleteForm) {
-                        deleteForm.action = deleteActionTemplate.replace('__id', id);
-                    }
-                    showModal(deleteModal);
-                });
-            });
-
-            document.querySelectorAll('.database-tables .desctable').forEach((link) => {
-                link.addEventListener('click', function (event) {
-                    event.preventDefault();
-                    const href = link.getAttribute('href');
-                    if (!href) {
-                        return;
-                    }
-                    table.name = link.dataset.name || '';
-                    table.rows = [];
-                    fetch(href, {
-                        headers: {
-                            'Accept': 'application/json',
-                        },
-                    })
-                        .then((response) => {
-                            if (!response.ok) {
-                                throw new Error('Failed to fetch table info');
-                            }
-                            return response.json();
-                        })
-                        .then((data) => {
-                            table.rows = Object.keys(data || {}).map((key) => {
-                                const val = data[key] || {};
-                                return {
-                                    Field: val.field,
-                                    Type: val.type,
-                                    Null: val.null,
-                                    Key: val.key,
-                                    Default: val.default,
-                                    Extra: val.extra,
-                                };
-                            });
-                            showModal(tableInfoModal);
-                        })
-                        .catch((error) => {
-                            console.error('Voyager table info fetch failed', error);
-                            toastr.error("{{ __('voyager::generic.internal_error') }}");
-                        });
-                });
-            });
-        });
-    </script>
+    <script type="application/json" id="voyager-tools-bread-index-config">@json($voyagerToolsBreadIndexConfig)</script>
 
 @stop
