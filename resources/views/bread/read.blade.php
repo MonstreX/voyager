@@ -17,7 +17,13 @@
                     <i class="voyager-trash"></i> <span class="hidden-xs hidden-sm">{{ __('voyager::generic.restore') }}</span>
                 </a>
             @else
-                <a href="javascript:;" title="{{ __('voyager::generic.delete') }}" class="btn btn-danger delete" data-id="{{ $dataTypeContent->getKey() }}" id="delete-{{ $dataTypeContent->getKey() }}">
+                <a href="javascript:;"
+                   title="{{ __('voyager::generic.delete') }}"
+                   class="btn btn-danger"
+                   data-confirm-target="#delete_modal"
+                   data-confirm-form="#delete_form"
+                   data-confirm-name="{{ $dataTypeContent->getKey() }}"
+                   id="delete-{{ $dataTypeContent->getKey() }}">
                     <i class="voyager-trash"></i> <span class="hidden-xs hidden-sm">{{ __('voyager::generic.delete') }}</span>
                 </a>
             @endif
@@ -144,81 +150,26 @@
     </div>
 
     {{-- Single delete modal --}}
-    <div class="modal modal-danger fade" tabindex="-1" id="delete_modal" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title"><i class="voyager-trash"></i> {{ __('voyager::generic.delete_question') }} {{ strtolower($dataType->getTranslatedAttribute('display_name_singular')) }}?</h4>
-                </div>
-                <div class="modal-footer">
-                    <form action="{{ route('voyager.'.$dataType->slug.'.index') }}" id="delete_form" method="POST">
-                        {{ method_field('DELETE') }}
-                        {{ csrf_field() }}
-                        <input type="submit" class="btn btn-danger pull-right delete-confirm"
-                               value="{{ __('voyager::generic.delete_confirm') }} {{ strtolower($dataType->getTranslatedAttribute('display_name_singular')) }}">
-                    </form>
-                    <button type="button" class="btn btn-default pull-right" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
-                </div>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
+    @include('voyager::components.modal-confirm', [
+        'id' => 'delete_modal',
+        'title' => __('voyager::generic.delete_question').' '.strtolower($dataType->getTranslatedAttribute('display_name_singular')).'?',
+        'message' => __('voyager::generic.are_you_sure_delete').' <span class="confirm_delete_name"></span>',
+        'confirmText' => __('voyager::generic.delete_confirm'),
+        'confirmClass' => 'btn-danger delete-confirm',
+        'confirmButtonId' => 'delete_confirm_button',
+        'icon' => 'voyager-trash'
+    ])
+    <form action="{{ route('voyager.'.$dataType->slug.'.destroy', $dataTypeContent->getKey()) }}" id="delete_form" method="POST" style="display:none">
+        {{ method_field('DELETE') }}
+        {{ csrf_field() }}
+    </form>
 @stop
 
 @section('javascript')
-    @if ($isModelTranslatable)
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                if (window.VoyagerInitMultilingual) {
-                    window.VoyagerInitMultilingual(document.querySelectorAll('.side-body'));
-                }
-            });
-        </script>
-    @endif
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const deleteButtons = document.querySelectorAll('.delete');
-            const deleteForm = document.getElementById('delete_form');
-            const deleteModal = document.getElementById('delete_modal');
-            const bootstrapCompat = window.VoyagerBootstrapCompat;
-            let deleteFormAction = deleteForm ? deleteForm.getAttribute('action') : null;
-
-            const showModal = (modal) => {
-                if (!modal) {
-                    return;
-                }
-                if (bootstrapCompat && typeof bootstrapCompat.showModal === 'function') {
-                    bootstrapCompat.showModal(modal);
-                    return;
-                }
-                modal.classList.add('in');
-                modal.style.display = 'block';
-                modal.setAttribute('aria-hidden', 'false');
-                const backdrop = document.createElement('div');
-                backdrop.className = 'modal-backdrop fade in';
-                backdrop.dataset.modalTarget = modal.id;
-                document.body.appendChild(backdrop);
-                document.body.classList.add('modal-open');
-            };
-
-            deleteButtons.forEach((button) => {
-                button.addEventListener('click', (event) => {
-                    event.preventDefault();
-                    if (!deleteForm) {
-                        return;
-                    }
-                    if (!deleteFormAction) {
-                        deleteFormAction = deleteForm.getAttribute('action');
-                    }
-                    const id = button.dataset.id || '';
-                    if (/\/[0-9]+$/.test(deleteFormAction)) {
-                        deleteForm.setAttribute('action', deleteFormAction.replace(/([0-9]+$)/, id));
-                    } else {
-                        deleteForm.setAttribute('action', `${deleteFormAction}/${id}`);
-                    }
-                    showModal(deleteModal);
-                });
-            });
-        });
-    </script>
+    @php
+        $breadReadConfig = [
+            'isModelTranslatable' => (bool) $isModelTranslatable,
+        ];
+    @endphp
+    <script type="application/json" id="voyager-bread-read-config">@json($breadReadConfig)</script>
 @stop

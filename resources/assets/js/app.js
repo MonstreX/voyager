@@ -40,6 +40,7 @@ import { initBreadBrowseList, subscribeToEvents as subscribeBreadBrowseList } fr
 import { initBreadBrowseTree, subscribeToEvents as subscribeBreadBrowseTree } from './pages/bread-browse-tree';
 import { initBreadBulkDelete, subscribeToEvents as subscribeBreadBulkDelete } from './pages/bread-bulk-delete';
 import { initBreadEditAdd, subscribeToEvents as subscribeBreadEditAdd } from './pages/bread-edit-add';
+import { initBreadRead, subscribeToEvents as subscribeBreadRead } from './pages/bread-read';
 import { initMediaManager, subscribeToEvents as subscribeMediaManager } from './pages/media-manager';
 import { initMenusBuilder, subscribeToEvents as subscribeMenusBuilder } from './pages/menus-builder';
 import { initToolsDatabaseIndex, subscribeToEvents as subscribeToolsDatabaseIndex } from './pages/tools-database-index';
@@ -300,6 +301,7 @@ subscribeBreadBrowseList(voyagerEvents);
 subscribeBreadBrowseTree(voyagerEvents);
 subscribeBreadBulkDelete(voyagerEvents);
 subscribeBreadEditAdd(voyagerEvents);
+subscribeBreadRead(voyagerEvents);
 subscribeMediaManager(voyagerEvents);
 subscribeMenusBuilder(voyagerEvents);
 subscribeToolsDatabaseIndex(voyagerEvents);
@@ -356,6 +358,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initBreadBrowseTree();
     initBreadBulkDelete();
     initBreadEditAdd();
+    initBreadRead();
     initMediaManager();
     initMenusBuilder();
     initToolsDatabaseIndex();
