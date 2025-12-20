@@ -102,8 +102,11 @@ export const initMenusBuilder = () => {
         element.style.display = 'none';
     };
 
-    prepareHeading(addHeading);
-    prepareHeading(editHeading);
+    if (menuModal && menuModal.dataset.voyagerMenuHeadingsPrepared !== '1') {
+        prepareHeading(addHeading);
+        prepareHeading(editHeading);
+        menuModal.dataset.voyagerMenuHeadingsPrepared = '1';
+    }
 
     const toggleModalHeading = (isAdd) => {
         if (addHeading) addHeading.style.display = isAdd ? '' : 'none';
@@ -140,6 +143,7 @@ export const initMenusBuilder = () => {
             statusInput.checked = true;
             statusInput.dispatchEvent(new Event('change', { bubbles: true }));
         }
+        if (menuModal) menuModal.dataset.voyagerMenuModalMode = 'add';
         toggleModalHeading(true);
         setLinkType('url');
         if (targetSelect) targetSelect.value = '_self';
@@ -153,6 +157,7 @@ export const initMenusBuilder = () => {
         menuForm.setAttribute('action', menuForm.dataset.actionUpdate);
         if (formMethodInput) formMethodInput.value = 'PUT';
         if (submitButton) submitButton.value = updateLabel;
+        if (menuModal) menuModal.dataset.voyagerMenuModalMode = 'edit';
         toggleModalHeading(false);
 
         const id = button.dataset.id || '';
@@ -192,6 +197,18 @@ export const initMenusBuilder = () => {
         showModal(menuModal);
         scheduleToggleRefresh(statusInput);
     };
+
+    if (menuModal) {
+        const isVisible = menuModal.classList.contains('in') ||
+            menuModal.classList.contains('show') ||
+            menuModal.classList.contains('voyager-modal-visible') ||
+            menuModal.style.display === 'block';
+        if (isVisible) {
+            const mode = menuModal.dataset.voyagerMenuModalMode;
+            if (mode === 'add') toggleModalHeading(true);
+            if (mode === 'edit') toggleModalHeading(false);
+        }
+    }
 
     const openDeleteModal = (button) => {
         if (!deleteModal || !deleteForm || !deleteActionTemplate || !button) return;

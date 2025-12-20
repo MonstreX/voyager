@@ -61,6 +61,25 @@
   color: #FFF;
 }
 
+/* Ensure close button is visible on themed headers */
+.modal.modal-primary .modal-header .close,
+.modal.modal-success .modal-header .close,
+.modal.modal-info .modal-header .close,
+.modal.modal-warning .modal-header .close,
+.modal.modal-danger .modal-header .close {
+  color: #fff;
+  opacity: 0.9;
+}
+
+.modal.modal-primary .modal-header .close:hover,
+.modal.modal-success .modal-header .close:hover,
+.modal.modal-info .modal-header .close:hover,
+.modal.modal-warning .modal-header .close:hover,
+.modal.modal-danger .modal-header .close:hover {
+  color: #fff;
+  opacity: 1;
+}
+
 /* Specific Modals */
 .voyager .modal.modal-relationships {
   border: 0px;
