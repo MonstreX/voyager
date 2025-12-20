@@ -344,13 +344,15 @@
                                         @endif
                                     @endif
                                 </div>
-                                <div class="col-md-2 no-padding-left-right">
-                                    <select class="form-control group_select voyager-select" name="{{ $setting->key }}_group">
-                                        @foreach($groups as $group)
-                                        <option value="{{ $group }}" {!! $setting->group == $group ? 'selected' : '' !!}>{{ $group }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
+	                                <div class="col-md-2 no-padding-left-right">
+	                                    <select class="form-control group_select voyager-select"
+	                                            name="{{ $setting->key }}_group"
+	                                            data-voyager-taggable="true">
+	                                        @foreach($groups as $group)
+	                                        <option value="{{ $group }}" {!! $setting->group == $group ? 'selected' : '' !!}>{{ $group }}</option>
+	                                        @endforeach
+	                                    </select>
+	                                </div>
                             </div>
                             @if(!$loop->last)
                                 <hr>
@@ -401,14 +403,18 @@
                             <option value="image">{{ __('voyager::form.type_image') }}</option>
                         </select>
                     </div>
-                    <div class="col-md-3">
-                        <label for="group">{{ __('voyager::settings.group') }}</label>
-                        <select class="form-control group_select group_select_new voyager-select" name="group">
-                            @foreach($groups as $group)
-                                <option value="{{ $group }}">{{ $group }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+	                    <div class="col-md-3">
+	                        <label for="group">{{ __('voyager::settings.group') }}</label>
+	                        <select class="form-control group_select group_select_new voyager-select"
+	                                name="group"
+	                                data-voyager-taggable="true"
+	                                data-placeholder="{{ __('voyager::generic.select_group') }}">
+	                            <option value="" selected></option>
+	                            @foreach($groups as $group)
+	                                <option value="{{ $group }}">{{ $group }}</option>
+	                            @endforeach
+	                        </select>
+	                    </div>
                     <div class="col-md-12">
                         <a id="toggle_options"><i class="voyager-double-down"></i> {{ mb_strtoupper(__('voyager::generic.options')) }}</a>
                         <div class="new-settings-options">

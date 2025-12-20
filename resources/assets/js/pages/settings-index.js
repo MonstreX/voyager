@@ -85,25 +85,6 @@ const initOptionsToggle = (config) => {
     ensureOptionsEditor(config);
 };
 
-const initGroupSelects = (config) => {
-    document.querySelectorAll('.group_select').forEach((select) => {
-        if (select.dataset.voyagerTaggable !== 'true') {
-            select.dataset.voyagerTaggable = 'true';
-        }
-        if (window.VoyagerSelectRefresh) {
-            window.VoyagerSelectRefresh(select);
-        }
-    });
-
-    document.querySelectorAll('.group_select_new').forEach((select) => {
-        select.dataset.placeholder = config?.i18n?.selectGroup || '';
-        select.value = '';
-        if (window.VoyagerSelectRefresh) {
-            window.VoyagerSelectRefresh(select);
-        }
-    });
-};
-
 const initTabs = () => {
     if (!listenersAttached) {
         document.addEventListener('click', (event) => {
@@ -141,7 +122,6 @@ export const initSettingsIndex = () => {
     if (!config) return;
 
     initOptionsToggle(config);
-    initGroupSelects(config);
 
     if (!listenersAttached) {
         listenersAttached = true;
@@ -158,4 +138,3 @@ export const subscribeToEvents = (events) => {
     if (!events || typeof events.on !== 'function') return;
     events.on('dom:updated', () => initSettingsIndex());
 };
-
