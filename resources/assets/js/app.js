@@ -33,6 +33,8 @@ import './components/adv-related';
 import './formfields/adv-image';
 import './formfields/adv-media-files';
 import './formfields/adv-inline-set';
+import { initRichTextBoxes, subscribeToEvents as subscribeRichTextBoxes } from './formfields/rich-text-box';
+import { initCoordinatesFields, subscribeToEvents as subscribeCoordinatesFields } from './formfields/coordinates';
 import { attachConfirmDelegates } from './modules/confirm-modal';
 import { initBreadBrowseList, subscribeToEvents as subscribeBreadBrowseList } from './pages/bread-browse-list';
 import { initBreadBrowseTree, subscribeToEvents as subscribeBreadBrowseTree } from './pages/bread-browse-tree';
@@ -308,6 +310,8 @@ subscribeSettingsIndex(voyagerEvents);
 subscribeUsersEditAdd(voyagerEvents);
 subscribeRolesEditAdd(voyagerEvents);
 subscribeBreadOrder(voyagerEvents);
+subscribeRichTextBoxes(voyagerEvents);
+subscribeCoordinatesFields(voyagerEvents);
 
 // Legacy Global Exports (keep for backward compatibility)
 window.VoyagerBootstrapCompat = { init: initBootstrapCompat, showModal, hideModal };
@@ -362,6 +366,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initUsersEditAdd();
     initRolesEditAdd();
     initBreadOrder();
+    initRichTextBoxes();
+    initCoordinatesFields();
 
     // Init Modules
     if (window.VoyagerInitSlugify) {
