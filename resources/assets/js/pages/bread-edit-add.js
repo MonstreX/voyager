@@ -27,7 +27,8 @@ const assignDefaults = (config) => {
         window.VoyagerInitMultilingual(document.querySelectorAll('.side-body'), { editing: true });
     }
     if (typeof window.VoyagerInitSlugify === 'function') {
-        window.VoyagerInitSlugify(document.querySelectorAll('.side-body input[data-slug-origin]'));
+        const selector = config.slugifySelector || '.side-body input[data-slug-origin]';
+        window.VoyagerInitSlugify(document.querySelectorAll(selector));
     }
     if (typeof window.VoyagerInitTooltips === 'function') {
         window.VoyagerInitTooltips(document.querySelectorAll('[data-toggle="tooltip"]'));
@@ -147,4 +148,3 @@ export const subscribeToEvents = (events) => {
     if (!events || typeof events.on !== 'function') return;
     events.on('dom:updated', () => initBreadEditAdd());
 };
-

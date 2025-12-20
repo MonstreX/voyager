@@ -190,6 +190,7 @@
             'slug' => $dataType->slug,
             'isModelTranslatable' => (bool) $isModelTranslatable,
             'mediaRemoveUrl' => route('voyager.'.$dataType->slug.'.media.remove'),
+            'slugifySelector' => '.side-body input[data-slug-origin]',
         ];
     @endphp
     <script type="application/json" id="voyager-edit-add-config">@json($editAddConfig)</script>
