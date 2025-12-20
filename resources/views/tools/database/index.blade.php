@@ -86,7 +86,7 @@
     {{-- Delete BREAD Modal --}}
     @include('voyager::components.modal-confirm', [
         'id' => 'delete_bread_modal',
-        'title' => '<i class=\"voyager-trash\"></i> ' . __('voyager::bread.delete_bread_quest', ['table' => '<span id=\"delete_bread_name\"></span>']),
+        'title' => '<i class="voyager-trash"></i> ' . __('voyager::bread.delete_bread_quest', ['table' => '<span id="delete_bread_name"></span>']),
         'message' => '',
         'confirmText' => __('voyager::bread.delete_bread_conf'),
         'confirmClass' => 'btn-danger',
@@ -100,7 +100,7 @@
 
     @include('voyager::components.modal-confirm', [
         'id' => 'delete_modal',
-        'title' => '<i class=\"voyager-trash\"></i> ' . __('voyager::database.delete_table_question', ['table' => '<span id=\"delete_table_name\"></span>']),
+        'title' => '<i class="voyager-trash"></i> ' . __('voyager::database.delete_table_question', ['table' => '<span id="delete_table_name"></span>']),
         'message' => '',
         'confirmText' => __('voyager::database.delete_table_confirm'),
         'confirmClass' => 'btn-danger',
@@ -154,146 +154,19 @@
 @stop
 
 @section('javascript')
+    @php
+        $voyagerToolsDatabaseIndexConfig = [
+            'urls' => [
+                'deleteTableTemplate' => route('voyager.database.destroy', ['database' => '__database']),
+                'deleteBreadTemplate' => route('voyager.bread.delete', '__id'),
+            ],
+            'i18n' => [
+                'internalError' => __('voyager::generic.internal_error'),
+                'deleteBreadBeforeTable' => __('voyager::database.delete_bread_before_table'),
+            ],
+        ];
+    @endphp
 
-    <script>
-
-        var table = {
-            name: '',
-            rows: []
-        };
-
-        (function bootTableInfoModal() {
-            if (!window.Voyager || typeof window.Voyager.withVue !== 'function') {
-                return;
-            }
-            window.Voyager.withVue(function(Vue) {
-                const app = Vue.createApp({
-                    data: function () {
-                        return {
-                            table: table,
-                        };
-                    },
-                }).mount('#table_info');
-                table = app.table;
-            });
-        })();
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const bootstrapCompat = window.VoyagerBootstrapCompat;
-            const tableInfoModal = document.getElementById('table_info');
-            const deleteTableModal = document.getElementById('delete_modal');
-            const deleteTableForm = document.getElementById('delete_table_form');
-            const deleteTableName = document.getElementById('delete_table_name');
-            const deleteTableActionTemplate = '{{ route('voyager.database.destroy', ['database' => '__database']) }}';
-            const deleteBreadModal = document.getElementById('delete_bread_modal');
-            const deleteBreadForm = document.getElementById('delete_bread_form');
-            const deleteBreadName = document.getElementById('delete_bread_name');
-            const deleteBreadActionTemplate = '{{ route('voyager.bread.delete', '__id') }}';
-
-            const showModal = (modal) => {
-                if (!modal) {
-                    return;
-                }
-                if (bootstrapCompat && typeof bootstrapCompat.showModal === 'function') {
-                    bootstrapCompat.showModal(modal);
-                    return;
-                }
-                modal.classList.add('in');
-                modal.style.display = 'block';
-                modal.setAttribute('aria-hidden', 'false');
-                const backdrop = document.createElement('div');
-                backdrop.className = 'modal-backdrop fade in';
-                backdrop.dataset.modalTarget = modal.id;
-                document.body.appendChild(backdrop);
-                document.body.classList.add('modal-open');
-            };
-
-            document.querySelectorAll('.database-tables .desctable').forEach((link) => {
-                link.addEventListener('click', function (event) {
-                    event.preventDefault();
-                    const href = link.getAttribute('href');
-                    if (!href) {
-                        return;
-                    }
-                    table.name = link.dataset.name || '';
-                    table.rows = [];
-                    fetch(href, { headers: { 'Accept': 'application/json' } })
-                        .then((response) => {
-                            if (!response.ok) {
-                                throw new Error('Failed to fetch table info');
-                            }
-                            return response.json();
-                        })
-                        .then((data) => {
-                            table.rows = Object.keys(data || {}).map((key) => {
-                                const val = data[key] || {};
-                                return {
-                                    Field: val.field,
-                                    Type: val.type,
-                                    Null: val.null,
-                                    Key: val.key,
-                                    Default: val.default,
-                                    Extra: val.extra,
-                                };
-                            });
-                            showModal(tableInfoModal);
-                        })
-                        .catch((error) => {
-                            console.error('Voyager table info fetch failed', error);
-                            toastr.error("{{ __('voyager::generic.internal_error') }}");
-                        });
-                });
-            });
-
-            document.querySelectorAll('td.actions .delete_table').forEach((button) => {
-                button.addEventListener('click', function (event) {
-                    event.preventDefault();
-                    const tableName = button.dataset.table || '';
-                    if (button.classList.contains('remove-bread-warning')) {
-                        toastr.warning('{{ __('voyager::database.delete_bread_before_table') }}');
-                        return;
-                    }
-                    if (deleteTableName) {
-                        deleteTableName.textContent = tableName;
-                    }
-                    if (deleteTableForm) {
-                        deleteTableForm.action = deleteTableActionTemplate.replace('__database', tableName);
-                    }
-                    showModal(deleteTableModal);
-                });
-            });
-
-            const deleteTableConfirm = document.getElementById('delete_table_confirm');
-            if (deleteTableConfirm) {
-                deleteTableConfirm.addEventListener('click', function () {
-                    if (!deleteTableForm) return;
-                    deleteTableForm.submit();
-                });
-            }
-
-            document.querySelectorAll('table .bread_actions .delete').forEach((button) => {
-                button.addEventListener('click', function (event) {
-                    event.preventDefault();
-                    const id = button.dataset.id || '';
-                    const name = button.dataset.name || '';
-                    if (deleteBreadName) {
-                        deleteBreadName.textContent = name;
-                    }
-                    if (deleteBreadForm) {
-                        deleteBreadForm.action = deleteBreadActionTemplate.replace('__id', id);
-                    }
-                    showModal(deleteBreadModal);
-                });
-            });
-
-            const deleteBreadConfirm = document.getElementById('delete_bread_confirm');
-            if (deleteBreadConfirm) {
-                deleteBreadConfirm.addEventListener('click', function () {
-                    if (!deleteBreadForm) return;
-                    deleteBreadForm.submit();
-                });
-            }
-        });
-    </script>
+    <script type="application/json" id="voyager-tools-database-index-config">@json($voyagerToolsDatabaseIndexConfig)</script>
 
 @stop

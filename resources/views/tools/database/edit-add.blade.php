@@ -38,7 +38,7 @@
 
 @section('content')
 
-    <div class="page-content container-fluid">
+<div class="page-content container-fluid">
         <div class="row">
             <div id="dbManager" class="col-md-12">
                 <form ref="form" @submit.prevent="stringifyTable" @keydown.enter.prevent action="{{ $db->formAction }}" method="POST">
@@ -59,34 +59,19 @@
 @section('javascript')
     @include('voyager::tools.database.vue-components.database-table-editor')
 
-    <script>
-        window.Voyager.withVue(function(Vue) {
-            Vue.createApp({
-                data() {
-                    return {
-                        table: {},
-                        originalTable: {!! $db->table->toJson() !!}, // to do comparison later?
-                        oldTable: {!! $db->oldTable !!},
-                        tableJson: ''
-                    };
-                },
-                created() {
-                    // If old table is set, use it to repopulate the form
-                    if (this.oldTable) {
-                        this.table = this.oldTable;
-                    } else {
-                        this.table = JSON.parse(JSON.stringify(this.originalTable));
-                    }
-                },
-                methods: {
-                    stringifyTable() {
-                        this.tableJson = JSON.stringify(this.table);
+    @php
+        $voyagerToolsDatabaseEditAddConfig = [
+            'originalTable' => json_decode($db->table->toJson(), true),
+            'oldTable' => $db->oldTable ? json_decode($db->oldTable, true) : null,
+            'i18n' => [
+                'unknownType' => __('voyager::database.unknown_type'),
+                'nameWarning' => __('voyager::database.name_warning'),
+                'tableHasIndex' => __('voyager::database.table_has_index'),
+                'columnAlreadyExists' => __('voyager::database.column') . ' __name ' . __('voyager::database.already_exists'),
+            ],
+        ];
+    @endphp
 
-                        this.$nextTick(() => this.$refs.form.submit());
-                    }
-                }
-            }).mount('#dbManager');
-        });
-    </script>
+    <script type="application/json" id="voyager-tools-database-edit-add-config">@json($voyagerToolsDatabaseEditAddConfig)</script>
 
 @stop
