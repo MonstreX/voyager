@@ -73,10 +73,10 @@
             </button>
         </div>
     </div>
-    <div id="uploadProgress" class="progress active progress-striped" v-if="allowUpload" style="display:none;">
+    <div :id="'uploadProgress_'+uid" class="progress active progress-striped" v-if="allowUpload" style="display:none;">
         <div class="progress-bar progress-bar-success" style="width: 0"></div>
     </div>
-    <input type="file" id="file_upload_input" name="files[]" multiple style="display:none;" v-on:change="handleFileUpload">
+    <input type="file" :id="'file_upload_input_'+uid" name="files[]" multiple style="display:none;" v-on:change="handleFileUpload">
     <div id="content" :style="isExpanded ? 'display:block' : 'display:none'">
         <div class="breadcrumb-container">
             <ol class="breadcrumb filemanager">
@@ -272,7 +272,7 @@
         @include('voyager::components.modal-confirm', [
             'bindId' => "'confirm_delete_modal_'+uid",
             'title' => __('voyager::generic.are_you_sure'),
-            'message' => '<h4>'.__('voyager::media.delete_question').'</h4><ul><li v-for=\"file in selected_files\">@{{ file.name }}</li></ul><h5 class=\"folder_warning\"><i class=\"voyager-warning\"></i> '.__('voyager::media.delete_folder_question').'</h5>',
+            'message' => '<h4>'.__('voyager::media.delete_question').'</h4><ul><li v-for="file in selected_files">@{{ file.name }}</li></ul><h5 class="folder_warning"><i class="voyager-warning"></i> '.__('voyager::media.delete_folder_question').'</h5>',
             'confirmText' => __('voyager::generic.delete_confirm'),
             'confirmClass' => 'btn-danger',
             'bindConfirmButtonId' => "'confirm_delete_files_'+uid",
@@ -363,7 +363,51 @@
 </div>
 @endsection
 
-<script>
+@php
+    $voyagerMediaStorageBaseUrl = rtrim(Storage::disk(config('voyager.storage.disk'))->url('/'), '/').'/';
+    $voyagerMediaManagerConfig = [
+        'routes' => [
+            'files' => route('voyager.media.files'),
+            'rename' => route('voyager.media.rename'),
+            'newFolder' => route('voyager.media.new_folder'),
+            'delete' => route('voyager.media.delete'),
+            'move' => route('voyager.media.move'),
+            'crop' => route('voyager.media.crop'),
+            'upload' => route('voyager.media.upload'),
+        ],
+        'storageBaseUrl' => $voyagerMediaStorageBaseUrl,
+        'i18n' => [
+            'whoopsie' => __('voyager::generic.whoopsie'),
+            'sweetSuccess' => __('voyager::generic.sweet_success'),
+            'successfullyCreated' => __('voyager::generic.successfully_created'),
+            'errorUploading' => __('voyager::media.error_uploading'),
+            'successRenamed' => __('voyager::media.success_renamed'),
+            'errorRenamingExt' => __('voyager::media.error_renaming_ext'),
+            'errorCreatingDir' => __('voyager::media.error_creating_dir'),
+            'errorDeletingFile' => __('voyager::media.error_deleting_file'),
+            'successMoved' => __('voyager::media.success_moved'),
+            'errorMoving' => __('voyager::media.error_moving'),
+            'cropOverrideConfirm' => __('voyager::media.crop_override_confirm'),
+        ],
+        'messages' => [
+            'maxFilesSelect' => [
+                'singular' => trans_choice('voyager::media.max_files_select', 1),
+                'plural' => trans_choice('voyager::media.max_files_select', 2),
+            ],
+            'minFilesSelect' => [
+                'singular' => trans_choice('voyager::media.min_files_select', 1),
+                'plural' => trans_choice('voyager::media.min_files_select', 2),
+            ],
+        ],
+    ];
+@endphp
+
+<template id="voyager-media-manager-template">
+    @yield('media-manager')
+</template>
+<script type="application/json" id="voyager-media-manager-config">@json($voyagerMediaManagerConfig)</script>
+
+<script type="text/plain" data-voyager-media-manager-legacy>
     const voyagerMediaCsrfMeta = document.querySelector('meta[name="csrf-token"]');
     const voyagerMediaCsrfToken = voyagerMediaCsrfMeta ? voyagerMediaCsrfMeta.getAttribute('content') : '';
 

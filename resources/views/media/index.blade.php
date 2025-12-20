@@ -18,7 +18,7 @@
                         'watermark' => config('voyager.media.watermark', (object)[])
                     ]);
                 @endphp
-                <div id="filemanager">
+                <div id="filemanager" data-voyager-media-manager-root>
                     <media-manager
                         base-path="{{ config('voyager.media.path', '/') }}"
                         :show-folders="{{ config('voyager.media.show_folders', true) ? 'true' : 'false' }}"
@@ -36,12 +36,3 @@
     </div><!-- .page-content container-fluid -->
 @stop
 
-@section('javascript')
-<script>
-window.Voyager.withVue(function(Vue) {
-    Vue.createApp({
-        data: () => ({})
-    }).mount('#filemanager');
-});
-</script>
-@endsection

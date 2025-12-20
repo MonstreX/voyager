@@ -1,6 +1,6 @@
 <div class="panel">
     <div class="page-content settings container-fluid">
-        <div id="media_picker_{{ $row->field }}">
+        <div id="media_picker_{{ $row->field }}" data-voyager-media-manager-root>
             <media-manager
                 base-path="{{ $options->base_path ?? '/'.$dataType->slug.'/' }}"
                 filename="{{ $options->rename ?? 'null' }}"
@@ -26,10 +26,3 @@
         </div>
     </div>
 </div>
-@push('javascript')
-<script>
-window.Voyager.withVue(function(Vue) {
-    Vue.createApp({}).mount('#media_picker_{{ $row->field }}');
-});
-</script>
-@endpush

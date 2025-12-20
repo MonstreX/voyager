@@ -38,6 +38,7 @@ import { initBreadBrowseList, subscribeToEvents as subscribeBreadBrowseList } fr
 import { initBreadBrowseTree, subscribeToEvents as subscribeBreadBrowseTree } from './pages/bread-browse-tree';
 import { initBreadBulkDelete, subscribeToEvents as subscribeBreadBulkDelete } from './pages/bread-bulk-delete';
 import { initBreadEditAdd, subscribeToEvents as subscribeBreadEditAdd } from './pages/bread-edit-add';
+import { initMediaManager, subscribeToEvents as subscribeMediaManager } from './pages/media-manager';
 
 // Voyager namespace and ready Promises are initialized in master.blade.php <head>
 // Get the resolvers that were created there
@@ -288,6 +289,7 @@ subscribeBreadBrowseList(voyagerEvents);
 subscribeBreadBrowseTree(voyagerEvents);
 subscribeBreadBulkDelete(voyagerEvents);
 subscribeBreadEditAdd(voyagerEvents);
+subscribeMediaManager(voyagerEvents);
 
 // Legacy Global Exports (keep for backward compatibility)
 window.VoyagerBootstrapCompat = { init: initBootstrapCompat, showModal, hideModal };
@@ -332,6 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initBreadBrowseTree();
     initBreadBulkDelete();
     initBreadEditAdd();
+    initMediaManager();
 
     // Init Modules
     if (window.VoyagerInitSlugify) {
