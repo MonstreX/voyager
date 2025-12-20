@@ -330,36 +330,31 @@
 }
 
 /* MENU */
-
-.dd-menu-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.dd-handle.dd-menu-item {
-    height: 50px;
-    padding: 0 0 0 20px;
-}
-
 .dd .item_actions {
-    z-index:9;
-    position:relative;
-    right:10px;
+    z-index: 9;
+    position: relative;
+    right: 10px;
 }
 
-.dd-menu-left small {
+.dd-menu-content {
+    width: auto;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.dd-menu-title {
+    color: #616161;
+}
+
+.dd-menu-url {
     font-weight: 300;
-}
-
-.dd-menu-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .tree-admin-status {
     display: inline-flex;
     align-items: center;
-    margin-left: 10px;
+    margin-left: 0;
 }
