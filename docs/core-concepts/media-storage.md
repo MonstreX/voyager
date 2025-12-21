@@ -42,7 +42,7 @@ class Post extends Model
 - `getMedia($collectionName = 'default')`
 - `getFirstMedia($collectionName = 'default')`
 - `getFirstMediaUrl($collectionName = 'default', $fallback = null)`
-- `addMedia($file, $collectionName = 'default')` (returns `MediaUploadService`)
+- `addMedia($file, $collectionName = 'default')` (returns `MediaUploader`)
 
 ### Automatic cleanup on delete
 
@@ -60,7 +60,7 @@ $media = app(\TCG\Voyager\Services\Media\MediaService::class)
     ->createFromFile($post, $request->file('cover'), 'cover');
 ```
 
-### 3.2 Fluent upload (MediaUploadService)
+### 3.2 Fluent upload (MediaUploader)
 
 ```php
 $media = $post
@@ -113,7 +113,7 @@ Name collisions are resolved by appending an incrementing suffix.
 `MediaService` reads an optional config key:
 
 ```php
-config('voyager.media.path_generator', \TCG\Voyager\Services\Media\PathGeneratorService::class)
+config('voyager.media.path_generator', \TCG\Voyager\Services\Media\MediaPathGenerator::class)
 ```
 
 To override:

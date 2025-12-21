@@ -1,6 +1,6 @@
 <?php
 
-namespace TCG\Voyager\Services\ContentTypes;
+namespace TCG\Voyager\Services;
 
 use TCG\Voyager\Http\Controllers\ContentTypes\AdvInlineSetContentType;
 use TCG\Voyager\Http\Controllers\ContentTypes\Checkbox;

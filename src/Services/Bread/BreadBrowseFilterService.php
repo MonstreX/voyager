@@ -4,7 +4,7 @@ namespace TCG\Voyager\Services\Bread;
 
 use Illuminate\Http\Request;
 
-class BrowseFilterService
+class BreadBrowseFilterService
 {
     /**
      * Resolve current browse filters for a given slug.

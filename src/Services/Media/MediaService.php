@@ -17,7 +17,7 @@ class MediaService
         $mimeType = $filePayload['mime_type'];
         $size = $filePayload['size'];
 
-        $pathGeneratorClass = config('voyager.media.path_generator', PathGeneratorService::class);
+        $pathGeneratorClass = config('voyager.media.path_generator', MediaPathGenerator::class);
         $dirPath = $pathGeneratorClass::generate([
             'model' => $model,
         ]);
@@ -55,7 +55,7 @@ class MediaService
 
         $model = $media->model;
         $dirPath = $model
-            ? PathGeneratorService::generate(['model' => $model])
+            ? MediaPathGenerator::generate(['model' => $model])
             : pathinfo($media->path, PATHINFO_DIRNAME);
 
         $fileName = $this->generateUniqueFileName($originalFileName, $dirPath, $disk);

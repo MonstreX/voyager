@@ -4,7 +4,7 @@ namespace TCG\Voyager\Services\Media;
 
 use Illuminate\Database\Eloquent\Model;
 
-class PathGeneratorService
+class MediaPathGenerator
 {
     const STRATEGY_DATED = 'dated';
 

@@ -64,6 +64,6 @@ trait HasMedia
 
     public function addMedia($file, $collectionName = 'default')
     {
-        return new \TCG\Voyager\Services\Media\MediaUploadService($this, $collectionName, $file);
+        return new \TCG\Voyager\Services\Media\MediaUploader($this, $collectionName, $file);
     }
 }

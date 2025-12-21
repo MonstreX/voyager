@@ -4,7 +4,7 @@ namespace TCG\Voyager\Services\Media;
 
 use TCG\Voyager\Media\ImageProcessor;
 
-class MediaUploadService
+class MediaUploader
 {
     protected $model;
     protected $collectionName;

@@ -1,6 +1,6 @@
 <?php
 
-namespace TCG\Voyager\Services\Models;
+namespace TCG\Voyager\Services;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;

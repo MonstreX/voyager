@@ -3,7 +3,7 @@
 namespace TCG\Voyager\Services\Bread;
 
 use Illuminate\Http\Request;
-use TCG\Voyager\Services\ContentTypes\ContentTypeRegistry;
+use TCG\Voyager\Services\ContentTypeRegistry;
 
 class BreadContentService
 {

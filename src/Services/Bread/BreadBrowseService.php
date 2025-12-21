@@ -13,7 +13,7 @@ use TCG\Voyager\Models\DataType;
 class BreadBrowseService
 {
     public function __construct(
-        protected BrowseFilterService $browseFilterService,
+        protected BreadBrowseFilterService $browseFilterService,
         protected BreadDataResolverService $dataResolverService
     ) {
     }

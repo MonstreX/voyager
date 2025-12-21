@@ -30,7 +30,7 @@ The default path generator uses a dated strategy:
 
 `{table}/media/{Y}/{m}/{slugged_name}.{ext}`
 
-Implementation: `TCG\\Voyager\\Services\\PathGeneratorService`.
+Implementation: `TCG\\Voyager\\Services\\Media\\MediaPathGenerator`.
 
 ## Service layer
 
@@ -43,7 +43,7 @@ Primary API for creating/updating/deleting media:
 - `updateMediaProps(Media $media, array $props)`
 - `reorderCollection($model, $collectionName, array $order)`
 
-### `MediaUploadService`
+### `MediaUploader`
 
 A fluent helper used by crop/resize flows:
 - accepts either `UploadedFile` or raw bytes string
