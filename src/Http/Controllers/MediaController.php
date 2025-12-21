@@ -172,7 +172,12 @@ class MediaController extends Controller
             }
             $this->mediaService->updateMediaProps($media, $props);
 
-            return $this->apiSuccessResponse(['media' => $media], null, 200, ['media' => $media]);
+            return $this->apiSuccessResponse(
+                ['media' => $media],
+                __('voyager::generic.successfully_updated'),
+                200,
+                ['media' => $media]
+            );
         } catch (ModelNotFoundException $e) {
             return $this->apiErrorCodeResponse('media_not_found', 'Not found', 404);
         } catch (AuthorizationException $e) {
@@ -203,7 +208,7 @@ class MediaController extends Controller
 
             $this->mediaService->reorderCollection($model, $collectionName, $order);
 
-            return $this->apiSuccessResponse([], 'Media reordered successfully', 200);
+            return $this->apiSuccessResponse([], __('voyager::generic.successfully_updated'), 200);
         } catch (ValidationException $e) {
             return $this->apiErrorCodeResponse('validation_failed', 'Validation failed', 422, ['errors' => $e->errors()]);
         } catch (MediaApiException $e) {

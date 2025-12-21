@@ -159,6 +159,7 @@ const removeItems = (listEl, ids, deleteUrlTemplate, confirmModal) => {
     Promise.all(requests).then((results) => {
         const removedIds = results.filter((r) => r && r.ok).map((r) => r.id);
         const failed = results.filter((r) => r && !r.ok);
+        const firstSuccessPayload = results.find((r) => r && r.ok && r.payload)?.payload || null;
 
         removedIds.forEach((id) => {
             const holder = listEl.querySelector(`.adv-media-files-item-holder[data-file-id="${id}"]`);
@@ -174,7 +175,7 @@ const removeItems = (listEl, ids, deleteUrlTemplate, confirmModal) => {
         closeModal(confirmModal);
         const toastr = getToastr();
         if (toastr && removedIds.length) {
-            toastr.success(translate('voyager.generic.successfully_deleted', 'Deleted'));
+            toastr.success(getApiMessage(firstSuccessPayload, translate('voyager.generic.successfully_deleted', 'Deleted')));
         }
         if (toastr && failed.length) {
             const firstMessage = getApiMessage(failed[0].payload, translate('voyager.generic.error_deleting', 'Error deleting'));
@@ -571,9 +572,7 @@ const bindList = (listEl) => {
                         }
                         const toastr = getToastr();
                         toastr &&
-                            toastr.success(
-                                translate('voyager.generic.successfully_updated', 'Saved')
-                            );
+                            toastr.success(getApiMessage(data, translate('voyager.generic.successfully_updated', 'Saved')));
                         closeModal(propsModal);
                     })
                     .catch((err) => {
