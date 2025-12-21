@@ -13,6 +13,16 @@ const getApiErrorMessage = (payload, fallback) => {
     return fallback;
 };
 
+const translate = (key, fallback) => {
+    if (window.voyager && typeof window.voyager.__ === 'function') {
+        const translated = window.voyager.__(key);
+        if (translated) {
+            return translated;
+        }
+    }
+    return fallback || key;
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     if (listenersAttached) return;
     listenersAttached = true;
@@ -242,7 +252,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 const toastr = getToastr();
-                toastr && toastr.success(getApiErrorMessage(data, 'Cropped'));
+                toastr && toastr.success(getApiErrorMessage(data, translate('voyager.media.success_crop_image', 'Cropped')));
                 closeModal(cropState.modal);
             })
             .catch(err => {
@@ -291,10 +301,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     fileInput.value = '';
                 }
                 const toastr = getToastr();
-                toastr && typeof toastr.success === 'function' && toastr.success('Image deleted successfully');
+                toastr &&
+                    typeof toastr.success === 'function' &&
+                    toastr.success(getApiErrorMessage(data, translate('voyager.generic.successfully_deleted', 'Deleted')));
             } else {
                 const toastr = getToastr();
-                toastr && typeof toastr.error === 'function' && toastr.error(getApiErrorMessage(data, 'Error deleting image'));
+                toastr &&
+                    typeof toastr.error === 'function' &&
+                    toastr.error(getApiErrorMessage(data, translate('voyager.generic.error_deleting', 'Error deleting')));
             }
             pendingDeleteData = null;
         })

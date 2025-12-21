@@ -146,7 +146,7 @@ class MediaController extends Controller
 
             $this->mediaService->deleteMedia($media);
 
-            return $this->apiSuccessResponse([], 'Media deleted successfully', 200);
+            return $this->apiSuccessResponse([], __('voyager::generic.successfully_deleted'), 200);
         } catch (ModelNotFoundException $e) {
             return $this->apiErrorCodeResponse('media_not_found', 'Not found', 404);
         } catch (AuthorizationException $e) {
