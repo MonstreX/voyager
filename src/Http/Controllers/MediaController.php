@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use TCG\Voyager\Exceptions\MediaApiException;
 use TCG\Voyager\Models\Media;
 use TCG\Voyager\Media\ImageProcessor;
 use TCG\Voyager\Services\Media\MediaService;
@@ -26,16 +27,16 @@ class MediaController extends Controller
         $modelId = (int) $request->input('model_id');
 
         if (!is_string($modelClass) || $modelClass === '') {
-            throw new \InvalidArgumentException('Missing model class');
+            throw MediaApiException::badRequest('missing_model_type', 'Invalid request');
         }
 
         if (!class_exists($modelClass) || !is_subclass_of($modelClass, Model::class)) {
-            throw new \InvalidArgumentException('Invalid model class');
+            throw MediaApiException::badRequest('invalid_model_type', 'Invalid request');
         }
 
         $allowed = config('voyager.media.api.allowed_model_types', []);
         if (is_array($allowed) && count($allowed) > 0 && !in_array($modelClass, $allowed, true)) {
-            throw new \InvalidArgumentException('Invalid model class');
+            throw MediaApiException::badRequest('invalid_model_type', 'Invalid request');
         }
 
         if (config('voyager.media.api.require_has_media_trait', true)) {
@@ -43,7 +44,7 @@ class MediaController extends Controller
             $hasMediaMethod = method_exists($modelClass, 'media');
 
             if (!$usesHasMedia && !$hasMediaMethod) {
-                throw new \InvalidArgumentException('Invalid model class');
+                throw MediaApiException::badRequest('invalid_model_type', 'Invalid request');
             }
         }
 
@@ -76,30 +77,28 @@ class MediaController extends Controller
                 $file = $file[0] ?? null;
             }
             if (is_null($file)) {
-                throw new \InvalidArgumentException('Missing file');
+                throw MediaApiException::badRequest('missing_file', 'Invalid request');
             }
 
             $media = $this->mediaService->createFromFile($model, $file, $collectionName);
 
-            return response()->json([
-                'status' => 'success',
-                'media' => $media,
-            ], 200, [], $this->voyagerJsonFlags());
+            return $this->apiSuccessResponse(
+                ['media' => $media],
+                null,
+                200,
+                ['media' => $media]
+            );
         } catch (ValidationException $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => $this->apiExceptionMessage($e, 'Validation failed'),
-                'errors' => $e->errors(),
-            ], 422, [], $this->voyagerJsonFlags());
+            return $this->apiErrorCodeResponse('validation_failed', 'Validation failed', 422, ['errors' => $e->errors()]);
+        } catch (MediaApiException $e) {
+            return $this->apiErrorCodeResponse($e->apiCode, $e->getMessage(), $e->statusCode, $e->extra);
         } catch (ModelNotFoundException $e) {
-            return $this->apiErrorResponse($e, 'Model not found', 404);
+            return $this->apiErrorCodeResponse('model_not_found', 'Not found', 404);
         } catch (AuthorizationException $e) {
-            return $this->apiErrorResponse($e, 'Unauthorized', 403);
-        } catch (\InvalidArgumentException $e) {
-            return $this->apiErrorResponse($e, 'Invalid request', 400);
+            return $this->apiErrorCodeResponse('forbidden', 'Unauthorized', 403);
         } catch (Throwable $e) {
             report($e);
-            return $this->apiErrorResponse($e, 'Server error', 500);
+            return $this->apiErrorCodeResponse('server_error', 'Server error', 500);
         }
     }
 
@@ -119,21 +118,20 @@ class MediaController extends Controller
                 $this->authorize('edit', $model);
             }
 
-            return response()->json([
-                'status' => 'success',
-                'media' => $media->toArray() + [
-                    'props' => $media->props,
-                    'url' => $media->url(),
-                    'full_url' => $media->fullUrl(),
-                ],
-            ], 200, [], $this->voyagerJsonFlags());
+            $payload = $media->toArray() + [
+                'props' => $media->props,
+                'url' => $media->url(),
+                'full_url' => $media->fullUrl(),
+            ];
+
+            return $this->apiSuccessResponse(['media' => $payload], null, 200, ['media' => $payload]);
         } catch (ModelNotFoundException $e) {
-            return $this->apiErrorResponse($e, 'Media not found', 404);
+            return $this->apiErrorCodeResponse('media_not_found', 'Not found', 404);
         } catch (AuthorizationException $e) {
-            return $this->apiErrorResponse($e, 'Unauthorized', 403);
+            return $this->apiErrorCodeResponse('forbidden', 'Unauthorized', 403);
         } catch (Throwable $e) {
             report($e);
-            return $this->apiErrorResponse($e, 'Server error', 500);
+            return $this->apiErrorCodeResponse('server_error', 'Server error', 500);
         }
     }
 
@@ -148,17 +146,14 @@ class MediaController extends Controller
 
             $this->mediaService->deleteMedia($media);
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Media deleted successfully',
-            ], 200, [], $this->voyagerJsonFlags());
+            return $this->apiSuccessResponse([], 'Media deleted successfully', 200);
         } catch (ModelNotFoundException $e) {
-            return $this->apiErrorResponse($e, 'Media not found', 404);
+            return $this->apiErrorCodeResponse('media_not_found', 'Not found', 404);
         } catch (AuthorizationException $e) {
-            return $this->apiErrorResponse($e, 'Unauthorized', 403);
+            return $this->apiErrorCodeResponse('forbidden', 'Unauthorized', 403);
         } catch (Throwable $e) {
             report($e);
-            return $this->apiErrorResponse($e, 'Server error', 500);
+            return $this->apiErrorCodeResponse('server_error', 'Server error', 500);
         }
     }
 
@@ -172,19 +167,21 @@ class MediaController extends Controller
             }
 
             $props = $request->input('props', []);
+            if (!is_array($props)) {
+                throw MediaApiException::badRequest('invalid_props', 'Invalid request');
+            }
             $this->mediaService->updateMediaProps($media, $props);
 
-            return response()->json([
-                'status' => 'success',
-                'media' => $media,
-            ], 200, [], $this->voyagerJsonFlags());
+            return $this->apiSuccessResponse(['media' => $media], null, 200, ['media' => $media]);
         } catch (ModelNotFoundException $e) {
-            return $this->apiErrorResponse($e, 'Media not found', 404);
+            return $this->apiErrorCodeResponse('media_not_found', 'Not found', 404);
         } catch (AuthorizationException $e) {
-            return $this->apiErrorResponse($e, 'Unauthorized', 403);
+            return $this->apiErrorCodeResponse('forbidden', 'Unauthorized', 403);
+        } catch (MediaApiException $e) {
+            return $this->apiErrorCodeResponse($e->apiCode, $e->getMessage(), $e->statusCode, $e->extra);
         } catch (Throwable $e) {
             report($e);
-            return $this->apiErrorResponse($e, 'Server error', 500);
+            return $this->apiErrorCodeResponse('server_error', 'Server error', 500);
         }
     }
 
@@ -206,25 +203,18 @@ class MediaController extends Controller
 
             $this->mediaService->reorderCollection($model, $collectionName, $order);
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Media reordered successfully',
-            ], 200, [], $this->voyagerJsonFlags());
+            return $this->apiSuccessResponse([], 'Media reordered successfully', 200);
         } catch (ValidationException $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => $this->apiExceptionMessage($e, 'Validation failed'),
-                'errors' => $e->errors(),
-            ], 422, [], $this->voyagerJsonFlags());
+            return $this->apiErrorCodeResponse('validation_failed', 'Validation failed', 422, ['errors' => $e->errors()]);
+        } catch (MediaApiException $e) {
+            return $this->apiErrorCodeResponse($e->apiCode, $e->getMessage(), $e->statusCode, $e->extra);
         } catch (ModelNotFoundException $e) {
-            return $this->apiErrorResponse($e, 'Model not found', 404);
+            return $this->apiErrorCodeResponse('model_not_found', 'Not found', 404);
         } catch (AuthorizationException $e) {
-            return $this->apiErrorResponse($e, 'Unauthorized', 403);
-        } catch (\InvalidArgumentException $e) {
-            return $this->apiErrorResponse($e, 'Invalid request', 400);
+            return $this->apiErrorCodeResponse('forbidden', 'Unauthorized', 403);
         } catch (Throwable $e) {
             report($e);
-            return $this->apiErrorResponse($e, 'Server error', 500);
+            return $this->apiErrorCodeResponse('server_error', 'Server error', 500);
         }
     }
 
@@ -238,10 +228,7 @@ class MediaController extends Controller
             }
 
             if (!$media->mime_type || strpos($media->mime_type, 'image/') !== 0) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Only image media can be cropped',
-                ], 400);
+                throw MediaApiException::badRequest('not_image', 'Only image media can be cropped');
             }
 
             $data = $request->validate([
@@ -309,23 +296,18 @@ class MediaController extends Controller
             $media->size = strlen($encoded);
             $media->save();
 
-            return response()->json([
-                'status' => 'success',
-                'message' => __('voyager::media.success_crop_image'),
-            ], 200, [], $this->voyagerJsonFlags());
+            return $this->apiSuccessResponse([], __('voyager::media.success_crop_image'), 200);
         } catch (ValidationException $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => $this->apiExceptionMessage($e, 'Validation failed'),
-                'errors' => $e->errors(),
-            ], 422, [], $this->voyagerJsonFlags());
+            return $this->apiErrorCodeResponse('validation_failed', 'Validation failed', 422, ['errors' => $e->errors()]);
         } catch (ModelNotFoundException $e) {
-            return $this->apiErrorResponse($e, 'Media not found', 404);
+            return $this->apiErrorCodeResponse('media_not_found', 'Not found', 404);
         } catch (AuthorizationException $e) {
-            return $this->apiErrorResponse($e, 'Unauthorized', 403);
+            return $this->apiErrorCodeResponse('forbidden', 'Unauthorized', 403);
+        } catch (MediaApiException $e) {
+            return $this->apiErrorCodeResponse($e->apiCode, $e->getMessage(), $e->statusCode, $e->extra);
         } catch (Throwable $e) {
             report($e);
-            return $this->apiErrorResponse($e, 'Server error', 500);
+            return $this->apiErrorCodeResponse('server_error', 'Server error', 500);
         }
     }
 }

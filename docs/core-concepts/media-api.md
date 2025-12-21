@@ -31,6 +31,21 @@ In Blade you usually already have the CSRF token meta tag:
 
 ## Endpoints
 
+## Response format
+
+All endpoints return JSON with a stable top-level `status`:
+
+- Success: `{ "status": "success", "data": { ... } }`
+- Error: `{ "status": "error", "code": "some_code", "message": "Human message", "error": { "code": "...", "message": "..." } }`
+
+For backward compatibility with existing field JS, some endpoints also include top-level fields like `media` and `message`.
+
+### Error messages
+
+This fork does **not** expose raw exception messages by default (even in debug). If you explicitly need them for local debugging, set:
+
+`voyager.media.api.expose_exception_messages=true`
+
 ### Upload media
 
 `POST /{adminPath}/api/media/upload` (`voyager.media-api.upload`)
@@ -47,6 +62,9 @@ Response (`200`):
 ```json
 {
   "status": "success",
+  "data": {
+    "media": { "id": 123, "model_type": "...", "model_id": 1, "collection_name": "default", "...": "..." }
+  },
   "media": { "id": 123, "model_type": "...", "model_id": 1, "collection_name": "default", "...": "..." }
 }
 ```
@@ -82,6 +100,14 @@ Response (`200`):
 ```json
 {
   "status": "success",
+  "data": {
+    "media": {
+      "id": 123,
+      "props": { "title": "Cover", "alt": "..." },
+      "url": "/storage/posts/media/2025/12/cover.jpg",
+      "full_url": "https://example.com/storage/posts/media/2025/12/cover.jpg"
+    }
+  },
   "media": {
     "id": 123,
     "props": { "title": "Cover", "alt": "..." },
@@ -101,7 +127,7 @@ Authorization:
 Response (`200`):
 
 ```json
-{ "status": "success", "message": "Media deleted successfully" }
+{ "status": "success", "message": "Media deleted successfully", "data": {} }
 ```
 
 Authorization:
@@ -118,7 +144,7 @@ Request: JSON or form-encoded
 Response (`200`):
 
 ```json
-{ "status": "success", "media": { "id": 123, "props": { "...": "..." } } }
+{ "status": "success", "data": { "media": { "id": 123, "props": { "...": "..." } } }, "media": { "id": 123, "props": { "...": "..." } } }
 ```
 
 Notes:
@@ -152,7 +178,7 @@ Request: JSON or form-encoded
 Response (`200`):
 
 ```json
-{ "status": "success", "message": "Media reordered successfully" }
+{ "status": "success", "message": "Media reordered successfully", "data": {} }
 ```
 
 ### Crop an image (and optionally downscale)
@@ -171,7 +197,7 @@ Request: JSON or form-encoded
 Response (`200`):
 
 ```json
-{ "status": "success", "message": "Image cropped successfully." }
+{ "status": "success", "message": "Image cropped successfully.", "data": {} }
 ```
 
 Errors:
@@ -180,3 +206,11 @@ Errors:
 
 After a successful crop, you usually need to refresh the UI preview (cache-bust by adding `?t=<updated_at>` or re-fetch `GET /api/media/{id}`).
 
+## Model allowlist (optional)
+
+By default the API accepts any `model_type` that is an Eloquent model and has the `TCG\\Voyager\\Traits\\HasMedia` trait (or at least a `media()` relation).
+
+To restrict which models are allowed, set:
+
+- `voyager.media.api.allowed_model_types` — array of FQCN strings (allowlist)
+- `voyager.media.api.require_has_media_trait` — boolean (default `true`)

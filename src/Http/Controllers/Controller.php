@@ -52,7 +52,7 @@ abstract class Controller extends BaseController
             return (bool) $configured;
         }
 
-        return (bool) config('app.debug', false);
+        return false;
     }
 
     protected function apiExceptionMessage(Throwable $e, string $fallback): string
@@ -63,6 +63,43 @@ abstract class Controller extends BaseController
     protected function apiErrorResponse(Throwable $e, string $fallbackMessage, int $statusCode = 500, array $extra = []): JsonResponse
     {
         $payload = ['status' => 'error', 'message' => $this->apiExceptionMessage($e, $fallbackMessage)];
+        if ($extra) {
+            $payload = $payload + $extra;
+        }
+
+        return response()->json($payload, $statusCode, [], $this->voyagerJsonFlags());
+    }
+
+    protected function apiErrorCodeResponse(string $code, string $message, int $statusCode = 400, array $extra = []): JsonResponse
+    {
+        $payload = [
+            'status' => 'error',
+            'code' => $code,
+            'message' => $message,
+            'error' => [
+                'code' => $code,
+                'message' => $message,
+            ],
+        ];
+
+        if ($extra) {
+            $payload = $payload + $extra;
+        }
+
+        return response()->json($payload, $statusCode, [], $this->voyagerJsonFlags());
+    }
+
+    protected function apiSuccessResponse(array $data = [], ?string $message = null, int $statusCode = 200, array $extra = []): JsonResponse
+    {
+        $payload = [
+            'status' => 'success',
+            'data' => $data,
+        ];
+
+        if (!is_null($message)) {
+            $payload['message'] = $message;
+        }
+
         if ($extra) {
             $payload = $payload + $extra;
         }
