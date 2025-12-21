@@ -1,3 +1,5 @@
+import { getToastr } from '../core/toastr';
+
 const voyagerSelectLang = Object.assign({
     placeholder: 'Select an option',
     searchPlaceholder: 'Search...',
@@ -618,11 +620,13 @@ export class VoyagerSelect {
                     this.toggleValue(option.value, true);
                 })
                 .catch(() => {
-                    if (window.toastr && typeof window.toastr.error === 'function') {
-                        window.toastr.error(errorMessage);
-                    } else {
-                        console.error(errorMessage);
+                    const toastr = getToastr();
+                    if (toastr && typeof toastr.error === 'function') {
+                        toastr.error(errorMessage);
+                        return;
                     }
+
+                    console.error(errorMessage);
                 });
         } else {
             const option = {

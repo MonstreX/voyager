@@ -1,5 +1,6 @@
 import { getCsrfToken } from '../modules/csrf';
 import { showModal, hideModal } from '../core/bootstrap-compat';
+import { getToastr } from '../core/toastr';
 
 let listenersAttached = false;
 
@@ -13,8 +14,6 @@ const getBrowseListConfig = () => {
         return null;
     }
 };
-
-const getToastr = () => window.toastr || (window.Voyager && window.Voyager.toastr);
 
 const postFormUrlEncoded = (url, params) => {
     const headers = {

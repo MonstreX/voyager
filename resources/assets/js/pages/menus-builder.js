@@ -1,9 +1,8 @@
 import { getCsrfToken } from '../modules/csrf';
 import { showModal, hideModal } from '../core/bootstrap-compat';
+import { getToastr } from '../core/toastr';
 
 let listenersAttached = false;
-
-const getToastr = () => window.toastr || (window.Voyager && window.Voyager.toastr) || null;
 
 const getMenuBuilderConfig = () => {
     if (typeof document === 'undefined') return null;

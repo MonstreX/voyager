@@ -2,10 +2,9 @@ import { getCsrfToken } from '../modules/csrf';
 import { showModal, hideModal } from '../core/bootstrap-compat';
 import { postJson } from '../core/http';
 import { confirmAction } from '../modules/confirm-modal';
+import { getToastr } from '../core/toastr';
 
 let componentRegistered = false;
-
-const getToastr = () => window.toastr || (window.Voyager && window.Voyager.toastr) || null;
 
 const parseJsonConfig = (elementId) => {
     if (typeof document === 'undefined') return null;

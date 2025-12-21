@@ -1,3 +1,5 @@
+import { getToastr } from '../core/toastr';
+
 let listenersAttached = false;
 let optionsEditorInstance = null;
 let optionsEditorReady = false;
@@ -57,7 +59,7 @@ const ensureOptionsEditor = (config) => {
         })
         .catch((error) => {
             console.error('[VoyagerSettings] Failed to initialize options editor', error);
-            const toastr = window.toastr || (window.Voyager && window.Voyager.toastr);
+            const toastr = getToastr();
             toastr && toastr.error(config?.i18n?.editorsInitFailed || 'Failed to initialize editor');
         });
 };

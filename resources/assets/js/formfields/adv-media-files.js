@@ -1,4 +1,5 @@
 import { showModal, hideModal } from '../core/bootstrap-compat';
+import { getToastr } from '../core/toastr';
 
 const getCsrfToken = () => {
     const tokenMeta = document.querySelector('meta[name="csrf-token"]');
@@ -65,9 +66,8 @@ const callReorder = (listEl) => {
     })
         .then((response) => response.json())
         .then((data) => {
-            if (window.toastr && data && data.status === 'success') {
-                window.toastr.success(data.message || 'Order updated');
-            }
+            const toastr = getToastr();
+            toastr && data && data.status === 'success' && toastr.success(data.message || 'Order updated');
         })
         .catch(() => {});
 };
@@ -130,9 +130,10 @@ const removeItems = (listEl, ids, deleteUrlTemplate, confirmModal) => {
         updateOrderInputs(listEl);
         callReorder(listEl);
         closeModal(confirmModal);
-        if (window.toastr && removedIds.length) {
-            window.toastr.success(window.voyager ? window.voyager.__('voyager.generic.successfully_deleted') || 'Deleted' : 'Deleted');
-        }
+        const toastr = getToastr();
+        toastr &&
+            removedIds.length &&
+            toastr.success(window.voyager ? window.voyager.__('voyager.generic.successfully_deleted') || 'Deleted' : 'Deleted');
     });
 };
 
@@ -177,7 +178,8 @@ const bindList = (listEl) => {
                 cropper = null;
             }
             if (typeof window.Cropper === 'undefined') {
-                if (window.toastr) window.toastr.error('Cropper is not available');
+                const toastr = getToastr();
+                toastr && toastr.error('Cropper is not available');
                 return;
             }
             cropper = new window.Cropper(cropImg, {
@@ -456,7 +458,8 @@ const bindList = (listEl) => {
                     });
                 })
                 .catch((err) => {
-                    if (window.toastr) window.toastr.error(err.message || 'Error loading media');
+                    const toastr = getToastr();
+                    toastr && toastr.error(err.message || 'Error loading media');
                 });
             return;
         }
@@ -524,11 +527,17 @@ const bindList = (listEl) => {
                         if (display) {
                             display.textContent = props.title || (window.voyager && window.voyager.__ ? window.voyager.__('voyager.generic.none') : '') || '...';
                         }
-                        if (window.toastr) window.toastr.success((window.voyager && window.voyager.__ ? window.voyager.__('voyager.generic.successfully_updated') : '') || 'Saved');
+                        const toastr = getToastr();
+                        toastr &&
+                            toastr.success(
+                                (window.voyager && window.voyager.__ ? window.voyager.__('voyager.generic.successfully_updated') : '') ||
+                                    'Saved'
+                            );
                         closeModal(propsModal);
                     })
                     .catch((err) => {
-                        if (window.toastr) window.toastr.error(err.message || 'Error saving');
+                        const toastr = getToastr();
+                        toastr && toastr.error(err.message || 'Error saving');
                     });
             });
         }
@@ -583,11 +592,13 @@ const bindList = (listEl) => {
                         const base = current.split('?')[0];
                         img.setAttribute('src', `${base}?t=${Date.now()}`);
                     }
-                    if (window.toastr) window.toastr.success(data.message || 'Cropped');
+                    const toastr = getToastr();
+                    toastr && toastr.success(data.message || 'Cropped');
                     closeModal(cropModal);
                 })
                 .catch((err) => {
-                    if (window.toastr) window.toastr.error(err.message || 'Crop failed');
+                    const toastr = getToastr();
+                    toastr && toastr.error(err.message || 'Crop failed');
                 })
                 .finally(() => {
                     cropConfirm.disabled = false;

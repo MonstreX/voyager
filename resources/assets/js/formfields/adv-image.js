@@ -1,4 +1,5 @@
 import { showModal, hideModal } from '../core/bootstrap-compat';
+import { getToastr } from '../core/toastr';
 
 let listenersAttached = false;
 
@@ -122,7 +123,8 @@ document.addEventListener('DOMContentLoaded', function() {
         cropState.shownHandler = function() {
             destroyCropper();
             if (typeof window.Cropper === 'undefined') {
-                if (window.toastr) window.toastr.error('Cropper is not available');
+                const toastr = getToastr();
+                toastr && toastr.error('Cropper is not available');
                 return;
             }
 
@@ -228,11 +230,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     previewImg.setAttribute('src', `${base}?t=${Date.now()}`);
                 }
 
-                if (window.toastr) window.toastr.success(data.message || 'Cropped');
+                const toastr = getToastr();
+                toastr && toastr.success(data.message || 'Cropped');
                 closeModal(cropState.modal);
             })
             .catch(err => {
-                if (window.toastr) window.toastr.error(err.message || 'Crop failed');
+                const toastr = getToastr();
+                toastr && toastr.error(err.message || 'Crop failed');
             })
             .finally(() => {
                 confirmBtn.disabled = false;
@@ -275,18 +279,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (fileInput) {
                     fileInput.value = '';
                 }
-                if (window.toastr && typeof window.toastr.success === 'function') {
-                    window.toastr.success('Image deleted successfully');
-                }
+                const toastr = getToastr();
+                toastr && typeof toastr.success === 'function' && toastr.success('Image deleted successfully');
             }
             pendingDeleteData = null;
         })
         .catch(error => {
             closeModal(modal);
             confirmButton.disabled = false;
-            if (window.toastr && typeof window.toastr.error === 'function') {
-                window.toastr.error('Error deleting image');
-            }
+            const toastr = getToastr();
+            toastr && typeof toastr.error === 'function' && toastr.error('Error deleting image');
             console.error('Error:', error);
             pendingDeleteData = null;
         });

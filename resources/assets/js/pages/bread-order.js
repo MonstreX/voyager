@@ -1,6 +1,6 @@
-let listenersAttached = false;
+import { getToastr } from '../core/toastr';
 
-const getToastr = () => window.toastr || (window.Voyager && window.Voyager.toastr) || null;
+let listenersAttached = false;
 
 const parseJsonConfig = () => {
     if (typeof document === 'undefined') return null;

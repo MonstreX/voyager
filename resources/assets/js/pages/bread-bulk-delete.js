@@ -1,4 +1,4 @@
-const getToastr = () => window.toastr || (window.Voyager && window.Voyager.toastr);
+import { getToastr } from '../core/toastr';
 
 const getSelectedIds = (tableSelector) => {
     const table = document.querySelector(tableSelector);

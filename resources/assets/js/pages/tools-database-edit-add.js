@@ -1,7 +1,7 @@
+import { getToastr } from '../core/toastr';
+
 let componentsRegistered = false;
 let mountedOnce = false;
-
-const getToastr = () => window.toastr || (window.Voyager && window.Voyager.toastr) || null;
 
 const parseJson = (elementId) => {
     if (typeof document === 'undefined') return null;

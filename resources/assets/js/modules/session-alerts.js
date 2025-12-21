@@ -1,3 +1,5 @@
+import { getToastr } from '../core/toastr';
+
 const parseJsonScript = (id) => {
     const el = document.getElementById(id);
     if (!el) return null;
@@ -15,7 +17,7 @@ export const initSessionAlerts = () => {
     if (!data) return;
 
     const helpers = window.helpers;
-    const toastr = window.toastr;
+    const toastr = getToastr();
 
     if (data.alerts && helpers && typeof helpers.displayAlerts === 'function') {
         helpers.displayAlerts(data.alerts, toastr);
@@ -31,4 +33,3 @@ export const initSessionAlerts = () => {
         }
     }
 };
-

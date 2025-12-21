@@ -1,4 +1,5 @@
 import { getCsrfToken } from '../modules/csrf';
+import { getToastr } from '../core/toastr';
 
 let listenersAttached = false;
 
@@ -14,8 +15,6 @@ const getEditAddConfig = () => {
         return null;
     }
 };
-
-const getToastr = () => window.toastr || (window.Voyager && window.Voyager.toastr);
 
 const assignDefaults = (config) => {
     if (typeof window.VoyagerInitToggles === 'function') {

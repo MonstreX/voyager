@@ -1,6 +1,7 @@
+import { getToastr } from '../core/toastr';
+
 let listenersAttached = false;
 
-const getToastr = () => window.toastr || (window.Voyager && window.Voyager.toastr) || null;
 const getBootstrap = () => (window.Voyager && window.Voyager.bootstrap) || window.VoyagerBootstrapCompat || null;
 
 const showModal = (modal) => {

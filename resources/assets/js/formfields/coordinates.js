@@ -1,6 +1,6 @@
-let vuePromise = null;
+import { getToastr } from '../core/toastr';
 
-const getToastr = () => window.toastr || (window.Voyager && window.Voyager.toastr) || null;
+let vuePromise = null;
 
 const resolveCallback = (path) => {
     if (!path) return null;
