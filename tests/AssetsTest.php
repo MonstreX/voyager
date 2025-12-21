@@ -15,6 +15,7 @@ class AssetsTest extends TestCase
         'resources/assets/js/vendor/ace.js',
         'ace-mode-json.js',
         'ace-theme-github.js',
+        'VoyagerInitMultilingual',
     ];
 
     public function setUp(): void

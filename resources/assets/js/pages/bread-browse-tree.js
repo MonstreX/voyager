@@ -1,5 +1,6 @@
 import { getCsrfToken } from '../modules/csrf';
 import { getToastr } from '../core/toastr';
+import { initMultilingual } from '../multilingual';
 
 let listenersAttached = false;
 
@@ -28,8 +29,8 @@ const postFormUrlEncoded = (url, params) => {
 };
 
 const initBrowseTreeOnce = (config) => {
-    if (config.isModelTranslatable && window.VoyagerInitMultilingual) {
-        window.VoyagerInitMultilingual('.side-body');
+    if (config.isModelTranslatable) {
+        initMultilingual('.side-body');
     }
 
     const nestableContainer = document.querySelector('.dd');

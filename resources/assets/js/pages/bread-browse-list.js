@@ -1,6 +1,7 @@
 import { getCsrfToken } from '../modules/csrf';
 import { showModal, hideModal } from '../core/bootstrap-compat';
 import { getToastr } from '../core/toastr';
+import { initMultilingual } from '../multilingual';
 
 let listenersAttached = false;
 
@@ -71,8 +72,8 @@ const initBrowseListOnce = () => {
         });
     }
 
-    if (config.isModelTranslatable && window.VoyagerInitMultilingual) {
-        window.VoyagerInitMultilingual('.side-body');
+    if (config.isModelTranslatable) {
+        initMultilingual('.side-body');
     }
 
     const groupModal = document.getElementById('group_inline_edit_modal');

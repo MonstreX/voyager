@@ -1,6 +1,7 @@
 import { getCsrfToken } from '../modules/csrf';
 import { showModal, hideModal } from '../core/bootstrap-compat';
 import { getToastr } from '../core/toastr';
+import { initMultilingual } from '../multilingual';
 
 let listenersAttached = false;
 
@@ -207,13 +208,12 @@ export const initMenusBuilder = () => {
 
     const initMultilingualSections = () => {
         if (!config.isModelTranslatable) return;
-        if (!window.VoyagerInitMultilingual) return;
 
-        window.VoyagerInitMultilingual('.side-body', {
+        initMultilingual('.side-body', {
             transInputs: '.dd-list input[data-i18n=true]',
         });
 
-        const modalInstance = window.VoyagerInitMultilingual('#menu_item_modal', {
+        const modalInstance = initMultilingual('#menu_item_modal', {
             form: 'form',
             transInputs: '#menu_item_modal input[data-i18n=true]',
             langSelectors: '#menu_item_modal .language-selector input',

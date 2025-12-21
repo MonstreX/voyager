@@ -1,5 +1,6 @@
 import { getToastr } from '../core/toastr';
 import { showModal } from '../core/bootstrap-compat';
+import { initMultilingual } from '../multilingual';
 
 let globalListenersAttached = false;
 let isDraggingBreadRow = false;
@@ -438,8 +439,8 @@ export const initToolsBreadEditAdd = () => {
 
     hideValidationAlerts();
 
-    if (config.flags?.isModelTranslatable && typeof window.VoyagerInitMultilingual === 'function') {
-        window.VoyagerInitMultilingual(document.querySelectorAll('.side-body'), {
+    if (config.flags?.isModelTranslatable) {
+        initMultilingual(document.querySelectorAll('.side-body'), {
             form: 'form',
             editing: true,
         });

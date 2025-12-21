@@ -1,3 +1,5 @@
+import { initMultilingual } from '../multilingual';
+
 let listenersAttached = false;
 
 const getBreadReadConfig = () => {
@@ -15,8 +17,8 @@ export const initBreadRead = () => {
     const config = getBreadReadConfig();
     if (!config) return;
 
-    if (config.isModelTranslatable && window.VoyagerInitMultilingual) {
-        window.VoyagerInitMultilingual(document.querySelectorAll('.side-body'));
+    if (config.isModelTranslatable) {
+        initMultilingual(document.querySelectorAll('.side-body'));
     }
 
     if (listenersAttached) return;
@@ -27,4 +29,3 @@ export const subscribeToEvents = (events) => {
     if (!events || typeof events.on !== 'function') return;
     events.on('dom:updated', () => initBreadRead());
 };
-

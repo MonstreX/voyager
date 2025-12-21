@@ -389,8 +389,4 @@ export const initMultilingual = (target, options = {}) => {
     return instances.length === 1 ? instances[0] : instances;
 };
 
-if (typeof window !== 'undefined') {
-    window.VoyagerInitMultilingual = initMultilingual;
-}
-
 export { VoyagerMultilingual };

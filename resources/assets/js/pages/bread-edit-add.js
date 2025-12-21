@@ -1,5 +1,6 @@
 import { getCsrfToken } from '../modules/csrf';
 import { getToastr } from '../core/toastr';
+import { initMultilingual } from '../multilingual';
 
 let listenersAttached = false;
 
@@ -20,8 +21,8 @@ const assignDefaults = (config) => {
     const init = window.Voyager && window.Voyager.init;
     if (init && typeof init.toggles === 'function') init.toggles();
     if (init && typeof init.datepickers === 'function') init.datepickers();
-    if (config.isModelTranslatable && typeof window.VoyagerInitMultilingual === 'function') {
-        window.VoyagerInitMultilingual(document.querySelectorAll('.side-body'), { editing: true });
+    if (config.isModelTranslatable) {
+        initMultilingual(document.querySelectorAll('.side-body'), { editing: true });
     }
     if (init && typeof init.slugify === 'function') {
         const selector = config.slugifySelector || '.side-body input[data-slug-origin]';
