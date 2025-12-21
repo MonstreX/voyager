@@ -4,8 +4,9 @@
 		<div class="modal-dialog relationship-panel">
 		    <div class="modal-content">
 		        <div class="modal-header">
-	                <button type="button" class="close" data-dismiss="modal"
-	                        aria-hidden="true">&times;</button>
+	                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
 	                <h4 class="modal-title"><i class="voyager-heart"></i> {{ \Illuminate\Support\Str::singular(ucfirst($table)) }}
 					{{ __('voyager::database.relationship.relationships') }} </h4>
 	            </div>
