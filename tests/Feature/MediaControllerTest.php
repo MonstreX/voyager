@@ -58,8 +58,9 @@ class MediaControllerTest extends TestCase
         ]);
 
         $response->assertStatus(200);
-        $response->assertJsonStructure(['status', 'media']);
+        $response->assertJsonStructure(['status', 'data' => ['media']]);
         $this->assertEquals('success', $response->json('status'));
+        $this->assertArrayNotHasKey('media', $response->json());
     }
 
     public function testUploadCreatesMediaRecord()
@@ -241,6 +242,10 @@ class MediaControllerTest extends TestCase
         ]);
 
         $response->assertStatus(422);
+        $response->assertJson([
+            'status' => 'error',
+            'code' => 'validation_failed',
+        ]);
     }
 
     public function testUploadWithInvalidModel()
@@ -254,5 +259,32 @@ class MediaControllerTest extends TestCase
         ]);
 
         $response->assertStatus(400);
+        $response->assertJson([
+            'status' => 'error',
+            'code' => 'invalid_model_type',
+        ]);
+    }
+
+    public function testUploadWithModelWithoutMediaTraitIsRejected()
+    {
+        $role = Role::create([
+            'name' => 'no-media-role',
+            'display_name' => 'No Media Role',
+        ]);
+
+        $file = UploadedFile::fake()->create('test.bin', 10, 'application/octet-stream');
+
+        $response = $this->call('POST', '/admin/api/media/upload', [
+            'file' => $file,
+            'model_type' => Role::class,
+            'model_id' => $role->id,
+            'collection_name' => 'featured',
+        ]);
+
+        $response->assertStatus(400);
+        $response->assertJson([
+            'status' => 'error',
+            'code' => 'invalid_model_type',
+        ]);
     }
 }

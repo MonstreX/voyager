@@ -85,8 +85,7 @@ class MediaController extends Controller
             return $this->apiSuccessResponse(
                 ['media' => $media],
                 null,
-                200,
-                ['media' => $media]
+                200
             );
         } catch (ValidationException $e) {
             return $this->apiErrorCodeResponse('validation_failed', 'Validation failed', 422, ['errors' => $e->errors()]);
@@ -124,7 +123,7 @@ class MediaController extends Controller
                 'full_url' => $media->fullUrl(),
             ];
 
-            return $this->apiSuccessResponse(['media' => $payload], null, 200, ['media' => $payload]);
+            return $this->apiSuccessResponse(['media' => $payload], null, 200);
         } catch (ModelNotFoundException $e) {
             return $this->apiErrorCodeResponse('media_not_found', 'Not found', 404);
         } catch (AuthorizationException $e) {
@@ -175,8 +174,7 @@ class MediaController extends Controller
             return $this->apiSuccessResponse(
                 ['media' => $media],
                 __('voyager::generic.successfully_updated'),
-                200,
-                ['media' => $media]
+                200
             );
         } catch (ModelNotFoundException $e) {
             return $this->apiErrorCodeResponse('media_not_found', 'Not found', 404);
