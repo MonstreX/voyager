@@ -407,6 +407,16 @@
 </template>
 <script type="application/json" id="voyager-media-manager-config">@json($voyagerMediaManagerConfig)</script>
 
+@include('voyager::components.modal-confirm', [
+    'id' => 'media_crop_override_modal',
+    'title' => __('voyager::generic.are_you_sure'),
+    'message' => __('voyager::media.crop_override_confirm'),
+    'confirmText' => __('voyager::generic.yes_please'),
+    'confirmClass' => 'btn-warning',
+    'icon' => 'voyager-warning',
+    'modalClass' => 'modal-warning'
+])
+
 <script type="text/plain" data-voyager-media-manager-legacy>
     const voyagerMediaCsrfMeta = document.querySelector('meta[name="csrf-token"]');
     const voyagerMediaCsrfToken = voyagerMediaCsrfMeta ? voyagerMediaCsrfMeta.getAttribute('content') : '';
@@ -994,11 +1004,7 @@
                 if (!this.allowCrop) {
                     return;
                 }
-                if (!mode) {
-                    if (!window.confirm('{{ __('voyager::media.crop_override_confirm') }}')) {
-						return;
-					}
-                }
+                // Confirmation handled by app bundle (resources/assets/js/pages/media-manager.js)
 
                 croppedData.originImageName = this.selected_file.name;
 				croppedData.upload_path = this.current_folder;

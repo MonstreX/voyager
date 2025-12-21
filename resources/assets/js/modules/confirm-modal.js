@@ -179,3 +179,50 @@ export function attachConfirmDelegates() {
         showConfirmModal(modal);
     });
 }
+
+export function confirmAction(modal, { confirmName } = {}) {
+    if (!modal) {
+        return Promise.resolve(false);
+    }
+
+    const acceptButton = modal.querySelector('[data-voyager-confirm-accept]');
+    if (!acceptButton) {
+        return Promise.resolve(false);
+    }
+
+    cleanupModalHandler(modal);
+
+    const nameSpan = modal.querySelector('.confirm_delete_name');
+    if (nameSpan && confirmName) {
+        nameSpan.textContent = confirmName;
+    }
+
+    let accepted = false;
+    let finished = false;
+
+    return new Promise((resolve) => {
+        const finish = (result) => {
+            if (finished) return;
+            finished = true;
+            resolve(result);
+        };
+
+        const hiddenHandler = () => {
+            modal.removeEventListener('hidden.bs.modal', hiddenHandler);
+            cleanupModalHandler(modal);
+            finish(accepted);
+        };
+
+        modal.addEventListener('hidden.bs.modal', hiddenHandler);
+
+        const acceptHandler = () => {
+            accepted = true;
+            hideConfirmModal(modal);
+        };
+
+        acceptButton.addEventListener('click', acceptHandler);
+        activeHandlers.set(modal, { acceptButton, acceptHandler });
+
+        showConfirmModal(modal);
+    });
+}

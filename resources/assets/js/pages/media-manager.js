@@ -1,6 +1,7 @@
 import { getCsrfToken } from '../modules/csrf';
 import { showModal, hideModal } from '../core/bootstrap-compat';
 import { postJson } from '../core/http';
+import { confirmAction } from '../modules/confirm-modal';
 
 let componentRegistered = false;
 
@@ -595,12 +596,15 @@ const registerComponent = (Vue, templateHtml, config) => {
                         toastr && toastr.error(i18n.errorMoving || '', i18n.whoopsie || '');
                     });
             },
-            crop: function (mode) {
+            crop: async function (mode) {
                 if (!this.allowCrop) {
                     return;
                 }
+                // overwritten crop needs explicit confirmation
                 if (!mode) {
-                    if (!window.confirm(i18n.cropOverrideConfirm || 'Are you sure?')) {
+                    const modal = document.getElementById('media_crop_override_modal');
+                    const confirmed = await confirmAction(modal);
+                    if (!confirmed) {
                         return;
                     }
                 }
