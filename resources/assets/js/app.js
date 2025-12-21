@@ -245,7 +245,8 @@ window.Voyager.withVue = (callback) => {
 
 // Core utilities
 window.Voyager.helpers = helpers;
-window.Voyager.toastr = new VoyagerToaster();
+const voyagerToastr = new VoyagerToaster();
+window.Voyager.toastr = voyagerToastr;
 window.Voyager.Cropper = Cropper;
 window.Voyager.Sortable = Sortable;
 
@@ -340,7 +341,7 @@ window.VoyagerInitSimpleTables = initSimpleTables;
 window.VoyagerInitSlugify = initSlugifyFields;
 window.helpers = helpers;
 window.Cropper = Cropper;
-window.toastr = new VoyagerToaster();
+window.toastr = voyagerToastr;
 window.Sortable = Sortable;
 
 
