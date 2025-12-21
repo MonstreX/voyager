@@ -71,39 +71,3 @@ if (typeof window.Voyager.withVue !== 'function') {
         });
     };
 }
-
-window.__voyagerDeprecationWarned = window.__voyagerDeprecationWarned || {};
-function warnDeprecated(api, replacement) {
-    if (window.__voyagerDeprecationWarned[api]) {
-        return;
-    }
-    window.__voyagerDeprecationWarned[api] = true;
-    if (window.console && typeof window.console.warn === 'function') {
-        window.console.warn('[Voyager] ' + api + ' is deprecated. Use ' + replacement + ' instead.');
-    }
-}
-
-window.whenAppReady = function(callback) {
-    warnDeprecated('whenAppReady()', 'Voyager.ready.app.then');
-    window.Voyager.ready.app.then(callback);
-};
-
-window.whenVueReady = function(callback) {
-    warnDeprecated('whenVueReady()', 'Voyager.loadVue().then');
-    window.Voyager.withVue(function() {
-        if (typeof callback === 'function') {
-            callback();
-        }
-    });
-};
-
-window.whenEditorsReady = function(callback) {
-    warnDeprecated('whenEditorsReady()', 'Voyager.loadEditors().then');
-    var loader = window.Voyager && typeof window.Voyager.loadEditors === 'function'
-        ? window.Voyager.loadEditors()
-        : Promise.resolve();
-    loader.then(function() {
-        return window.Voyager.ready.editors;
-    }).then(callback);
-};
-
