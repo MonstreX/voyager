@@ -1,18 +1,12 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
-import { viteStaticCopy } from 'vite-plugin-static-copy';
 import inject from '@rollup/plugin-inject';
 import path from 'path';
 
 export default defineConfig({
   base: '/vendor/voyager/',
   plugins: [
-    vue(),
-    viteStaticCopy({
-      targets: [
-        { src: 'node_modules/ace-builds/src-noconflict', dest: 'js/ace/libs' }
-      ]
-    })
+    vue()
   ],
   build: {
     outDir: 'publishable/assets',
