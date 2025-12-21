@@ -5,7 +5,6 @@
     $confirmText = $confirmText ?? __('voyager::generic.delete_confirm');
     $cancelText = $cancelText ?? __('voyager::generic.cancel');
     $confirmClass = trim(($confirmClass ?? 'btn-danger').' '.($confirmButtonClass ?? ''));
-    $confirmButtonId = $confirmButtonId ?? null;
     $icon = $icon ?? 'voyager-trash';
     $modalClass = $modalClass ?? 'modal-danger';
 @endphp
@@ -34,8 +33,6 @@
                         class="btn {{ $confirmClass }} pull-right"
                         @if(!empty($bindConfirmButtonId))
                             :id="{{ $bindConfirmButtonId }}"
-                        @elseif($confirmButtonId)
-                            id="{{ $confirmButtonId }}"
                         @endif
                         data-voyager-confirm-accept>
                     {{ $confirmText }}
