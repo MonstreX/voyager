@@ -24,7 +24,6 @@ export default defineConfig({
         auth: 'resources/assets/js/auth.js',
         'vue-bundle': 'resources/assets/js/vue-bundle.js',
         editors: 'resources/assets/js/editors.js',
-        ga: 'resources/assets/js/ga.js'
       },
       output: {
         entryFileNames: 'js/[name].js',
