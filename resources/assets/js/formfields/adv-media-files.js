@@ -85,10 +85,11 @@ const buildUpdatePropsUrl = (mediaUrl) => `${mediaUrl.replace(/\/$/, '')}/props`
 const buildCropUrl = (mediaUrl) => `${mediaUrl.replace(/\/$/, '')}/crop`;
 
 const bindSortable = (listEl) => {
-    if (typeof Sortable === 'undefined') {
+    const SortableLib = window.Voyager && window.Voyager.Sortable;
+    if (!SortableLib || typeof SortableLib.create !== 'function') {
         return;
     }
-    Sortable.create(listEl, {
+    SortableLib.create(listEl, {
         animation: 200,
         sort: true,
         scroll: true,
@@ -200,12 +201,6 @@ const bindList = (listEl) => {
                     };
                 },
             });
-
-            setTimeout(() => {
-                if (cropper && typeof cropper.resize === 'function') {
-                    cropper.resize();
-                }
-            }, 0);
 
             if (cropAspectEl) {
                 const raw = cropAspectEl.value;
