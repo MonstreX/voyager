@@ -410,11 +410,12 @@ const bindList = (listEl) => {
             })
                 .then((response) => response.json())
                 .then((data) => {
-                    if (!data || data.status !== 'success' || !data.media) {
+                    const media = data && data.data && data.data.media ? data.data.media : null;
+                    if (!data || data.status !== 'success' || !media) {
                         throw new Error(data && data.message ? data.message : 'Failed to load media props');
                     }
 
-                    const props = (data.media.props && typeof data.media.props === 'object') ? data.media.props : {};
+                    const props = (media.props && typeof media.props === 'object') ? media.props : {};
                     loadedProps.set(mediaId, props);
 
                     const titleInput = propsModal.querySelector('.modal-prop-title');
