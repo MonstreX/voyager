@@ -1,42 +1,15 @@
-const getBootstrapCompat = () => window.VoyagerBootstrapCompat || (window.Voyager && window.Voyager.bootstrap);
+import { showModal, hideModal } from '../core/bootstrap-compat';
 
 const activeHandlers = new WeakMap();
 
 export function showConfirmModal(modal) {
-    const compat = getBootstrapCompat();
     if (!modal) return;
-    if (compat && typeof compat.showModal === 'function') {
-        compat.showModal(modal);
-    } else {
-        // Minimal fallback for plain DOM
-        modal.classList.add('in');
-        modal.style.display = 'block';
-        modal.setAttribute('aria-hidden', 'false');
-        const backdrop = document.createElement('div');
-        backdrop.className = 'modal-backdrop fade in';
-        backdrop.dataset.modalTarget = modal.id || '';
-        document.body.appendChild(backdrop);
-        document.body.classList.add('modal-open');
-    }
+    showModal(modal);
 }
 
 export function hideConfirmModal(modal) {
-    const compat = getBootstrapCompat();
     if (!modal) return;
-    if (compat && typeof compat.hideModal === 'function') {
-        compat.hideModal(modal);
-    } else {
-        modal.classList.remove('in');
-        modal.style.display = 'none';
-        modal.setAttribute('aria-hidden', 'true');
-        const backdrop = modal.id ? document.querySelector(`.modal-backdrop[data-modal-target="${modal.id}"]`) : null;
-        if (backdrop) {
-            backdrop.remove();
-        }
-        if (!document.querySelector('.modal.in')) {
-            document.body.classList.remove('modal-open');
-        }
-    }
+    hideModal(modal);
 }
 
 const cleanupModalHandler = (modal) => {
