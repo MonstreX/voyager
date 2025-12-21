@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use TCG\Voyager\Models\Media;
 use TCG\Voyager\Media\ImageProcessor;
-use TCG\Voyager\Services\MediaService;
+use TCG\Voyager\Services\Media\MediaService;
 use Illuminate\Support\Facades\Storage;
 use TCG\Voyager\Traits\HasMedia;
 use Throwable;

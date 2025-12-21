@@ -112,7 +112,7 @@ It uses the same disk setting as Voyager storage by default (`voyager.storage.di
 
 ### Optional: custom path generator for stored media files
 
-`TCG\Voyager\Services\MediaService` can read an optional config key:
+`TCG\Voyager\Services\Media\MediaService` can read an optional config key:
 
 ```php
 'media' => [

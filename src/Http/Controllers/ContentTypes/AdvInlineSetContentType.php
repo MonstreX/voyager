@@ -2,7 +2,7 @@
 
 namespace TCG\Voyager\Http\Controllers\ContentTypes;
 
-use TCG\Voyager\Services\MediaService;
+use TCG\Voyager\Services\Media\MediaService;
 
 class AdvInlineSetContentType extends BaseType
 {

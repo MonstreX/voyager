@@ -5,7 +5,7 @@ namespace TCG\Voyager\Http\Controllers;
 use Illuminate\Http\Request;
 use TCG\Voyager\Facades\Voyager;
 use Illuminate\Support\Facades\Log;
-use TCG\Voyager\Services\ModelInlineUpdateService;
+use TCG\Voyager\Services\Models\ModelInlineUpdateService;
 use Throwable;
 
 class VoyagerModelController extends Controller

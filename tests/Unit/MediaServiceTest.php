@@ -7,7 +7,7 @@ use TCG\Voyager\Models\Media;
 use TCG\Voyager\Models\Post;
 use TCG\Voyager\Models\Role;
 use TCG\Voyager\Models\User;
-use TCG\Voyager\Services\MediaService;
+use TCG\Voyager\Services\Media\MediaService;
 use TCG\Voyager\Tests\TestCase;
 
 class MediaServiceTest extends TestCase

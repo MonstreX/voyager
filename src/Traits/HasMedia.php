@@ -4,7 +4,7 @@ namespace TCG\Voyager\Traits;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 use TCG\Voyager\Models\Media;
-use TCG\Voyager\Services\MediaService;
+use TCG\Voyager\Services\Media\MediaService;
 
 trait HasMedia
 {
@@ -64,6 +64,6 @@ trait HasMedia
 
     public function addMedia($file, $collectionName = 'default')
     {
-        return new \TCG\Voyager\Services\MediaUploadService($this, $collectionName, $file);
+        return new \TCG\Voyager\Services\Media\MediaUploadService($this, $collectionName, $file);
     }
 }

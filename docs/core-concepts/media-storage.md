@@ -56,7 +56,7 @@ If you need different semantics (e.g. keep files on soft delete), override the m
 ### 3.1 Create a media record from an uploaded file
 
 ```php
-$media = app(\TCG\Voyager\Services\MediaService::class)
+$media = app(\TCG\Voyager\Services\Media\MediaService::class)
     ->createFromFile($post, $request->file('cover'), 'cover');
 ```
 
@@ -75,21 +75,21 @@ $media = $post
 ### 3.3 Update props
 
 ```php
-app(\TCG\Voyager\Services\MediaService::class)
+app(\TCG\Voyager\Services\Media\MediaService::class)
     ->updateMediaProps($media, ['title' => 'New title']);
 ```
 
 ### 3.4 Replace the file but keep the same media record
 
 ```php
-app(\TCG\Voyager\Services\MediaService::class)
+app(\TCG\Voyager\Services\Media\MediaService::class)
     ->replaceMediaFile($media, $request->file('replacement'));
 ```
 
 ### 3.5 Reorder a collection
 
 ```php
-app(\TCG\Voyager\Services\MediaService::class)
+app(\TCG\Voyager\Services\Media\MediaService::class)
     ->reorderCollection($post, 'gallery', [12, 8, 15]);
 ```
 
@@ -113,7 +113,7 @@ Name collisions are resolved by appending an incrementing suffix.
 `MediaService` reads an optional config key:
 
 ```php
-config('voyager.media.path_generator', \TCG\Voyager\Services\PathGeneratorService::class)
+config('voyager.media.path_generator', \TCG\Voyager\Services\Media\PathGeneratorService::class)
 ```
 
 To override:
