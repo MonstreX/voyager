@@ -193,9 +193,6 @@ const registerEditorsApi = () => {
         initJodit,
         initAceEditors
     });
-
-    window.VoyagerInitJodit = initJodit;
-    window.VoyagerInitAceEditors = initAceEditors;
 };
 
 registerEditorsApi();
@@ -214,6 +211,3 @@ if (typeof window !== 'undefined' && typeof window.__resolveEditorsReady === 'fu
     window.__resolveEditorsReady();
 }
 
-if (typeof document !== 'undefined') {
-    document.dispatchEvent(new CustomEvent('voyager:editors-ready'));
-}

@@ -33,17 +33,19 @@ const initBrowseTreeOnce = (config) => {
     }
 
     const nestableContainer = document.querySelector('.dd');
-    if (!nestableContainer || !window.VoyagerInitNestable) return;
+    const initNestable = window.Voyager && window.Voyager.init && window.Voyager.init.nestable;
+    if (!nestableContainer || typeof initNestable !== 'function') return;
 
     if (nestableContainer.dataset.voyagerNestableInit === '1') return;
     nestableContainer.dataset.voyagerNestableInit = '1';
 
-    window.VoyagerInitNestable(nestableContainer, { handle: '.dd-tree-handle' });
+    initNestable(nestableContainer, { handle: '.dd-tree-handle' });
 
     nestableContainer.addEventListener('voyager.sortable.updated', (event) => {
+        const serialize = window.Voyager && window.Voyager.serializeNestable;
         const structure = event.detail && event.detail.structure
             ? event.detail.structure
-            : (window.VoyagerSerializeNestable ? window.VoyagerSerializeNestable(nestableContainer) : []);
+            : (serialize ? serialize(nestableContainer) : []);
 
         const params = new URLSearchParams();
         params.append('slug', config.slug || '');

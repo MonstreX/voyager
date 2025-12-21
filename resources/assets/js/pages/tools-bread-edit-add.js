@@ -60,7 +60,8 @@ const sortBreadItems = () => {
 
 const initBreadItemsSortable = () => {
     const container = document.getElementById('bread-items');
-    if (!container || typeof window.Sortable === 'undefined') {
+    const Sortable = window.Voyager && window.Voyager.Sortable;
+    if (!container || typeof Sortable === 'undefined') {
         return;
     }
 
@@ -93,7 +94,7 @@ const initBreadItemsSortable = () => {
             });
         };
 
-        container._voyagerSortable = window.Sortable.create(container, {
+        container._voyagerSortable = Sortable.create(container, {
             handle: '.handler',
             animation: 150,
             ghostClass: 'bread-sortable-ghost',
@@ -341,8 +342,9 @@ const populateRowsFromTable = (dropdown, config) => {
 
             container.querySelectorAll('.rowDrop').forEach((select) => {
                 const selectedValue = select.dataset.selected || '';
-                if (window.VoyagerSelectSetOptions) {
-                    window.VoyagerSelectSetOptions(select, options, selectedValue);
+                const setSelectOptions = window.Voyager && window.Voyager.setSelectOptions;
+                if (typeof setSelectOptions === 'function') {
+                    setSelectOptions(select, options, selectedValue);
                     if (selectedValue) {
                         select.dispatchEvent(new Event('change', { bubbles: true }));
                     }
@@ -458,12 +460,9 @@ export const initToolsBreadEditAdd = () => {
 
         initRelationshipControls(config);
 
-        if (typeof window.VoyagerInitToggles === 'function') {
-            window.VoyagerInitToggles();
-        }
-        if (typeof window.VoyagerInitTooltips === 'function') {
-            window.VoyagerInitTooltips(document.querySelectorAll('[data-toggle="tooltip"]'));
-        }
+        const init = window.Voyager && window.Voyager.init;
+        if (init && typeof init.toggles === 'function') init.toggles();
+        if (init && typeof init.tooltips === 'function') init.tooltips(document.querySelectorAll('[data-toggle="tooltip"]'));
     } else {
         initRelationshipControls(config);
     }

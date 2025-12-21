@@ -23,9 +23,8 @@ export const initRolesEditAdd = () => {
     const config = parseJsonConfig();
     if (!config) return;
 
-    if (typeof window.VoyagerInitToggles === 'function') {
-        window.VoyagerInitToggles();
-    }
+    const init = window.Voyager && window.Voyager.init;
+    if (init && typeof init.toggles === 'function') init.toggles();
 
     if (listenersAttached) {
         return;
@@ -82,4 +81,3 @@ export const subscribeToEvents = (events) => {
     if (!events || typeof events.on !== 'function') return;
     events.on('dom:updated', () => initRolesEditAdd());
 };
-

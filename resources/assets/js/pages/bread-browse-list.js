@@ -64,8 +64,9 @@ const initBrowseListOnce = () => {
         document.querySelectorAll('#search-input select').forEach((select) => {
             if (select.dataset.voyagerDisableSearch === 'true') return;
             select.dataset.voyagerDisableSearch = 'true';
-            if (window.VoyagerSelectRefresh) {
-                window.VoyagerSelectRefresh(select);
+            const refreshSelect = window.Voyager && window.Voyager.refresh && window.Voyager.refresh.select;
+            if (typeof refreshSelect === 'function') {
+                refreshSelect(select);
             }
         });
     }

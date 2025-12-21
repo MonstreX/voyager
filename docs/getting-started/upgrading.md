@@ -14,7 +14,7 @@ And then run `composer update`
 
 Voyager no longer ships TinyMCE. The `rich_text_box` field now mounts [Jodit Editor](https://xdsoft.net/jodit/), so any legacy `window.voyagerTinyMCE...` customizations will stop working.
 
-If you previously injected custom TinyMCE scripts/options, remove them and use the new `window.VoyagerInitJodit` hook instead (documented in the Rich Text form field guide).
+If you previously injected custom TinyMCE scripts/options, remove them and use the new lazy-loaded editors API instead: `Voyager.loadEditors().then(({ initJodit }) => initJodit(...))` (documented in the Rich Text form field guide).
 
 ### Troubleshooting
 

@@ -169,7 +169,8 @@ const markRowMediaDeleted = (rowEl) => {
 };
 
 const initMediaSortables = (container) => {
-    if (!window.Sortable) {
+    const Sortable = window.Voyager && window.Voyager.Sortable;
+    if (!Sortable) {
         return;
     }
     container.querySelectorAll('.adv-inline-set-media-list').forEach((mediaList) => {
@@ -177,7 +178,7 @@ const initMediaSortables = (container) => {
             return;
         }
         mediaList.dataset.sortableInitialized = 'true';
-        window.Sortable.create(mediaList, {
+        Sortable.create(mediaList, {
             animation: 200,
             sort: true,
             scroll: true,
@@ -188,12 +189,13 @@ const initMediaSortables = (container) => {
 };
 
 const initRowSortable = (listEl) => {
-    if (!window.Sortable || listEl.dataset.sortableInitialized === 'true') {
+    const Sortable = window.Voyager && window.Voyager.Sortable;
+    if (!Sortable || listEl.dataset.sortableInitialized === 'true') {
         return;
     }
     listEl.dataset.sortableInitialized = 'true';
 
-    window.Sortable.create(listEl, {
+    Sortable.create(listEl, {
         animation: 200,
         sort: true,
         scroll: true,

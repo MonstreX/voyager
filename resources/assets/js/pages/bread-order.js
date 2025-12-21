@@ -30,20 +30,20 @@ export const initBreadOrder = () => {
     if (!listenersAttached) {
         listenersAttached = true;
 
-        if (window.VoyagerInitNestable) {
-            window.VoyagerInitNestable(breadNestable, {
+        const initNestable = window.Voyager && window.Voyager.init && window.Voyager.init.nestable;
+        if (typeof initNestable === 'function') {
+            initNestable(breadNestable, {
                 handle: '.dd-tree-handle',
                 allowChildren: false,
             });
         }
 
         breadNestable.addEventListener('voyager.sortable.updated', (event) => {
+            const serialize = window.Voyager && window.Voyager.serializeNestable;
             const structure =
                 event.detail && event.detail.structure
                     ? event.detail.structure
-                    : window.VoyagerSerializeNestable
-                        ? window.VoyagerSerializeNestable(breadNestable)
-                        : [];
+                    : (serialize ? serialize(breadNestable) : []);
 
             const payload = new URLSearchParams();
             payload.append('order', JSON.stringify(structure));

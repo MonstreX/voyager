@@ -21,10 +21,7 @@ php artisan vendor:publish --tag=voyager_assets --force
 Jodit and Ace are shipped as a separate bundle (`js/editors.js`) and are loaded only when needed.
 
 - Global loader: `window.Voyager.loadEditors()`
-- Ready signal: `voyager:editors-ready` DOM event
-- Global helpers:
-  - `window.VoyagerInitJodit(selector, options)`
-  - `window.VoyagerInitAceEditors(scope)`
+- Usage: `Voyager.loadEditors().then(({ initJodit, initAceEditors }) => { ... })`
 
 ## Jodit (rich text)
 
@@ -51,4 +48,3 @@ Typical options:
 Notes:
 - Ace base path is published into `public/vendor/voyager/js/ace/libs`.
 - To avoid slow DOM updates during drag-and-drop operations, some UIs hide `.ace_editor` while a Sortable item is being dragged.
-

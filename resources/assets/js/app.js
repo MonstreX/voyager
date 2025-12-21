@@ -321,30 +321,6 @@ subscribeRichTextBoxes(voyagerEvents);
 subscribeCoordinatesFields(voyagerEvents);
 subscribeCoordinatesReadMaps(voyagerEvents);
 
-// Legacy Global Exports (keep for backward compatibility)
-window.VoyagerBootstrapCompat = { init: initBootstrapCompat, showModal, hideModal };
-window.VoyagerInitTooltips = initTooltips;
-window.VoyagerInitDatePickers = initDatePickers;
-window.VoyagerDestroyDatePicker = destroyDatePicker;
-window.VoyagerRefreshDatePicker = refreshDatePicker;
-window.VoyagerInitToggles = initToggleSwitches;
-window.VoyagerDestroyToggle = destroyToggleSwitch;
-window.VoyagerRefreshToggle = refreshToggleSwitch;
-window.VoyagerInitSelects = initVoyagerSelects;
-window.VoyagerSelectRefresh = refreshVoyagerSelect;
-window.VoyagerSelectSetOptions = setVoyagerSelectOptions;
-window.VoyagerInitMatchHeight = initMatchHeight;
-window.VoyagerInitNestable = initNestable;
-window.VoyagerSerializeNestable = serializeNestable;
-window.VoyagerSimpleTable = SimpleTable;
-window.VoyagerInitSimpleTables = initSimpleTables;
-window.VoyagerInitSlugify = initSlugifyFields;
-window.helpers = helpers;
-window.Cropper = Cropper;
-window.toastr = voyagerToastr;
-window.Sortable = Sortable;
-
-
 document.addEventListener('DOMContentLoaded', () => {
     // Init Core
     initBootstrapCompat();
@@ -381,8 +357,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initCoordinatesReadMaps();
 
     // Init Modules
-    if (window.VoyagerInitSlugify) {
-        window.VoyagerInitSlugify('.side-body input[data-slug-origin]');
+    if (window.Voyager && window.Voyager.init && typeof window.Voyager.init.slugify === 'function') {
+        window.Voyager.init.slugify('.side-body input[data-slug-origin]');
     }
 
     initSessionAlerts();

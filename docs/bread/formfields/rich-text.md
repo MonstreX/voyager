@@ -3,8 +3,8 @@
 Voyager ships the [`rich_text_box`](../../bread/fields.md#rich_text_box) field with [Jodit Editor](https://xdsoft.net/jodit/).  
 The editor is lazy-loaded through `js/editors.js`, so it only loads when a page contains a rich text area.
 
-On load, Voyager will call the global helper `window.VoyagerInitJodit(selector, options)` for every textarea with the `richTextBox` class.
-This function accepts a CSS selector and a plain object with any Jodit configuration you would like to override.
+On load, Voyager will call `Voyager.loadEditors()` and then initialize Jodit for every textarea with the `richTextBox` class.
+You can customize the initialization by calling the exported `initJodit(selector, options)` function yourself.
 
 ## Customizing the default options
 
@@ -25,16 +25,16 @@ You can override any of the defaults by defining an `options` object:
 
 Voyager will merge the properties above with the safe defaults (`type_slug`, `upload_url`, Ace settings, etc.) before initializing Jodit.
 
-## Hooking into the global helper
+## Hooking into initialization
 
 If you need to adjust behaviour before the editors are mounted (for example for all rich text fields),
-listen for the `voyager:editors-ready` event and call `window.VoyagerInitJodit` yourself:
+call `Voyager.loadEditors()` and then `initJodit` yourself:
 
 ```blade
 @push('javascript')
 <script type="module">
-document.addEventListener('voyager:editors-ready', () => {
-    window.VoyagerInitJodit('textarea.richTextBox', {
+Voyager.loadEditors().then(({ initJodit }) => {
+    initJodit('textarea.richTextBox', {
         toolbarAdaptive: true,
         buttons: [
             'bold', 'italic', 'underline', '|',
@@ -48,5 +48,5 @@ document.addEventListener('voyager:editors-ready', () => {
 @endpush
 ```
 
-> **Note:** `window.VoyagerInitJodit` can be called multiple times with different selectors if you need per-field overrides.
+> **Note:** `initJodit` can be called multiple times with different selectors if you need per-field overrides.
 > The helper checks for already-initialized instances and will skip them automatically.

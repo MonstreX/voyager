@@ -37,13 +37,14 @@ const postForm = (url, params) => {
 const scheduleToggleRefresh = (() => {
     let pending = false;
     return (input) => {
-        if (!input || typeof window.VoyagerRefreshToggle !== 'function') return;
+        const refreshToggle = window.Voyager && window.Voyager.refresh && window.Voyager.refresh.toggle;
+        if (!input || typeof refreshToggle !== 'function') return;
         if (pending) return;
         pending = true;
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
                 pending = false;
-                window.VoyagerRefreshToggle(input);
+                refreshToggle(input);
             });
         });
     };
@@ -318,12 +319,14 @@ export const initMenusBuilder = () => {
         });
 
         const menuNestable = document.querySelector('.dd');
-        if (menuNestable && window.VoyagerInitNestable) {
-            window.VoyagerInitNestable(menuNestable, { handle: '.dd-tree-handle' });
+        const initNestable = window.Voyager && window.Voyager.init && window.Voyager.init.nestable;
+        if (menuNestable && typeof initNestable === 'function') {
+            initNestable(menuNestable, { handle: '.dd-tree-handle' });
             menuNestable.addEventListener('voyager.sortable.updated', (event) => {
+                const serialize = window.Voyager && window.Voyager.serializeNestable;
                 const structure = event.detail && event.detail.structure
                     ? event.detail.structure
-                    : (window.VoyagerSerializeNestable ? window.VoyagerSerializeNestable(menuNestable) : []);
+                    : (serialize ? serialize(menuNestable) : []);
 
                 const payload = new URLSearchParams();
                 payload.append('order', JSON.stringify(structure));

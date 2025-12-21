@@ -17,22 +17,17 @@ const getEditAddConfig = () => {
 };
 
 const assignDefaults = (config) => {
-    if (typeof window.VoyagerInitToggles === 'function') {
-        window.VoyagerInitToggles();
-    }
-    if (typeof window.VoyagerInitDatePickers === 'function') {
-        window.VoyagerInitDatePickers();
-    }
+    const init = window.Voyager && window.Voyager.init;
+    if (init && typeof init.toggles === 'function') init.toggles();
+    if (init && typeof init.datepickers === 'function') init.datepickers();
     if (config.isModelTranslatable && typeof window.VoyagerInitMultilingual === 'function') {
         window.VoyagerInitMultilingual(document.querySelectorAll('.side-body'), { editing: true });
     }
-    if (typeof window.VoyagerInitSlugify === 'function') {
+    if (init && typeof init.slugify === 'function') {
         const selector = config.slugifySelector || '.side-body input[data-slug-origin]';
-        window.VoyagerInitSlugify(document.querySelectorAll(selector));
+        init.slugify(document.querySelectorAll(selector));
     }
-    if (typeof window.VoyagerInitTooltips === 'function') {
-        window.VoyagerInitTooltips(document.querySelectorAll('[data-toggle="tooltip"]'));
-    }
+    if (init && typeof init.tooltips === 'function') init.tooltips(document.querySelectorAll('[data-toggle="tooltip"]'));
 };
 
 const findSibling = (container, selector) => {

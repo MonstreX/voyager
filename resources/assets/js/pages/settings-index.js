@@ -131,9 +131,8 @@ export const initSettingsIndex = () => {
         initDeleteValueLinks();
     }
 
-    if (typeof window.VoyagerInitToggles === 'function') {
-        window.VoyagerInitToggles();
-    }
+    const init = window.Voyager && window.Voyager.init;
+    if (init && typeof init.toggles === 'function') init.toggles();
 };
 
 export const subscribeToEvents = (events) => {

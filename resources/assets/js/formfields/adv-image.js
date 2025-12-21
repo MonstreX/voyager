@@ -122,13 +122,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
         cropState.shownHandler = function() {
             destroyCropper();
-            if (typeof window.Cropper === 'undefined') {
+            const Cropper = window.Voyager && window.Voyager.Cropper;
+            if (typeof Cropper === 'undefined') {
                 const toastr = getToastr();
                 toastr && toastr.error('Cropper is not available');
                 return;
             }
 
-            cropState.cropper = new window.Cropper(modalImg, {
+            cropState.cropper = new Cropper(modalImg, {
                 viewMode: 1,
                 responsive: true,
                 background: false,

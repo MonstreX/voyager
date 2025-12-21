@@ -1,5 +1,5 @@
 export function getToastr() {
-    return window.toastr || (window.Voyager && window.Voyager.toastr) || null;
+    return (window.Voyager && window.Voyager.toastr) || null;
 }
 
 export function toast(type, message, title) {
@@ -16,4 +16,3 @@ export function toast(type, message, title) {
 
     handler.call(toastr, message, title);
 }
-

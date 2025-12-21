@@ -16,7 +16,7 @@ export const initSessionAlerts = () => {
     const data = parseJsonScript('voyager-session-alerts');
     if (!data) return;
 
-    const helpers = window.helpers;
+    const helpers = window.Voyager && window.Voyager.helpers;
     const toastr = getToastr();
 
     if (data.alerts && helpers && typeof helpers.displayAlerts === 'function') {

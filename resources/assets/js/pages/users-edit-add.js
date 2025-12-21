@@ -21,13 +21,11 @@ export const initUsersEditAdd = () => {
         listenersAttached = true;
     }
 
-    if (typeof window.VoyagerInitToggles === 'function') {
-        window.VoyagerInitToggles();
-    }
+    const init = window.Voyager && window.Voyager.init;
+    if (init && typeof init.toggles === 'function') init.toggles();
 };
 
 export const subscribeToEvents = (events) => {
     if (!events || typeof events.on !== 'function') return;
     events.on('dom:updated', () => initUsersEditAdd());
 };
-

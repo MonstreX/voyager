@@ -314,7 +314,7 @@ export const serializeNestable = (target) => {
 
 export const initNestable = (target, options = {}) => {
     const containers = resolveNestableTargets(target);
-    logNestable('VoyagerInitNestable call', { target, resolvedCount: containers.length, options });
+    logNestable('nestable init', { target, resolvedCount: containers.length, options });
     const instances = containers
         .map((container) => initNestableContainer(container, options))
         .filter(Boolean);

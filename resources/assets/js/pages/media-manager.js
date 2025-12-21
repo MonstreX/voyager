@@ -968,11 +968,12 @@ const registerComponent = (Vue, templateHtml, config) => {
                             console.warn('Voyager media: cropping image element not found');
                             return;
                         }
-                        if (typeof window.Cropper === 'undefined') {
+                        const Cropper = window.Voyager && window.Voyager.Cropper;
+                        if (typeof Cropper === 'undefined') {
                             console.error('Voyager media: Cropper library is not available');
                             return;
                         }
-                        cropperInstance = new window.Cropper(croppingImage, {
+                        cropperInstance = new Cropper(croppingImage, {
                             viewMode: 1,
                             responsive: true,
                             background: false,
@@ -1033,9 +1034,10 @@ const registerComponent = (Vue, templateHtml, config) => {
                 });
 
                 const ddContainer = document.getElementById('dd_' + vm.uid);
-                if (ddContainer && window.Sortable) {
+                const Sortable = window.Voyager && window.Voyager.Sortable;
+                if (ddContainer && Sortable) {
                     const ddList = ddContainer.querySelector('.dd-list') || ddContainer;
-                    window.Sortable.create(ddList, {
+                    Sortable.create(ddList, {
                         handle: '.file_link',
                         draggable: '.dd-item',
                         animation: 150,

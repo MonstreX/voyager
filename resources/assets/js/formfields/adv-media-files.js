@@ -177,12 +177,13 @@ const bindList = (listEl) => {
                 cropper.destroy();
                 cropper = null;
             }
-            if (typeof window.Cropper === 'undefined') {
+            const Cropper = window.Voyager && window.Voyager.Cropper;
+            if (typeof Cropper === 'undefined') {
                 const toastr = getToastr();
                 toastr && toastr.error('Cropper is not available');
                 return;
             }
-            cropper = new window.Cropper(cropImg, {
+            cropper = new Cropper(cropImg, {
                 viewMode: 1,
                 responsive: true,
                 background: false,

@@ -1,12 +1,13 @@
 // Initialize Sortable for adv_json lists
 const initAdvJsonSortable = () => {
-    if (typeof window.Sortable === 'undefined') {
+    const Sortable = window.Voyager && window.Voyager.Sortable;
+    if (typeof Sortable === 'undefined') {
         return;
     }
 
     document.querySelectorAll('.adv-json-list').forEach((list) => {
         if (!list.dataset.sortableInitialized) {
-            window.Sortable.create(list, {
+            Sortable.create(list, {
                 animation: 200,
                 handle: '.adv-json-drag-handle',
                 draggable: '.adv-json-item',
