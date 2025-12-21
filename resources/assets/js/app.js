@@ -146,17 +146,10 @@ const loadEditorsAssets = () => {
 };
 
 const resolveVueApi = (module) => {
-    const voyagerVue = (window.Voyager && window.Voyager.vue) || {};
-    const fallback = {
-        createApp: typeof window.createVueApp === 'function' ? window.createVueApp : undefined,
-        registerComponent: typeof window.VueRegisterComponent === 'function' ? window.VueRegisterComponent : undefined,
-        mountApp: typeof window.VueMountApp === 'function' ? window.VueMountApp : undefined
-    };
-
     return {
-        createApp: module && module.createVueApp ? module.createVueApp : voyagerVue.createApp || fallback.createApp,
-        registerComponent: module && module.registerComponent ? module.registerComponent : voyagerVue.registerComponent || fallback.registerComponent,
-        mountApp: module && module.mountApp ? module.mountApp : voyagerVue.mountApp || fallback.mountApp
+        createApp: module && module.createApp ? module.createApp : window.Voyager?.vue?.createApp,
+        registerComponent: module && module.registerComponent ? module.registerComponent : window.Voyager?.vue?.registerComponent,
+        mountApp: module && module.mountApp ? module.mountApp : window.Voyager?.vue?.mountApp
     };
 };
 
@@ -379,13 +372,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const vueRoots = document.querySelectorAll('[data-voyager-vue-root]');
     const shouldLoadVue = document.getElementById('adminmenu') || vueRoots.length > 0;
     if (shouldLoadVue) {
-        window.Voyager.loadVue()
-            .then(() => {
-                if (vueRoots.length && typeof window.VueMountApp === 'function') {
-                    window.VueMountApp(vueRoots);
-                }
-            })
-            .catch(() => {});
+        window.Voyager.withVue(({ mountApp }) => {
+            if (vueRoots.length && typeof mountApp === 'function') {
+                mountApp(vueRoots);
+            }
+        }).catch(() => {});
     }
 
     // Emit dom:updated event for initial page load
@@ -397,4 +388,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Signal that app bundle is ready
 resolveAppReady();
-document.dispatchEvent(new CustomEvent('voyager:app-ready'));

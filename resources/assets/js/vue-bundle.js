@@ -10,7 +10,7 @@
  */
 
 import AdminMenu from './components/admin_menu.vue';
-import { createApp } from 'vue';
+import { createApp as vueCreateApp } from 'vue';
 
 // Voyager.ready.vue Promise already initialized in master.blade.php <head>
 // Just get the resolver
@@ -31,7 +31,7 @@ const applyVoyagerComponents = (appInstance) => {
 const createVoyagerVueApp = function (rootComponent = {}) {
     const shouldClone = rootComponent && typeof rootComponent === 'object';
     const resolvedRootComponent = shouldClone ? { ...rootComponent } : rootComponent;
-    const appInstance = applyVoyagerComponents(createApp(resolvedRootComponent));
+    const appInstance = applyVoyagerComponents(vueCreateApp(resolvedRootComponent));
     const originalMount = appInstance.mount;
 
     appInstance.mount = function (target, ...args) {
@@ -53,8 +53,6 @@ const createVoyagerVueApp = function (rootComponent = {}) {
     voyagerActiveApps.push(appInstance);
     return appInstance;
 };
-
-window.__vueGlobalApp = null;
 
 const registerVoyagerComponent = function (name, definition) {
     voyagerComponentRegistry[name] = definition;
@@ -78,25 +76,11 @@ const mountVoyagerVueApp = function (selector, rootComponent = {}) {
         if (!target) {
             return;
         }
-        mountedApp = window.createVueApp(rootComponent);
+        mountedApp = createVoyagerVueApp(rootComponent);
         mountedApp.mount(target);
     });
 
     return mountedApp;
-};
-
-const attachLegacyGlobal = (name, fn, message) => {
-    if (typeof window === 'undefined') {
-        return;
-    }
-    const warnedFlag = `__voyagerWarned_${name}`;
-    window[name] = function (...args) {
-        if (typeof console !== 'undefined' && typeof console.warn === 'function' && !window[warnedFlag]) {
-            window[warnedFlag] = true;
-            console.warn(message);
-        }
-        return fn(...args);
-    };
 };
 
 if (typeof window !== 'undefined') {
@@ -106,16 +90,12 @@ if (typeof window !== 'undefined') {
         registerComponent: registerVoyagerComponent,
         mountApp: mountVoyagerVueApp
     });
-
-    attachLegacyGlobal('createVueApp', createVoyagerVueApp, '[Voyager] window.createVueApp is deprecated. Use Voyager.vue.createApp instead.');
-    attachLegacyGlobal('VueRegisterComponent', registerVoyagerComponent, '[Voyager] window.VueRegisterComponent is deprecated. Use Voyager.vue.registerComponent instead.');
-    attachLegacyGlobal('VueMountApp', mountVoyagerVueApp, '[Voyager] window.VueMountApp is deprecated. Use Voyager.vue.mountApp instead.');
 }
 
 // Initialize admin menu when DOM is ready
 const initAdminMenu = () => {
     if (document.getElementById('adminmenu')) {
-        const adminMenuApp = createApp({});
+        const adminMenuApp = vueCreateApp({});
         adminMenuApp.component('admin-menu', AdminMenu);
         adminMenuApp.mount('#adminmenu');
     }
@@ -127,10 +107,9 @@ if (document.readyState === 'loading') {
     initAdminMenu();
 }
 
-export const createVueApp = createVoyagerVueApp;
+export const createApp = createVoyagerVueApp;
 export const registerComponent = registerVoyagerComponent;
 export const mountApp = mountVoyagerVueApp;
 
 // Signal that Vue bundle is ready
 resolveVueReady();
-document.dispatchEvent(new CustomEvent('voyager:vue-ready'));

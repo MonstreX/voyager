@@ -51,20 +51,14 @@ if (typeof window.Voyager.loadEditors !== 'function') {
 if (typeof window.Voyager.withVue !== 'function') {
     window.Voyager.withVue = function(callback) {
         return window.Voyager.loadVue().then(function() {
-            var api = (window.Voyager && window.Voyager.vue) ? window.Voyager.vue : {
-                createApp: window.createVueApp,
-                registerComponent: window.VueRegisterComponent,
-                mountApp: window.VueMountApp
-            };
-            var result = {
-                createApp: api.createApp || window.createVueApp || function() {},
-                registerComponent: api.registerComponent || window.VueRegisterComponent || function() {},
-                mountApp: api.mountApp || window.VueMountApp || function() {}
-            };
-            if (typeof callback === 'function') {
-                callback(result);
+            var api = (window.Voyager && window.Voyager.vue) ? window.Voyager.vue : null;
+            if (!api) {
+                throw new Error('[Voyager] Voyager.vue API unavailable.');
             }
-            return result;
+            if (typeof callback === 'function') {
+                callback(api);
+            }
+            return api;
         }).catch(function(error) {
             console.error('[Voyager] Failed to prepare Vue helpers', error);
             throw error;
