@@ -3,6 +3,16 @@ import { getToastr } from '../core/toastr';
 
 let listenersAttached = false;
 
+const getApiErrorMessage = (payload, fallback) => {
+    if (payload && payload.error && typeof payload.error.message === 'string' && payload.error.message) {
+        return payload.error.message;
+    }
+    if (payload && typeof payload.message === 'string' && payload.message) {
+        return payload.message;
+    }
+    return fallback;
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     if (listenersAttached) return;
     listenersAttached = true;
@@ -220,7 +230,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (!data || data.status !== 'success') {
-                    throw new Error(data && data.message ? data.message : 'Crop failed');
+                    throw new Error(getApiErrorMessage(data, 'Crop failed'));
                 }
 
                 const mediaDiv = document.getElementById('adv-image-' + cropState.field);
@@ -232,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 const toastr = getToastr();
-                toastr && toastr.success(data.message || 'Cropped');
+                toastr && toastr.success(getApiErrorMessage(data, 'Cropped'));
                 closeModal(cropState.modal);
             })
             .catch(err => {
@@ -282,6 +292,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 const toastr = getToastr();
                 toastr && typeof toastr.success === 'function' && toastr.success('Image deleted successfully');
+            } else {
+                const toastr = getToastr();
+                toastr && typeof toastr.error === 'function' && toastr.error(getApiErrorMessage(data, 'Error deleting image'));
             }
             pendingDeleteData = null;
         })
