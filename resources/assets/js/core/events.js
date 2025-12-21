@@ -5,6 +5,14 @@ export const initGlobalEvents = () => {
     const appContainer = document.querySelector('.app-container');
     const hamburgerButtons = document.querySelectorAll('.hamburger, .navbar-expand-toggle');
 
+    if (appContainer && window.localStorage && window.innerWidth > 768) {
+        const stickySidebar = window.localStorage.getItem('voyager.stickySidebar') === 'true';
+        if (stickySidebar) {
+            appContainer.classList.add('expanded', 'no-animation');
+            hamburgerButtons.forEach((button) => button.classList.add('is-active', 'no-animation'));
+        }
+    }
+
     const sideMenuEl = document.querySelector('.side-menu');
     if (sideMenuEl) {
         new PerfectScrollbar(sideMenuEl);

@@ -8,9 +8,6 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="assets-path" content="{{ voyager_asset() }}">
     <meta name="voyager-ace-base" content="{{ voyager_asset('js/ace/libs') }}">
-    <script>
-        window.voyagerAceBase = "{{ voyager_asset('js/ace/libs') }}";
-    </script>
     <meta name="description" content="admin login">
     <title>@yield('title', 'Admin - '.Voyager::setting("admin.title"))</title>
     <link rel="stylesheet" href="{{ voyager_asset('css/app.css') }}">
