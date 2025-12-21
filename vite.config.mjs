@@ -20,6 +20,7 @@ export default defineConfig({
     cssCodeSplit: true,
     rollupOptions: {
       input: {
+        boot: 'resources/assets/js/boot.js',
         app: 'resources/assets/js/app.js',
         auth: 'resources/assets/js/auth.js',
         'vue-bundle': 'resources/assets/js/vue-bundle.js',
