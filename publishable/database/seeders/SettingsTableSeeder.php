@@ -48,18 +48,6 @@ class SettingsTableSeeder extends Seeder
             ])->save();
         }
 
-        $setting = $this->findSetting('site.google_analytics_tracking_id');
-        if (!$setting->exists) {
-            $setting->fill([
-                'display_name' => __('voyager::seeders.settings.site.google_analytics_tracking_id'),
-                'value'        => '',
-                'details'      => '',
-                'type'         => 'text',
-                'order'        => 4,
-                'group'        => 'Site',
-            ])->save();
-        }
-
         $setting = $this->findSetting('admin.bg_image');
         if (!$setting->exists) {
             $setting->fill([
@@ -67,7 +55,7 @@ class SettingsTableSeeder extends Seeder
                 'value'        => '',
                 'details'      => '',
                 'type'         => 'image',
-                'order'        => 5,
+                'order'        => 4,
                 'group'        => 'Admin',
             ])->save();
         }
@@ -116,18 +104,6 @@ class SettingsTableSeeder extends Seeder
                 'details'      => '',
                 'type'         => 'image',
                 'order'        => 4,
-                'group'        => 'Admin',
-            ])->save();
-        }
-
-        $setting = $this->findSetting('admin.google_analytics_client_id');
-        if (!$setting->exists) {
-            $setting->fill([
-                'display_name' => __('voyager::seeders.settings.admin.google_analytics_client_id'),
-                'value'        => '',
-                'details'      => '',
-                'type'         => 'text',
-                'order'        => 1,
                 'group'        => 'Admin',
             ])->save();
         }
