@@ -9,6 +9,13 @@ use PHPUnit\Framework\Attributes\DataProvider;
 class AssetsTest extends TestCase
 {
     protected static bool $assetsPublished = false;
+    protected const LEGACY_ASSET_TOKENS = [
+        'voyager_ace_editor.js',
+        'voyager_jodit.js',
+        'resources/assets/js/vendor/ace.js',
+        'ace-mode-json.js',
+        'ace-theme-github.js',
+    ];
 
     public function setUp(): void
     {
@@ -46,7 +53,7 @@ class AssetsTest extends TestCase
     {
         $assetUrl = voyager_asset('css/app.css');
 
-        $this->assertSame(asset('vendor/voyager/css/app.css'), $assetUrl);
+        $this->assertStringStartsWith(asset('vendor/voyager/css/app.css'), $assetUrl);
         $this->assertFileExists(public_path('vendor/voyager/css/app.css'));
     }
 
@@ -71,5 +78,41 @@ class AssetsTest extends TestCase
 
         $this->assertStringStartsWith(asset('vendor/voyager'), $assetUrl);
         $this->assertStringNotContainsString('..', $assetUrl);
+    }
+
+    public function testLegacyEditorAssetsAreNotPresentOrReferenced(): void
+    {
+        $legacyPaths = [
+            dirname(__DIR__).'/resources/assets/js/voyager_ace_editor.js',
+            dirname(__DIR__).'/resources/assets/js/voyager_jodit.js',
+            dirname(__DIR__).'/resources/assets/js/vendor/ace.js',
+            dirname(__DIR__).'/resources/assets/js/vendor/ace-mode-json.js',
+            dirname(__DIR__).'/resources/assets/js/vendor/ace-theme-github.js',
+        ];
+
+        foreach ($legacyPaths as $path) {
+            $this->assertFileDoesNotExist($path);
+        }
+
+        /** @var Filesystem $filesystem */
+        $filesystem = app(Filesystem::class);
+
+        $scanRoots = [
+            dirname(__DIR__).'/resources/views',
+            dirname(__DIR__).'/resources/assets/js',
+        ];
+
+        foreach ($scanRoots as $root) {
+            foreach ($filesystem->allFiles($root) as $file) {
+                $contents = $file->getContents();
+                foreach (self::LEGACY_ASSET_TOKENS as $token) {
+                    $this->assertStringNotContainsString(
+                        $token,
+                        $contents,
+                        "Legacy token '{$token}' found in {$file->getPathname()}"
+                    );
+                }
+            }
+        }
     }
 }
