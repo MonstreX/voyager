@@ -1,6 +1,6 @@
 <?php
 
-namespace TCG\Voyager\Services\Bread;
+namespace TCG\Voyager\Services\Bread\Media;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;

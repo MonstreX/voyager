@@ -5,7 +5,7 @@ namespace TCG\Voyager\Services;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use TCG\Voyager\Facades\Voyager;
-use TCG\Voyager\Services\Bread\BreadValidationService;
+use TCG\Voyager\Services\Bread\Write\BreadValidationService;
 
 class ModelInlineUpdateService
 {

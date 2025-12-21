@@ -1,10 +1,11 @@
 <?php
 
-namespace TCG\Voyager\Services\Bread;
+namespace TCG\Voyager\Services\Bread\Write;
 
 use Illuminate\Http\Request;
 use TCG\Voyager\Events\BreadDataRestored;
 use TCG\Voyager\Models\DataType;
+use TCG\Voyager\Services\Bread\Support\BreadDataResolverService;
 
 class BreadRestoreService
 {

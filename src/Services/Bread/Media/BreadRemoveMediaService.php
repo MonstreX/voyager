@@ -1,11 +1,12 @@
 <?php
 
-namespace TCG\Voyager\Services\Bread;
+namespace TCG\Voyager\Services\Bread\Media;
 
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use TCG\Voyager\Facades\Voyager;
+use TCG\Voyager\Services\Bread\Write\BreadCleanupService;
 
 class BreadRemoveMediaService
 {

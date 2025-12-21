@@ -1,8 +1,12 @@
 <?php
 
-namespace TCG\Voyager\Services\Bread;
+namespace TCG\Voyager\Services\Bread\Write;
 
 use Illuminate\Http\Request;
+use TCG\Voyager\Services\Bread\Media\BreadFieldUploadService;
+use TCG\Voyager\Services\Bread\Media\BreadMediaPickerPathService;
+use TCG\Voyager\Services\Bread\Relations\BreadBelongsToManySyncService;
+use TCG\Voyager\Services\Bread\Support\BreadContentService;
 
 class BreadWriteService
 {

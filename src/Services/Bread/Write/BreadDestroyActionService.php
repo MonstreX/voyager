@@ -1,6 +1,6 @@
 <?php
 
-namespace TCG\Voyager\Services\Bread;
+namespace TCG\Voyager\Services\Bread\Write;
 
 use Illuminate\Http\Request;
 use TCG\Voyager\Models\DataType;

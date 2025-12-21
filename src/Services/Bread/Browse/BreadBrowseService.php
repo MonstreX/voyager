@@ -1,6 +1,6 @@
 <?php
 
-namespace TCG\Voyager\Services\Bread;
+namespace TCG\Voyager\Services\Bread\Browse;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\LengthAwarePaginator;
 use TCG\Voyager\Facades\Voyager;
 use TCG\Voyager\Models\DataType;
+use TCG\Voyager\Services\Bread\Support\BreadDataResolverService;
 
 class BreadBrowseService
 {

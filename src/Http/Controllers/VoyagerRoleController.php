@@ -4,10 +4,10 @@ namespace TCG\Voyager\Http\Controllers;
 
 use Illuminate\Http\Request;
 use TCG\Voyager\Facades\Voyager;
-use TCG\Voyager\Services\Bread\BreadCleanupService;
-use TCG\Voyager\Services\Bread\BreadDataResolverService;
-use TCG\Voyager\Services\Bread\BreadValidationService;
-use TCG\Voyager\Services\Bread\BreadWriteService;
+use TCG\Voyager\Services\Bread\Support\BreadDataResolverService;
+use TCG\Voyager\Services\Bread\Write\BreadCleanupService;
+use TCG\Voyager\Services\Bread\Write\BreadValidationService;
+use TCG\Voyager\Services\Bread\Write\BreadWriteService;
 
 class VoyagerRoleController extends VoyagerBaseController
 {

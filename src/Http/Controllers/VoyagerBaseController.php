@@ -6,20 +6,20 @@ use Illuminate\Http\Request;
 use TCG\Voyager\Events\BreadDataRestored;
 use TCG\Voyager\Facades\Voyager;
 use TCG\Voyager\Http\Controllers\Traits\BreadRelationshipParser;
-use TCG\Voyager\Services\Bread\BreadBrowseService;
-use TCG\Voyager\Services\Bread\BreadCleanupService;
-use TCG\Voyager\Services\Bread\BreadActionService;
-use TCG\Voyager\Services\Bread\BreadDestroyService;
-use TCG\Voyager\Services\Bread\BreadDestroyActionService;
-use TCG\Voyager\Services\Bread\BreadRelationService;
-use TCG\Voyager\Services\Bread\BreadRemoveMediaService;
-use TCG\Voyager\Services\Bread\BreadDataResolverService;
-use TCG\Voyager\Services\Bread\BreadOrderService;
-use TCG\Voyager\Services\Bread\BreadFormViewService;
-use TCG\Voyager\Services\Bread\BreadReadViewService;
-use TCG\Voyager\Services\Bread\BreadRestoreService;
-use TCG\Voyager\Services\Bread\BreadStoreService;
-use TCG\Voyager\Services\Bread\BreadUpdateService;
+use TCG\Voyager\Services\Bread\Browse\BreadBrowseService;
+use TCG\Voyager\Services\Bread\Media\BreadRemoveMediaService;
+use TCG\Voyager\Services\Bread\Relations\BreadRelationService;
+use TCG\Voyager\Services\Bread\Read\BreadReadViewService;
+use TCG\Voyager\Services\Bread\Support\BreadActionService;
+use TCG\Voyager\Services\Bread\Support\BreadDataResolverService;
+use TCG\Voyager\Services\Bread\Support\BreadFormViewService;
+use TCG\Voyager\Services\Bread\Support\BreadOrderService;
+use TCG\Voyager\Services\Bread\Write\BreadCleanupService;
+use TCG\Voyager\Services\Bread\Write\BreadDestroyActionService;
+use TCG\Voyager\Services\Bread\Write\BreadDestroyService;
+use TCG\Voyager\Services\Bread\Write\BreadRestoreService;
+use TCG\Voyager\Services\Bread\Write\BreadStoreService;
+use TCG\Voyager\Services\Bread\Write\BreadUpdateService;
 
 class VoyagerBaseController extends Controller
 {

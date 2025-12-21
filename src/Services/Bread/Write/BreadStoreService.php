@@ -1,12 +1,13 @@
 <?php
 
-namespace TCG\Voyager\Services\Bread;
+namespace TCG\Voyager\Services\Bread\Write;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use TCG\Voyager\Events\BreadDataAdded;
 use TCG\Voyager\Models\DataType;
+use TCG\Voyager\Services\Bread\Support\BreadDataResolverService;
 
 class BreadStoreService
 {

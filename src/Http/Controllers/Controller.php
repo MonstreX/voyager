@@ -11,10 +11,10 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Storage;
 use TCG\Voyager\Events\FileDeleted;
 use TCG\Voyager\Traits\AlertsMessages;
-use TCG\Voyager\Services\Bread\BreadFieldUploadService;
-use TCG\Voyager\Services\Bread\BreadValidationService;
-use TCG\Voyager\Services\Bread\BreadWriteService;
-use TCG\Voyager\Services\Bread\BreadContentService;
+use TCG\Voyager\Services\Bread\Media\BreadFieldUploadService;
+use TCG\Voyager\Services\Bread\Support\BreadContentService;
+use TCG\Voyager\Services\Bread\Write\BreadValidationService;
+use TCG\Voyager\Services\Bread\Write\BreadWriteService;
 use Throwable;
 
 abstract class Controller extends BaseController
