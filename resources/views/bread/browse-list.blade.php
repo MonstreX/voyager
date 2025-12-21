@@ -478,7 +478,6 @@
         'message' => '',
         'confirmText' => __('voyager::generic.delete_confirm'),
         'confirmClass' => 'btn-danger delete-confirm',
-        'confirmButtonId' => 'delete_confirm_button',
         'icon' => 'voyager-trash'
     ])
     <form action="#" id="delete_form" method="POST" style="display:none">
@@ -493,7 +492,6 @@
         'message' => '',
         'confirmText' => __('voyager::generic.yes_please'),
         'confirmClass' => 'btn-warning clone-confirm',
-        'confirmButtonId' => 'clone_confirm_button',
         'icon' => 'voyager-documentation',
         'modalClass' => 'modal-warning'
     ])

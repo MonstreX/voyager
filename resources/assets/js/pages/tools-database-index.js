@@ -1,20 +1,8 @@
+import { showModal } from '../core/bootstrap-compat';
+
 let listenersAttached = false;
 
 const getToastr = () => window.toastr || (window.Voyager && window.Voyager.toastr) || null;
-const getBootstrap = () => (window.Voyager && window.Voyager.bootstrap) || window.VoyagerBootstrapCompat || null;
-
-const showModal = (modal) => {
-    const bootstrap = getBootstrap();
-    if (bootstrap && typeof bootstrap.showModal === 'function') {
-        bootstrap.showModal(modal);
-        return;
-    }
-    if (!modal) return;
-    modal.classList.add('in');
-    modal.style.display = 'block';
-    modal.setAttribute('aria-hidden', 'false');
-    document.body.classList.add('modal-open');
-};
 
 const parseJsonConfig = () => {
     if (typeof document === 'undefined') return null;
@@ -87,12 +75,6 @@ export const initToolsDatabaseIndex = () => {
     const tableInfoRoot = document.getElementById('table_info');
     const tableInfoTitle = document.getElementById('table_info_title');
     const tableInfoRows = document.getElementById('table_info_rows');
-    const deleteTableModal = document.getElementById('delete_modal');
-    const deleteTableForm = document.getElementById('delete_table_form');
-    const deleteTableName = document.getElementById('delete_table_name');
-    const deleteBreadModal = document.getElementById('delete_bread_modal');
-    const deleteBreadForm = document.getElementById('delete_bread_form');
-    const deleteBreadName = document.getElementById('delete_bread_name');
 
     if (!listenersAttached) {
         listenersAttached = true;
@@ -132,51 +114,14 @@ export const initToolsDatabaseIndex = () => {
         document.addEventListener('click', (event) => {
             const button = event.target.closest('td.actions .delete_table');
             if (!button) return;
-            event.preventDefault();
-
-            const tableName = button.dataset.table || '';
             if (button.classList.contains('remove-bread-warning')) {
+                event.preventDefault();
+                event.stopPropagation();
                 const toastr = getToastr();
                 toastr && toastr.warning(config.i18n && config.i18n.deleteBreadBeforeTable ? config.i18n.deleteBreadBeforeTable : '');
                 return;
             }
-
-            if (deleteTableName) deleteTableName.textContent = tableName;
-            if (deleteTableForm && config.urls && config.urls.deleteTableTemplate) {
-                deleteTableForm.action = config.urls.deleteTableTemplate.replace('__database', tableName);
-            }
-            showModal(deleteTableModal);
         });
-
-        const deleteTableConfirm = document.getElementById('delete_table_confirm');
-        if (deleteTableConfirm) {
-            deleteTableConfirm.addEventListener('click', () => {
-                if (!deleteTableForm) return;
-                deleteTableForm.submit();
-            });
-        }
-
-        document.addEventListener('click', (event) => {
-            const button = event.target.closest('table .bread_actions .delete');
-            if (!button) return;
-            event.preventDefault();
-
-            const id = button.dataset.id || '';
-            const name = button.dataset.name || '';
-            if (deleteBreadName) deleteBreadName.textContent = name;
-            if (deleteBreadForm && config.urls && config.urls.deleteBreadTemplate) {
-                deleteBreadForm.action = config.urls.deleteBreadTemplate.replace('__id', id);
-            }
-            showModal(deleteBreadModal);
-        });
-
-        const deleteBreadConfirm = document.getElementById('delete_bread_confirm');
-        if (deleteBreadConfirm) {
-            deleteBreadConfirm.addEventListener('click', () => {
-                if (!deleteBreadForm) return;
-                deleteBreadForm.submit();
-            });
-        }
     }
 
     // noop

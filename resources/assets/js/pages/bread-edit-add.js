@@ -1,7 +1,8 @@
 import { getCsrfToken } from '../modules/csrf';
-import { showModal, hideModal } from '../core/bootstrap-compat';
 
 let listenersAttached = false;
+
+let currentConfig = null;
 
 const getEditAddConfig = () => {
     const configEl = document.getElementById('voyager-edit-add-config');
@@ -40,71 +41,59 @@ const findSibling = (container, selector) => {
     return Array.from(container.children).find((child) => child.matches(selector)) || null;
 };
 
-export const initBreadEditAdd = () => {
-    const config = getEditAddConfig();
-    if (!config || !config.slug || !config.mediaRemoveUrl) return;
+const resolveRemoveContext = (trigger) => {
+    if (!trigger || typeof document === 'undefined') return null;
 
-    assignDefaults(config);
+    const isMulti =
+        trigger.classList.contains('remove-multi-image') ||
+        trigger.classList.contains('remove-multi-file');
 
-    if (listenersAttached) return;
-    listenersAttached = true;
+    const isImage =
+        trigger.classList.contains('remove-multi-image') ||
+        trigger.classList.contains('remove-single-image');
 
-    const confirmDeleteModal = document.getElementById('confirm_delete_modal');
-    const confirmDeleteButton = document.getElementById('confirm_delete');
-    const confirmDeleteName = confirmDeleteModal ? confirmDeleteModal.querySelector('.confirm_delete_name') : null;
+    const container = trigger.closest('[data-field-name]') || trigger.parentElement;
+    if (!container) return null;
 
-    const deleteState = {
-        params: {},
-        wrapper: null,
-    };
+    const selector = isImage ? 'img' : 'a.fileType';
+    const fileNode = findSibling(container, selector) || container.querySelector(selector);
+    if (!fileNode) return null;
 
-    const startDeleteFlow = (trigger, selector, isMulti) => {
-        const container = trigger.parentElement;
-        const fileNode = findSibling(container, selector);
-        if (!container || !fileNode) return;
-
-        deleteState.params = {
-            slug: config.slug,
+    return {
+        wrapper: container,
+        params: {
+            slug: currentConfig && currentConfig.slug ? currentConfig.slug : '',
             filename: fileNode.dataset.fileName || '',
             id: fileNode.dataset.id || '',
             field: container.dataset.fieldName || '',
             multi: isMulti,
             _token: getCsrfToken(),
-        };
-        deleteState.wrapper = container;
+        },
+    };
+};
 
-        if (confirmDeleteName) {
-            confirmDeleteName.textContent = deleteState.params.filename || '';
+const registerConfirmCallbacks = () => {
+    if (typeof window === 'undefined') return;
+    window.Voyager = window.Voyager || {};
+    window.Voyager.confirmCallbacks = window.Voyager.confirmCallbacks || {};
+
+    if (window.Voyager.confirmCallbacks.mediaRemove) {
+        return;
+    }
+
+    window.Voyager.confirmCallbacks.mediaRemove = ({ trigger }) => {
+        const context = resolveRemoveContext(trigger);
+        if (!context || !currentConfig || !currentConfig.mediaRemoveUrl) {
+            return true;
         }
-        showModal(confirmDeleteModal);
-    };
 
-    const registerRemovalHandler = (selector, targetTag, isMulti) => {
-        document.addEventListener('click', (event) => {
-            const trigger = event.target.closest(selector);
-            if (!trigger) return;
-            event.preventDefault();
-            startDeleteFlow(trigger, targetTag, isMulti);
-        });
-    };
-
-    [
-        { selector: '.remove-multi-image', tag: 'img', multi: true },
-        { selector: '.remove-single-image', tag: 'img', multi: false },
-        { selector: '.remove-multi-file', tag: 'a', multi: true },
-        { selector: '.remove-single-file', tag: 'a', multi: false },
-    ].forEach(({ selector, tag, multi }) => registerRemovalHandler(selector, tag, multi));
-
-    if (!confirmDeleteButton) return;
-
-    confirmDeleteButton.addEventListener('click', () => {
         const formData = new URLSearchParams();
-        Object.keys(deleteState.params).forEach((key) => {
-            const value = deleteState.params[key];
+        Object.keys(context.params).forEach((key) => {
+            const value = context.params[key];
             formData.append(key, typeof value === 'boolean' ? Number(value).toString() : value);
         });
 
-        fetch(config.mediaRemoveUrl, {
+        return fetch(currentConfig.mediaRemoveUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -123,7 +112,7 @@ export const initBreadEditAdd = () => {
                 const toastr = getToastr();
                 if (response && response.data && response.data.status && response.data.status == 200) {
                     toastr && toastr.success(response.data.message);
-                    const wrapper = deleteState.wrapper;
+                    const wrapper = context.wrapper;
                     if (wrapper) {
                         wrapper.style.transition = 'opacity 0.3s ease';
                         wrapper.style.opacity = '0';
@@ -137,11 +126,20 @@ export const initBreadEditAdd = () => {
                 console.error('Voyager media remove failed', error);
                 const toastr = getToastr();
                 toastr && toastr.error('Error removing file.');
-            })
-            .finally(() => {
-                hideModal(confirmDeleteModal);
             });
-    });
+    };
+};
+
+export const initBreadEditAdd = () => {
+    const config = getEditAddConfig();
+    if (!config || !config.slug || !config.mediaRemoveUrl) return;
+
+    currentConfig = config;
+    assignDefaults(config);
+    registerConfirmCallbacks();
+
+    if (listenersAttached) return;
+    listenersAttached = true;
 };
 
 export const subscribeToEvents = (events) => {

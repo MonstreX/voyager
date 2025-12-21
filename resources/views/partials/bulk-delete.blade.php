@@ -16,7 +16,6 @@
     'message' => '<div id="bulk_delete_modal_body"></div>',
     'confirmText' => __('voyager::generic.bulk_delete_confirm').' '.strtolower($dataType->getTranslatedAttribute('display_name_plural')),
     'confirmClass' => 'btn-danger delete-confirm',
-    'confirmButtonId' => 'bulk_delete_confirm',
     'icon' => 'voyager-trash'
 ])
 <form action="{{ route('voyager.'.$dataType->slug.'.index') }}/0" id="bulk_delete_form" method="POST" style="display:none">

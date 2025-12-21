@@ -259,7 +259,6 @@
         'message' => __('voyager::generic.are_you_sure_delete').' \'<span class="confirm_delete_name"></span>\'',
         'confirmText' => __('voyager::generic.delete_confirm'),
         'confirmClass' => 'btn-danger',
-        'confirmButtonId' => 'confirm_delete',
         'icon' => 'voyager-warning'
     ])
     <!-- End Delete File Modal -->

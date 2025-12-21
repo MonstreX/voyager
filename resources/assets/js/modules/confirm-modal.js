@@ -61,6 +61,24 @@ const cleanupModalHandler = (modal) => {
     activeHandlers.delete(modal);
 };
 
+const resolveCallback = (path) => {
+    if (!path) return null;
+    const trimmed = String(path).trim();
+    if (!trimmed) return null;
+    const parts = trimmed.split('.').map((part) => part.trim()).filter(Boolean);
+    let current = window;
+    for (const part of parts) {
+        if (current && Object.prototype.hasOwnProperty.call(current, part)) {
+            current = current[part];
+        } else if (current && part in current) {
+            current = current[part];
+        } else {
+            return null;
+        }
+    }
+    return typeof current === 'function' ? current : null;
+};
+
 export function attachConfirmDelegates() {
     document.addEventListener('click', (event) => {
         const trigger = event.target.closest('[data-confirm-target]');
@@ -97,6 +115,26 @@ export function attachConfirmDelegates() {
         }
 
         const acceptHandler = () => {
+            if (payload.confirmCallback) {
+                const callback = resolveCallback(payload.confirmCallback);
+                if (callback) {
+                    const result = callback({ trigger, modal, payload });
+                    Promise.resolve(result)
+                        .then((shouldClose) => {
+                            if (shouldClose === false) {
+                                return;
+                            }
+                            hideConfirmModal(modal);
+                        })
+                        .catch((error) => {
+                            console.error('[Voyager] confirm callback failed', error);
+                            hideConfirmModal(modal);
+                        })
+                        .finally(() => cleanupModalHandler(modal));
+                    return;
+                }
+            }
+
             if (payload.confirmForm) {
                 const form = document.querySelector(payload.confirmForm);
                 if (form) {

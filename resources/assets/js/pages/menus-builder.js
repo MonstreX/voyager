@@ -64,7 +64,6 @@ export const initMenusBuilder = () => {
     if (!config) return;
 
     const menuModal = document.getElementById('menu_item_modal');
-    const deleteModal = document.getElementById('delete_modal');
     const menuForm = document.getElementById('m_form');
     const formMethodInput = document.getElementById('m_form_method');
 
@@ -89,10 +88,6 @@ export const initMenusBuilder = () => {
     const addHeading = document.getElementById('m_hd_add');
     const editHeading = document.getElementById('m_hd_edit');
     const submitButton = menuForm.querySelector('input[type="submit"]');
-
-    const deleteForm = document.getElementById('delete_form');
-    const deleteActionTemplate = deleteForm ? deleteForm.getAttribute('action') : '';
-    const deleteConfirmButton = document.getElementById('delete_confirm_button');
 
     let modalMultilingualInstance = null;
 
@@ -210,15 +205,6 @@ export const initMenusBuilder = () => {
         }
     }
 
-    const openDeleteModal = (button) => {
-        if (!deleteModal || !deleteForm || !deleteActionTemplate || !button) return;
-        const id = button.dataset.id;
-        if (id) {
-            deleteForm.setAttribute('action', deleteActionTemplate.replace('__id', id));
-        }
-        showModal(deleteModal);
-    };
-
     const initMultilingualSections = () => {
         if (!config.isModelTranslatable) return;
         if (!window.VoyagerInitMultilingual) return;
@@ -258,17 +244,9 @@ export const initMenusBuilder = () => {
 
             const deleteButton = event.target.closest('.item_actions .delete');
             if (deleteButton) {
-                event.preventDefault();
-                openDeleteModal(deleteButton);
+                return;
             }
         });
-
-        if (deleteConfirmButton) {
-            deleteConfirmButton.addEventListener('click', () => {
-                if (!deleteForm) return;
-                deleteForm.submit();
-            });
-        }
 
         if (linkTypeSelect) {
             linkTypeSelect.addEventListener('change', () => {

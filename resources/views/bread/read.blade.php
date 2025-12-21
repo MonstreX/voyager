@@ -156,7 +156,6 @@
         'message' => __('voyager::generic.are_you_sure_delete').' <span class="confirm_delete_name"></span>',
         'confirmText' => __('voyager::generic.delete_confirm'),
         'confirmClass' => 'btn-danger delete-confirm',
-        'confirmButtonId' => 'delete_confirm_button',
         'icon' => 'voyager-trash'
     ])
     <form action="{{ route('voyager.'.$dataType->slug.'.destroy', $dataTypeContent->getKey()) }}" id="delete_form" method="POST" style="display:none">

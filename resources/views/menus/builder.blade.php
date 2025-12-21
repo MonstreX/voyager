@@ -37,8 +37,7 @@
         'title' => __('voyager::menu_builder.delete_item_question'),
         'message' => '',
         'confirmText' => __('voyager::menu_builder.delete_item_confirm'),
-        'confirmClass' => 'btn-danger delete-confirm',
-        'confirmButtonId' => 'delete_confirm_button',
+        'confirmClass' => 'btn-danger',
         'icon' => 'voyager-trash'
     ])
     <form action="{{ route('voyager.menus.item.destroy', ['menu' => $menu->id, 'id' => '__id']) }}"

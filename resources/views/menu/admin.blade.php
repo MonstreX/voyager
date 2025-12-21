@@ -60,7 +60,15 @@
                         >
                             <i class="voyager-edit"></i>
                         </a>
-                        <a href="javascript:;" class="btn btn-sm btn-danger pull-right delete" data-id="{{ $item->id }}" title="{{ __('voyager::generic.delete') }}">
+                        <a
+                            href="#"
+                            class="btn btn-sm btn-danger pull-right delete"
+                            data-confirm-target="#delete_modal"
+                            data-confirm-form="#delete_form"
+                            data-confirm-form-action="{{ route('voyager.menus.item.destroy', ['menu' => $item->menu_id, 'id' => $item->id]) }}"
+                            data-confirm-name="{{ $item->title }}"
+                            title="{{ __('voyager::generic.delete') }}"
+                        >
                             <i class="voyager-trash"></i>
                         </a>
                     </div>

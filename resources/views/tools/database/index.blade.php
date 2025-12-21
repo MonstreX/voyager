@@ -48,8 +48,12 @@
                                    class="btn-sm btn-default edit">
                                    {{ __('voyager::bread.edit_bread') }}
                                 </a>
-                                <a data-id="{{ $table->dataTypeId }}" data-name="{{ $table->name }}"
-                                     class="btn-sm btn-danger delete">
+                                <a href="#"
+                                     class="btn-sm btn-danger delete"
+                                     data-confirm-target="#delete_bread_modal"
+                                     data-confirm-form="#delete_bread_form"
+                                     data-confirm-form-action="{{ route('voyager.bread.delete', $table->dataTypeId) }}"
+                                     data-confirm-name="{{ $table->name }}">
                                      {{ __('voyager::bread.delete_bread') }}
                                 </a>
                             @else
@@ -62,8 +66,15 @@
                         </td>
 
                         <td class="actions">
-                            <a class="btn btn-danger btn-sm pull-right delete_table @if($table->dataTypeId) remove-bread-warning @endif"
-                               data-table="{{ $table->prefix.$table->name }}">
+                            <a href="#"
+                               class="btn btn-danger btn-sm pull-right delete_table @if($table->dataTypeId) remove-bread-warning @endif"
+                               data-table="{{ $table->prefix.$table->name }}"
+                               @if(!$table->dataTypeId)
+                                   data-confirm-target="#delete_modal"
+                                   data-confirm-form="#delete_table_form"
+                                   data-confirm-form-action="{{ route('voyager.database.destroy', $table->prefix.$table->name) }}"
+                                   data-confirm-name="{{ $table->prefix.$table->name }}"
+                               @endif>
                                <i class="voyager-trash"></i> {{ __('voyager::generic.delete') }}
                             </a>
                             <a href="{{ route('voyager.database.edit', $table->prefix.$table->name) }}"
@@ -86,11 +97,10 @@
     {{-- Delete BREAD Modal --}}
     @include('voyager::components.modal-confirm', [
         'id' => 'delete_bread_modal',
-        'title' => __('voyager::bread.delete_bread_quest', ['table' => '<span id="delete_bread_name"></span>']),
+        'title' => __('voyager::bread.delete_bread_quest', ['table' => '<span class="confirm_delete_name"></span>']),
         'message' => '',
         'confirmText' => __('voyager::bread.delete_bread_conf'),
         'confirmClass' => 'btn-danger',
-        'confirmButtonId' => 'delete_bread_confirm',
         'icon' => 'voyager-trash'
     ])
     <form action="#" id="delete_bread_form" method="POST" style="display:none">
@@ -100,11 +110,10 @@
 
     @include('voyager::components.modal-confirm', [
         'id' => 'delete_modal',
-        'title' => __('voyager::database.delete_table_question', ['table' => '<span id="delete_table_name"></span>']),
+        'title' => __('voyager::database.delete_table_question', ['table' => '<span class="confirm_delete_name"></span>']),
         'message' => '',
         'confirmText' => __('voyager::database.delete_table_confirm'),
         'confirmClass' => 'btn-danger',
-        'confirmButtonId' => 'delete_table_confirm',
         'icon' => 'voyager-trash'
     ])
     <form action="#" id="delete_table_form" method="POST" style="display:none">
@@ -147,10 +156,6 @@
 @section('javascript')
     @php
         $voyagerToolsDatabaseIndexConfig = [
-            'urls' => [
-                'deleteTableTemplate' => route('voyager.database.destroy', ['database' => '__database']),
-                'deleteBreadTemplate' => route('voyager.bread.delete', '__id'),
-            ],
             'i18n' => [
                 'internalError' => __('voyager::generic.internal_error'),
                 'deleteBreadBeforeTable' => __('voyager::database.delete_bread_before_table'),

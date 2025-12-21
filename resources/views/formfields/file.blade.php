@@ -7,7 +7,13 @@
               data-file-name="{{ $file->original_name }}" data-id="{{ $dataTypeContent->getKey() }}">
               {{ $file->original_name ?: '' }}
             </a>
-            <a href="#" class="voyager-x remove-multi-file"></a>
+            <a
+                href="#"
+                class="voyager-x remove-multi-file"
+                data-confirm-target="#confirm_delete_modal"
+                data-confirm-callback="Voyager.confirmCallbacks.mediaRemove"
+                data-confirm-name="{{ $file->original_name }}"
+            ></a>
           </div>
         @endforeach
     @else
@@ -17,7 +23,13 @@
           data-file-name="{{ $dataTypeContent->{$row->field} }}" data-id="{{ $dataTypeContent->getKey() }}">>
             {{ __('voyager::generic.download') }}
         </a>
-        <a href="#" class="voyager-x remove-single-file"></a>
+        <a
+            href="#"
+            class="voyager-x remove-single-file"
+            data-confirm-target="#confirm_delete_modal"
+            data-confirm-callback="Voyager.confirmCallbacks.mediaRemove"
+            data-confirm-name="{{ $dataTypeContent->{$row->field} }}"
+        ></a>
       </div>
     @endif
 @endif
