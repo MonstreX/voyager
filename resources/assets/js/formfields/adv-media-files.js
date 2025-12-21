@@ -1,6 +1,26 @@
 import { showModal, hideModal } from '../core/bootstrap-compat';
 import { getToastr } from '../core/toastr';
 
+const getApiMessage = (payload, fallback) => {
+    if (payload && payload.error && typeof payload.error.message === 'string' && payload.error.message) {
+        return payload.error.message;
+    }
+    if (payload && typeof payload.message === 'string' && payload.message) {
+        return payload.message;
+    }
+    return fallback;
+};
+
+const translate = (key, fallback) => {
+    if (window.voyager && typeof window.voyager.__ === 'function') {
+        const translated = window.voyager.__(key);
+        if (translated) {
+            return translated;
+        }
+    }
+    return fallback || key;
+};
+
 const getCsrfToken = () => {
     const tokenMeta = document.querySelector('meta[name="csrf-token"]');
     return tokenMeta ? tokenMeta.getAttribute('content') : '';
@@ -66,8 +86,11 @@ const callReorder = (listEl) => {
     })
         .then((response) => response.json())
         .then((data) => {
+            if (!data || data.status !== 'success') {
+                throw new Error(getApiMessage(data, 'Failed to update order'));
+            }
             const toastr = getToastr();
-            toastr && data && data.status === 'success' && toastr.success(data.message || 'Order updated');
+            toastr && toastr.success(getApiMessage(data, translate('voyager.generic.successfully_updated', 'Updated')));
         })
         .catch(() => {});
 };
@@ -115,10 +138,28 @@ const removeItems = (listEl, ids, deleteUrlTemplate, confirmModal) => {
                 'X-CSRF-TOKEN': getCsrfToken(),
                 'Accept': 'application/json',
             },
-        }).then(() => id).catch(() => id);
+        })
+            .then(async (response) => {
+                let payload = null;
+                try {
+                    payload = await response.json();
+                } catch (error) {
+                    payload = null;
+                }
+
+                if (payload && payload.status === 'success') {
+                    return { id, ok: true, payload };
+                }
+
+                return { id, ok: false, payload };
+            })
+            .catch(() => ({ id, ok: false, payload: null }));
     });
 
-    Promise.all(requests).then((removedIds) => {
+    Promise.all(requests).then((results) => {
+        const removedIds = results.filter((r) => r && r.ok).map((r) => r.id);
+        const failed = results.filter((r) => r && !r.ok);
+
         removedIds.forEach((id) => {
             const holder = listEl.querySelector(`.adv-media-files-item-holder[data-file-id="${id}"]`);
             if (holder) {
@@ -132,9 +173,13 @@ const removeItems = (listEl, ids, deleteUrlTemplate, confirmModal) => {
         callReorder(listEl);
         closeModal(confirmModal);
         const toastr = getToastr();
-        toastr &&
-            removedIds.length &&
-            toastr.success(window.voyager ? window.voyager.__('voyager.generic.successfully_deleted') || 'Deleted' : 'Deleted');
+        if (toastr && removedIds.length) {
+            toastr.success(translate('voyager.generic.successfully_deleted', 'Deleted'));
+        }
+        if (toastr && failed.length) {
+            const firstMessage = getApiMessage(failed[0].payload, translate('voyager.generic.error_deleting', 'Error deleting'));
+            toastr.error(firstMessage);
+        }
     });
 };
 
@@ -412,7 +457,7 @@ const bindList = (listEl) => {
                 .then((data) => {
                     const media = data && data.data && data.data.media ? data.data.media : null;
                     if (!data || data.status !== 'success' || !media) {
-                        throw new Error(data && data.message ? data.message : 'Failed to load media props');
+                        throw new Error(getApiMessage(data, 'Failed to load media props'));
                     }
 
                     const props = (media.props && typeof media.props === 'object') ? media.props : {};
@@ -516,7 +561,7 @@ const bindList = (listEl) => {
                     .then((response) => response.json())
                     .then((data) => {
                         if (!data || data.status !== 'success') {
-                            throw new Error(data && data.message ? data.message : 'Error saving');
+                            throw new Error(getApiMessage(data, 'Error saving'));
                         }
                         loadedProps.set(mediaId, props);
                         const item = activeItem.closest('.adv-media-files-item');
@@ -527,8 +572,7 @@ const bindList = (listEl) => {
                         const toastr = getToastr();
                         toastr &&
                             toastr.success(
-                                (window.voyager && window.voyager.__ ? window.voyager.__('voyager.generic.successfully_updated') : '') ||
-                                    'Saved'
+                                translate('voyager.generic.successfully_updated', 'Saved')
                             );
                         closeModal(propsModal);
                     })
@@ -581,7 +625,7 @@ const bindList = (listEl) => {
                 .then((response) => response.json())
                 .then((data) => {
                     if (!data || data.status !== 'success') {
-                        throw new Error(data && data.message ? data.message : 'Crop failed');
+                        throw new Error(getApiMessage(data, 'Crop failed'));
                     }
                     const img = cropTarget ? cropTarget.querySelector('img') : null;
                     if (img) {
@@ -590,7 +634,7 @@ const bindList = (listEl) => {
                         img.setAttribute('src', `${base}?t=${Date.now()}`);
                     }
                     const toastr = getToastr();
-                    toastr && toastr.success(data.message || 'Cropped');
+                    toastr && toastr.success(getApiMessage(data, translate('voyager.media.success_crop_image', 'Cropped')));
                     closeModal(cropModal);
                 })
                 .catch((err) => {
