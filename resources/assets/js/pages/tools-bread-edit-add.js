@@ -1,19 +1,13 @@
 import { getToastr } from '../core/toastr';
+import { showModal } from '../core/bootstrap-compat';
 
 let globalListenersAttached = false;
 let isDraggingBreadRow = false;
 
-const getBootstrap = () => (window.Voyager && window.Voyager.bootstrap) || window.VoyagerBootstrapCompat || null;
-
 const showModalById = (id) => {
     const modal = document.getElementById(id);
     if (!modal) return;
-
-    const bootstrap = getBootstrap();
-    if (bootstrap && typeof bootstrap.showModal === 'function') {
-        bootstrap.showModal(modal);
-        return;
-    }
+    showModal(modal);
 };
 
 const parseJsonConfig = () => {

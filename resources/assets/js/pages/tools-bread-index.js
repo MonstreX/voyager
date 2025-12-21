@@ -1,21 +1,7 @@
 import { getToastr } from '../core/toastr';
+import { showModal } from '../core/bootstrap-compat';
 
 let listenersAttached = false;
-
-const getBootstrap = () => (window.Voyager && window.Voyager.bootstrap) || window.VoyagerBootstrapCompat || null;
-
-const showModal = (modal) => {
-    const bootstrap = getBootstrap();
-    if (bootstrap && typeof bootstrap.showModal === 'function') {
-        bootstrap.showModal(modal);
-        return;
-    }
-    if (!modal) return;
-    modal.classList.add('in');
-    modal.style.display = 'block';
-    modal.setAttribute('aria-hidden', 'false');
-    document.body.classList.add('modal-open');
-};
 
 const parseJsonConfig = () => {
     if (typeof document === 'undefined') return null;
