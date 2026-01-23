@@ -1,0 +1,27 @@
+.legacy-image-wrapper,
+.img_settings_container {
+    position: relative;
+    display: inline-block;
+}
+
+.legacy-image-wrapper .adv-media-files-actions,
+.img_settings_container .adv-media-files-actions {
+    position: absolute;
+    right: 4px;
+    top: 4px;
+}
+
+.modal-bread-image-crop.in,
+.modal-bread-image-crop.show,
+.modal-bread-multi-image-crop.in,
+.modal-bread-multi-image-crop.show {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-bread-image-crop .modal-dialog,
+.modal-bread-multi-image-crop .modal-dialog {
+    margin: 0;
+    transform: translateY(-50px);
+}
