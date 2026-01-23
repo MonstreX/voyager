@@ -50,3 +50,10 @@
     height: auto;
     margin: 0 auto;
 }
+
+.modal-adv-image-props .modal-dialog {
+    margin: 0 auto;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
