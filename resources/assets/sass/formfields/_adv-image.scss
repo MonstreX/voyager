@@ -51,8 +51,8 @@
     margin: 0 auto;
 }
 
-.modal-adv-image-props {
-    display: flex !important;
+.modal-adv-image-props.in {
+    display: flex;
     align-items: center;
     justify-content: center;
 }
