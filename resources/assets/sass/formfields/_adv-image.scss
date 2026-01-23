@@ -51,6 +51,18 @@
     margin: 0 auto;
 }
 
+.modal-voyager-crop.in,
+.modal-voyager-crop.show {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-voyager-crop .modal-dialog {
+    margin: 0;
+    transform: translateY(-50px);
+}
+
 .modal-adv-image-props.in,
 .modal-adv-image-props.show {
     display: flex !important;
