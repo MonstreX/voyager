@@ -7,6 +7,26 @@
     <meta name="assets-path" content="{{ voyager_asset() }}"/>
     <meta name="voyager-ace-base" content="{{ voyager_asset('js/ace/libs') }}"/>
     <script type="module" src="{{ voyager_asset('js/boot.js') }}"></script>
+    <script>
+        (function() {
+            try {
+                window.__voyagerStickySidebar = window.innerWidth > 768 &&
+                    window.localStorage &&
+                    window.localStorage.getItem('voyager.stickySidebar') === 'true';
+            } catch (e) {
+                window.__voyagerStickySidebar = false;
+            }
+        })();
+    </script>
+    <style>
+        .app-container .content-container .side-menu { width: 60px; }
+        .app-container .side-body { margin-left: 75px; }
+        .app-container .app-footer { left: 65px; }
+        .app-container.expanded .content-container .side-menu { width: 250px; }
+        .app-container.expanded .side-body { margin-left: 235px; }
+        .app-container.expanded .app-footer { left: 250px; }
+        .app-container.expanded .content-container .navbar-top { padding-left: 250px; }
+    </style>
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
@@ -74,6 +94,17 @@ if (\Illuminate\Support\Str::startsWith(Auth::user()->avatar, 'http://') || \Ill
 ?>
 
 <div class="app-container">
+    <script>
+        (function() {
+            if (!window.__voyagerStickySidebar) {
+                return;
+            }
+            var appContainer = document.querySelector('.app-container');
+            if (appContainer) {
+                appContainer.classList.add('expanded');
+            }
+        })();
+    </script>
     <div class="fadetoblack visible-xs"></div>
     <div class="row content-container">
         @include('voyager::dashboard.navbar')

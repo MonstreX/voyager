@@ -9,10 +9,13 @@
   bottom: 0;
   right: 0;
   left: 65px;
-  -webkit-transition: all 0.25s;
-  transition: all 0.25s;
+  -webkit-transition: none;
+  transition: none;
   font-size: 12px;
   font-family: 'Open Sans', sans-serif; }
+.app-container.is-animating .app-footer {
+  -webkit-transition: all 0.25s;
+  transition: all 0.25s; }
 .app-container .app-footer .wrapper {
   padding: 10px 35px;
   padding-left: 25px;
@@ -40,8 +43,11 @@
 .app-container .side-body {
   margin-left: 75px;
   margin-right: 0px;
+  -webkit-transition: none;
+  transition: none; }
+.app-container.is-animating .side-body {
   -webkit-transition: all 500ms cubic-bezier(0.19, 1, 0.22, 1);
-  transition: all 500ms cubic-bezier(0.19, 1, 0.22, 1) }
+  transition: all 500ms cubic-bezier(0.19, 1, 0.22, 1); }
 .app-container .side-body .container-fluid {
   padding-right: 0;
 }

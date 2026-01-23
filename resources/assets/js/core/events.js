@@ -8,8 +8,8 @@ export const initGlobalEvents = () => {
     if (appContainer && window.localStorage && window.innerWidth > 768) {
         const stickySidebar = window.localStorage.getItem('voyager.stickySidebar') === 'true';
         if (stickySidebar) {
-            appContainer.classList.add('expanded', 'no-animation');
-            hamburgerButtons.forEach((button) => button.classList.add('is-active', 'no-animation'));
+            appContainer.classList.add('expanded');
+            hamburgerButtons.forEach((button) => button.classList.add('is-active'));
         }
     }
 
@@ -24,8 +24,19 @@ export const initGlobalEvents = () => {
         loader.style.display = 'none';
     }
 
+    const animateSidebar = () => {
+        if (!sideMenuEl || !appContainer) {
+            return;
+        }
+        appContainer.classList.add('is-animating');
+        const cleanup = () => appContainer.classList.remove('is-animating');
+        sideMenuEl.addEventListener('transitionend', cleanup, { once: true });
+        setTimeout(cleanup, 700);
+    };
+
     hamburgerButtons.forEach((button) => {
         button.addEventListener('click', () => {
+            animateSidebar();
             if (appContainer) {
                 appContainer.classList.toggle('expanded');
             }

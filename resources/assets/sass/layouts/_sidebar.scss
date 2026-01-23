@@ -4,6 +4,9 @@
   position: fixed;
   width: 60px;
   height: 100%;
+  -webkit-transition: none;
+  transition: none; }
+.app-container.is-animating .content-container .side-menu {
   -webkit-transition: width 0.25s;
   transition: width 0.25s; }
 .app-container .content-container .side-menu .navbar-header {
