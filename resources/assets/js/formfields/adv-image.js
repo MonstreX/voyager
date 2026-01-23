@@ -269,8 +269,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const previewImg = mediaDiv ? mediaDiv.querySelector('img') : null;
                 if (previewImg) {
                     const current = previewImg.getAttribute('src') || '';
-                    const base = current.split('?')[0];
-                    previewImg.setAttribute('src', `${base}?t=${Date.now()}`);
+                    const base = current.split('#')[0];
+                    previewImg.setAttribute('src', `${base}#t=${Date.now()}`);
                 }
 
                 const toastr = getToastr();

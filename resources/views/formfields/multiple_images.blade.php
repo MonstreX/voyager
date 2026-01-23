@@ -8,7 +8,7 @@
      data-model-id="{{ $modelId }}">
     @if($images != null)
         @foreach($images as $image)
-            <div class="img_settings_container" data-field-name="{{ $row->field }}" style="float:left;padding-right:15px;">
+            <div class="img_settings_container" data-field-name="{{ $row->field }}">
                 <div class="adv-media-files-actions">
                     <span class="adv-media-files-crop bread-multi-image-crop icon voyager-crop" title="{{ __('voyager::media.crop') }}"></span>
                     <span
@@ -18,7 +18,7 @@
                         data-confirm-callback="Voyager.confirmCallbacks.mediaRemove"
                         data-confirm-name="{{ $image }}"></span>
                 </div>
-                <img src="{{ Voyager::image( $image ) }}" data-file-name="{{ $image }}" data-id="{{ $modelId }}" style="max-width:200px; height:auto; clear:both; display:block; padding:2px; border:1px solid #ddd; margin-bottom:5px;">
+                <img src="{{ Voyager::image( $image ) }}" data-file-name="{{ $image }}" data-id="{{ $modelId }}">
             </div>
         @endforeach
     @endif

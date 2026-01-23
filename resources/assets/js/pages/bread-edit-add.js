@@ -224,8 +224,8 @@ const initLegacyImageCrop = () => {
 
                 const img = cropState.imageEl;
                 const current = img.getAttribute('src') || '';
-                const base = current.split('?')[0];
-                img.setAttribute('src', `${base}?t=${Date.now()}`);
+                const base = current.split('#')[0];
+                img.setAttribute('src', `${base}#t=${Date.now()}`);
 
                 const toastr = getToastr();
                 toastr && toastr.success(data.message || 'Cropped');

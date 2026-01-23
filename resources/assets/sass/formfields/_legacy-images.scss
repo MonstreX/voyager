@@ -4,6 +4,22 @@
     display: inline-block;
 }
 
+.multi-images-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.legacy-image-wrapper img,
+.img_settings_container img {
+    max-width: 200px;
+    height: auto;
+    display: block;
+    padding: 2px;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+}
+
 .legacy-image-wrapper .adv-media-files-actions,
 .img_settings_container .adv-media-files-actions {
     position: absolute;
