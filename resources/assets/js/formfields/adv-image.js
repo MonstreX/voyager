@@ -23,7 +23,48 @@ const translate = (key, fallback) => {
     return fallback || key;
 };
 
-document.addEventListener('DOMContentLoaded', function() {
+const getCsrfToken = () => {
+    const tokenMeta = document.querySelector('meta[name="csrf-token"]');
+    return tokenMeta ? tokenMeta.getAttribute('content') : '';
+};
+
+const buildMediaUrl = (holder, mediaId) => {
+    if (!holder) return '';
+    const template = holder.getAttribute('data-delete-url-template');
+    if (template) {
+        return template.replace('__MEDIA_ID__', mediaId);
+    }
+    const prefix = (window.voyagerPrefix || '/admin').replace(/\/?$/, '');
+    return `${prefix}/api/media/${mediaId}`;
+};
+
+const buildUpdatePropsUrl = (mediaUrl) => `${mediaUrl.replace(/\/$/, '')}/props`;
+const buildCropUrl = (mediaUrl) => `${mediaUrl.replace(/\/$/, '')}/crop`;
+
+const openModal = (modal) => {
+    if (modal) {
+        showModal(modal);
+    }
+};
+
+const closeModal = (modal) => {
+    if (modal) {
+        hideModal(modal);
+    }
+};
+
+const updateTitleDisplay = (holder, title) => {
+    const item = holder ? holder.closest('.adv-media-files-item') : null;
+    const display = item ? item.querySelector('.adv-media-prop-display') : null;
+    if (!display) return;
+    if (title) {
+        display.textContent = title;
+        return;
+    }
+    display.innerHTML = '<i>...</i>';
+};
+
+document.addEventListener('DOMContentLoaded', () => {
     if (listenersAttached) return;
     listenersAttached = true;
 
@@ -32,39 +73,11 @@ document.addEventListener('DOMContentLoaded', function() {
         mediaId: null,
         field: null,
         modal: null,
+        holder: null,
         cropper: null,
         cropData: null,
         shownHandler: null,
         hiddenHandler: null,
-    };
-
-    const getCsrfToken = () => {
-        const tokenMeta = document.querySelector('meta[name="csrf-token"]');
-        return tokenMeta ? tokenMeta.getAttribute('content') : '';
-    };
-
-    const buildDeleteUrl = (button, mediaId) => {
-        const template = button.getAttribute('data-delete-url-template');
-        if (template) {
-            return template.replace('__MEDIA_ID__', mediaId);
-        }
-        const prefix = (window.voyagerPrefix || '/admin').replace(/\/?$/, '');
-        return `${prefix}/api/media/${mediaId}`;
-    };
-
-    const buildCropUrl = (mediaId) => {
-        const prefix = (window.voyagerPrefix || '/admin').replace(/\/?$/, '');
-        return `${prefix}/api/media/${mediaId}/crop`;
-    };
-
-    const closeModal = (modal) => {
-        if (!modal) return;
-        hideModal(modal);
-    };
-
-    const openModal = (modal) => {
-        if (!modal) return;
-        showModal(modal);
     };
 
     const destroyCropper = () => {
@@ -88,31 +101,38 @@ document.addEventListener('DOMContentLoaded', function() {
         cropState.cropper.setAspectRatio(Number.isFinite(ratio) ? ratio : NaN);
     };
 
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', (event) => {
         const removeButton = event.target.closest('.single-adv-image-remove');
         if (!removeButton) {
             return;
         }
 
-        const mediaId = removeButton.getAttribute('data-media-id');
-        const field = removeButton.getAttribute('data-field');
-        const mediaDiv = document.getElementById('adv-image-' + field);
+        const holder = removeButton.closest('.adv-media-files-item-holder');
+        if (!holder) {
+            return;
+        }
+        const mediaId = holder.getAttribute('data-file-id');
+        const field = holder.getAttribute('data-field-name');
+        const mediaDiv = holder.closest('.adv-media-files-item');
         const modal = document.getElementById('adv-image-delete-modal-' + field);
 
-        pendingDeleteData = { mediaId, field, mediaDiv, modal, button: removeButton };
+        pendingDeleteData = { mediaId, field, mediaDiv, modal, holder };
         openModal(modal);
     });
 
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', (event) => {
         const cropButton = event.target.closest('.single-adv-image-crop');
         if (!cropButton) {
             return;
         }
 
-        const mediaId = cropButton.getAttribute('data-media-id');
-        const field = cropButton.getAttribute('data-field');
-        const mediaDiv = document.getElementById('adv-image-' + field);
-        const previewImg = mediaDiv ? mediaDiv.querySelector('img') : null;
+        const holder = cropButton.closest('.adv-media-files-item-holder');
+        if (!holder) {
+            return;
+        }
+        const mediaId = holder.getAttribute('data-file-id');
+        const field = holder.getAttribute('data-field-name');
+        const previewImg = holder.querySelector('img');
 
         const modal = document.getElementById('adv-image-crop-modal-' + field);
         const modalImg = modal ? modal.querySelector('.crop-container img') : null;
@@ -124,7 +144,6 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Cleanup old listeners/cropper if this modal was used before
         if (cropState.modal && cropState.shownHandler) {
             cropState.modal.removeEventListener('shown.bs.modal', cropState.shownHandler);
         }
@@ -136,6 +155,7 @@ document.addEventListener('DOMContentLoaded', function() {
         cropState.mediaId = mediaId;
         cropState.field = field;
         cropState.modal = modal;
+        cropState.holder = holder;
 
         const src = previewImg.getAttribute('src') || '';
         modalImg.src = src ? (src.indexOf('?') >= 0 ? `${src}&t=${Date.now()}` : `${src}?t=${Date.now()}`) : '';
@@ -181,6 +201,7 @@ document.addEventListener('DOMContentLoaded', function() {
             cropState.mediaId = null;
             cropState.field = null;
             cropState.modal = null;
+            cropState.holder = null;
             cropState.shownHandler = null;
             cropState.hiddenHandler = null;
         };
@@ -197,7 +218,7 @@ document.addEventListener('DOMContentLoaded', function() {
         openModal(modal);
     });
 
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', (event) => {
         const confirmBtn = event.target.closest('.adv-image-crop-confirm');
         if (!confirmBtn || !cropState.mediaId || !cropState.modal) {
             return;
@@ -227,8 +248,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         confirmBtn.disabled = true;
+        const mediaUrl = buildMediaUrl(cropState.holder, cropState.mediaId);
 
-        fetch(buildCropUrl(cropState.mediaId), {
+        fetch(buildCropUrl(mediaUrl), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -264,61 +286,183 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     });
 
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', (event) => {
+        const editButton = event.target.closest('.adv-image-edit');
+        if (!editButton) {
+            return;
+        }
+
+        const holder = editButton.closest('.adv-media-files-item-holder');
+        if (!holder) {
+            return;
+        }
+
+        const mediaId = holder.getAttribute('data-file-id');
+        const field = holder.getAttribute('data-field-name');
+        const modal = document.getElementById('adv-image-props-modal-' + field);
+        if (!modal || !mediaId) {
+            return;
+        }
+
+        const mediaUrl = buildMediaUrl(holder, mediaId);
+
+        fetch(mediaUrl, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            },
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                const media = data && data.data && data.data.media ? data.data.media : null;
+                if (!data || data.status !== 'success' || !media) {
+                    throw new Error(getApiErrorMessage(data, 'Failed to load media props'));
+                }
+
+                const props = (media.props && typeof media.props === 'object') ? media.props : {};
+                const titleInput = modal.querySelector('.modal-prop-title');
+                const altInput = modal.querySelector('.modal-prop-alt');
+                if (titleInput) titleInput.value = props.title || '';
+                if (altInput) altInput.value = props.alt || '';
+
+                modal.__advImageHolder = holder;
+                modal.__advImageMediaId = mediaId;
+
+                openModal(modal);
+            })
+            .catch((err) => {
+                const toastr = getToastr();
+                toastr && toastr.error(err.message || 'Error loading media');
+            });
+    });
+
+    document.addEventListener('click', (event) => {
+        const saveButton = event.target.closest('.modal-adv-image-props .modal-prop-save');
+        if (!saveButton) {
+            return;
+        }
+
+        const modal = saveButton.closest('.modal-adv-image-props');
+        const holder = modal ? modal.__advImageHolder : null;
+        const mediaId = modal ? modal.__advImageMediaId : null;
+        if (!modal || !holder || !mediaId) {
+            closeModal(modal);
+            return;
+        }
+
+        const titleInput = modal.querySelector('.modal-prop-title');
+        const altInput = modal.querySelector('.modal-prop-alt');
+        const titleValue = titleInput ? titleInput.value : '';
+        const altValue = altInput ? altInput.value : '';
+
+        const mediaUrl = buildMediaUrl(holder, mediaId);
+        const updateUrl = buildUpdatePropsUrl(mediaUrl);
+
+        saveButton.disabled = true;
+
+        fetch(updateUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': getCsrfToken(),
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({
+                props: {
+                    title: titleValue,
+                    alt: altValue,
+                },
+            }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (!data || data.status !== 'success') {
+                    throw new Error(getApiErrorMessage(data, 'Error saving'));
+                }
+
+                updateTitleDisplay(holder, titleValue);
+                const img = holder.querySelector('img');
+                if (img) img.setAttribute('alt', altValue || '');
+
+                const field = holder.getAttribute('data-field-name');
+                const titleHidden = document.querySelector(`input[name="${field}_title"]`);
+                const altHidden = document.querySelector(`input[name="${field}_alt"]`);
+                if (titleHidden) titleHidden.value = titleValue || '';
+                if (altHidden) altHidden.value = altValue || '';
+
+                const toastr = getToastr();
+                toastr &&
+                    toastr.success(getApiErrorMessage(data, translate('voyager.generic.successfully_updated', 'Saved')));
+                closeModal(modal);
+            })
+            .catch((err) => {
+                const toastr = getToastr();
+                toastr && toastr.error(err.message || 'Error saving');
+            })
+            .finally(() => {
+                saveButton.disabled = false;
+            });
+    });
+
+    document.addEventListener('click', (event) => {
         const confirmButton = event.target.closest('.adv-image-delete-confirm');
         if (!confirmButton || !pendingDeleteData) {
             return;
         }
 
-        const { mediaId, field, mediaDiv, modal, button } = pendingDeleteData;
-        const url = buildDeleteUrl(button, mediaId);
+        const { mediaId, field, mediaDiv, modal, holder } = pendingDeleteData;
+        const mediaUrl = buildMediaUrl(holder, mediaId);
 
         const clearInput = document.querySelector(`input[name="${field}_clear"]`);
         if (clearInput) {
             clearInput.value = '1';
         }
+        const titleHidden = document.querySelector(`input[name="${field}_title"]`);
+        const altHidden = document.querySelector(`input[name="${field}_alt"]`);
+        if (titleHidden) titleHidden.value = '';
+        if (altHidden) altHidden.value = '';
 
         confirmButton.disabled = true;
 
-        fetch(url, {
+        fetch(mediaUrl, {
             method: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': getCsrfToken(),
                 'Accept': 'application/json',
             }
         })
-        .then(response => response.json())
-        .then(data => {
-            closeModal(modal);
-            confirmButton.disabled = false;
+            .then(response => response.json())
+            .then(data => {
+                closeModal(modal);
+                confirmButton.disabled = false;
 
-            if (data.status === 'success') {
-                if (mediaDiv) {
-                    mediaDiv.remove();
+                if (data.status === 'success') {
+                    if (mediaDiv) {
+                        mediaDiv.remove();
+                    }
+                    const fileInput = document.getElementById('adv-image-input-' + field);
+                    if (fileInput) {
+                        fileInput.value = '';
+                    }
+                    const toastr = getToastr();
+                    toastr &&
+                        typeof toastr.success === 'function' &&
+                        toastr.success(getApiErrorMessage(data, translate('voyager.generic.successfully_deleted', 'Deleted')));
+                } else {
+                    const toastr = getToastr();
+                    toastr &&
+                        typeof toastr.error === 'function' &&
+                        toastr.error(getApiErrorMessage(data, translate('voyager.generic.error_deleting', 'Error deleting')));
                 }
-                const fileInput = document.getElementById('adv-image-input-' + field);
-                if (fileInput) {
-                    fileInput.value = '';
-                }
+                pendingDeleteData = null;
+            })
+            .catch(error => {
+                closeModal(modal);
+                confirmButton.disabled = false;
                 const toastr = getToastr();
-                toastr &&
-                    typeof toastr.success === 'function' &&
-                    toastr.success(getApiErrorMessage(data, translate('voyager.generic.successfully_deleted', 'Deleted')));
-            } else {
-                const toastr = getToastr();
-                toastr &&
-                    typeof toastr.error === 'function' &&
-                    toastr.error(getApiErrorMessage(data, translate('voyager.generic.error_deleting', 'Error deleting')));
-            }
-            pendingDeleteData = null;
-        })
-        .catch(error => {
-            closeModal(modal);
-            confirmButton.disabled = false;
-            const toastr = getToastr();
-            toastr && typeof toastr.error === 'function' && toastr.error('Error deleting image');
-            console.error('Error:', error);
-            pendingDeleteData = null;
-        });
+                toastr && typeof toastr.error === 'function' && toastr.error('Error deleting image');
+                console.error('Error:', error);
+                pendingDeleteData = null;
+            });
     });
 });
