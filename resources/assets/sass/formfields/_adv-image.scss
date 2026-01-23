@@ -51,13 +51,14 @@
     margin: 0 auto;
 }
 
-.modal-adv-image-props.in {
+.modal-adv-image-props.in,
+.modal-adv-image-props.show {
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .modal-adv-image-props .modal-dialog {
-    margin: 0 auto;
+    margin: 0;
     transform: translateY(-50px);
 }
