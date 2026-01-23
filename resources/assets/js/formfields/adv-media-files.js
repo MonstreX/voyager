@@ -629,8 +629,8 @@ const bindList = (listEl) => {
                     const img = cropTarget ? cropTarget.querySelector('img') : null;
                     if (img) {
                         const current = img.getAttribute('src') || '';
-                        const base = current.split('#')[0];
-                        img.setAttribute('src', `${base}#t=${Date.now()}`);
+                        const base = current.split(/[?#]/)[0];
+                        img.setAttribute('src', `${base}?v=${Date.now()}`);
                     }
                     const toastr = getToastr();
                     toastr && toastr.success(getApiMessage(data, translate('voyager.media.success_crop_image', 'Cropped')));

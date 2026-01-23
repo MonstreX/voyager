@@ -9,7 +9,7 @@
                 data-confirm-callback="Voyager.confirmCallbacks.mediaRemove"
                 data-confirm-name="{{ $dataTypeContent->{$row->field} }}"></span>
         </div>
-        <img src="@if( !filter_var($dataTypeContent->{$row->field}, FILTER_VALIDATE_URL)){{ Voyager::image( $dataTypeContent->{$row->field} ) }}@else{{ $dataTypeContent->{$row->field} }}@endif"
+        <img src="@if( !filter_var($dataTypeContent->{$row->field}, FILTER_VALIDATE_URL)){{ Voyager::image( $dataTypeContent->{$row->field} ) }}@else{{ $dataTypeContent->{$row->field} }}@endif?v={{ time() }}"
           data-file-name="{{ $dataTypeContent->{$row->field} }}" data-id="{{ $dataTypeContent->getKey() }}">
     </div>
 @endif

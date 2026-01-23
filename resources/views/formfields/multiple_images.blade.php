@@ -18,7 +18,7 @@
                         data-confirm-callback="Voyager.confirmCallbacks.mediaRemove"
                         data-confirm-name="{{ $image }}"></span>
                 </div>
-                <img src="{{ Voyager::image( $image ) }}" data-file-name="{{ $image }}" data-id="{{ $modelId }}">
+                <img src="{{ Voyager::image( $image ) }}?v={{ time() }}" data-file-name="{{ $image }}" data-id="{{ $modelId }}">
             </div>
         @endforeach
     @endif
