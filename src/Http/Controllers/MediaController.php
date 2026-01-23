@@ -245,7 +245,12 @@ class MediaController extends Controller
 
             $disk = $media->disk ?: config('voyager.storage.disk', 'public');
 
-            $content = Storage::disk($disk)->get($media->path);
+            $storage = Storage::disk($disk);
+            if (!$storage->exists($media->path)) {
+                return $this->apiErrorCodeResponse('media_not_found', 'Not found', 404);
+            }
+
+            $content = $storage->get($media->path);
             $processor = ImageProcessor::make($content);
             $processor->crop(
                 (int) $data['width'],
@@ -294,7 +299,7 @@ class MediaController extends Controller
 
             $encoded = (string) $processor->encode($format)->encoded;
 
-            Storage::disk($disk)->put($media->path, $encoded);
+            $storage->put($media->path, $encoded);
 
             $media->size = strlen($encoded);
             $media->save();
