@@ -10,7 +10,7 @@ export default defineConfig({
   ],
   build: {
     outDir: 'publishable/assets',
-    emptyOutDir: true,
+    emptyOutDir: false,
     cssCodeSplit: true,
     rollupOptions: {
       input: {
