@@ -31,6 +31,73 @@ const assignDefaults = (config) => {
     if (init && typeof init.tooltips === 'function') init.tooltips(document.querySelectorAll('[data-toggle="tooltip"]'));
 };
 
+const initMultiImagesSortable = () => {
+    const SortableLib = window.Voyager && window.Voyager.Sortable;
+    if (!SortableLib || !currentConfig || !currentConfig.mediaReorderUrl) {
+        return;
+    }
+
+    document.querySelectorAll('.multi-images-list').forEach((listEl) => {
+        if (listEl.__multiImagesSortable) {
+            return;
+        }
+
+        const modelId = listEl.getAttribute('data-model-id');
+        const field = listEl.getAttribute('data-field-name');
+        if (!modelId || !field) {
+            return;
+        }
+
+        const sortable = SortableLib.create(listEl, {
+            animation: 150,
+            handle: 'img',
+            onEnd: () => {
+                const order = [];
+                listEl.querySelectorAll('img[data-file-name]').forEach((img) => {
+                    const name = img.getAttribute('data-file-name');
+                    if (name) {
+                        order.push(name);
+                    }
+                });
+
+                if (!order.length) {
+                    return;
+                }
+
+                fetch(currentConfig.mediaReorderUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': getCsrfToken(),
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        slug: currentConfig.slug,
+                        id: modelId,
+                        field,
+                        order,
+                    }),
+                })
+                    .then((response) => response.json())
+                    .then((response) => {
+                        const toastr = getToastr();
+                        if (response && response.data && response.data.status === 200) {
+                            toastr && toastr.success(response.data.message);
+                        } else {
+                            toastr && toastr.error('Error updating order.');
+                        }
+                    })
+                    .catch(() => {
+                        const toastr = getToastr();
+                        toastr && toastr.error('Error updating order.');
+                    });
+            },
+        });
+
+        listEl.__multiImagesSortable = sortable;
+    });
+};
+
 const findSibling = (container, selector) => {
     if (!container) return null;
     return Array.from(container.children).find((child) => child.matches(selector)) || null;
@@ -132,6 +199,7 @@ export const initBreadEditAdd = () => {
     currentConfig = config;
     assignDefaults(config);
     registerConfirmCallbacks();
+    initMultiImagesSortable();
 
     if (listenersAttached) return;
     listenersAttached = true;

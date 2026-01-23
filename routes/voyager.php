@@ -47,6 +47,7 @@ Route::group(['as' => 'voyager.'], function () {
                 Route::get($dataType->slug.'/{id}/restore', $breadController.'@restore')->name($dataType->slug.'.restore');
                 Route::get($dataType->slug.'/relation', $breadController.'@relation')->name($dataType->slug.'.relation');
                 Route::post($dataType->slug.'/remove', $breadController.'@remove_media')->name($dataType->slug.'.media.remove');
+                Route::post($dataType->slug.'/reorder-media', $breadController.'@reorder_media')->name($dataType->slug.'.media.reorder');
                 // Extension Routes
                 Route::post($dataType->slug.'/tree-order', '\TCG\Voyager\Http\Controllers\VoyagerModelController@order')->name($dataType->slug.'.tree-order');
                 Route::post($dataType->slug.'/{id}/update-field', '\TCG\Voyager\Http\Controllers\VoyagerModelController@update_field')->name($dataType->slug.'.update-field');

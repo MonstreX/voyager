@@ -189,6 +189,7 @@
             'slug' => $dataType->slug,
             'isModelTranslatable' => (bool) $isModelTranslatable,
             'mediaRemoveUrl' => route('voyager.'.$dataType->slug.'.media.remove'),
+            'mediaReorderUrl' => route('voyager.'.$dataType->slug.'.media.reorder'),
             'slugifySelector' => '.side-body input[data-slug-origin]',
         ];
     @endphp

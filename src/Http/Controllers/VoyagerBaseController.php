@@ -8,6 +8,7 @@ use TCG\Voyager\Facades\Voyager;
 use TCG\Voyager\Http\Controllers\Traits\BreadRelationshipParser;
 use TCG\Voyager\Services\Bread\Browse\BreadBrowseService;
 use TCG\Voyager\Services\Bread\Media\BreadRemoveMediaService;
+use TCG\Voyager\Services\Bread\Media\BreadReorderMediaService;
 use TCG\Voyager\Services\Bread\Relations\BreadRelationService;
 use TCG\Voyager\Services\Bread\Read\BreadReadViewService;
 use TCG\Voyager\Services\Bread\Support\BreadActionService;
@@ -225,6 +226,11 @@ class VoyagerBaseController extends Controller
     public function remove_media(Request $request, BreadRemoveMediaService $breadRemoveMediaService)
     {
         return $breadRemoveMediaService->removeMedia($request);
+    }
+
+    public function reorder_media(Request $request, BreadReorderMediaService $breadReorderMediaService)
+    {
+        return $breadReorderMediaService->reorderMedia($request);
     }
 
     /**
