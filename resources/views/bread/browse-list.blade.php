@@ -282,7 +282,7 @@
 
                                                 @elseif($row->type == 'date' || $row->type == 'timestamp')
                                                     @if ( property_exists($row->details, 'format') && !is_null($data->{$row->field}) )
-                                                        {{ \Carbon\Carbon::parse($data->{$row->field})->formatLocalized($row->details->format) }}
+                                                        {{ voyager_format_datetime($data->{$row->field}, $row->details->format) }}
                                                     @else
                                                         {{ $data->{$row->field} }}
                                                     @endif

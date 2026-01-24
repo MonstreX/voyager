@@ -141,3 +141,46 @@ if (!function_exists('build_flat_children')) {
         }
     }
 }
+
+if (!function_exists('voyager_strftime_to_dateformat')) {
+    function voyager_strftime_to_dateformat($format)
+    {
+        $map = [
+            '%Y' => 'Y',
+            '%y' => 'y',
+            '%m' => 'm',
+            '%d' => 'd',
+            '%e' => 'j',
+            '%H' => 'H',
+            '%I' => 'h',
+            '%M' => 'i',
+            '%S' => 's',
+            '%b' => 'M',
+            '%B' => 'F',
+            '%a' => 'D',
+            '%A' => 'l',
+            '%p' => 'A',
+            '%z' => 'O',
+            '%Z' => 'T',
+        ];
+
+        return strtr($format, $map);
+    }
+}
+
+if (!function_exists('voyager_format_datetime')) {
+    function voyager_format_datetime($value, $format = null)
+    {
+        if (empty($value)) {
+            return '';
+        }
+
+        $date = \Carbon\Carbon::parse($value);
+        if ($format) {
+            $phpFormat = str_contains($format, '%') ? voyager_strftime_to_dateformat($format) : $format;
+            return $date->translatedFormat($phpFormat);
+        }
+
+        return $date->toDateTimeString();
+    }
+}
