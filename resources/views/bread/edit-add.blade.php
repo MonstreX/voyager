@@ -85,16 +85,21 @@
                                     @endforeach
                                 </ul>
                                 <div class="tab-content bread-tab-content">
+                            @else
+                                <div class="row">
                             @endif
 
                             @foreach($dataTypeRows as $row)
                                 @if(count($tabs) > 1)
                                     @if($loop->first)
                                         <div id="{{ 'tab-id-'.\Illuminate\Support\Str::slug($tabs[0]) }}" class="tab-pane active">
+                                            <div class="row">
                                         @php $cur_tab = $tabs[0]; @endphp
                                     @elseif(isset($row->details->tab_title) && $row->details->tab_title !== $cur_tab)
+                                            </div>
                                         </div>
                                         <div id="{{ 'tab-id-'.\Illuminate\Support\Str::slug($row->details->tab_title) }}" class="tab-pane">
+                                            <div class="row">
                                         @php $cur_tab = $row->details->tab_title; @endphp
                                     @endif
                                 @endif
@@ -138,8 +143,11 @@
                             @endforeach
 
                             @if(count($tabs) > 1)
+                                    </div> <!-- .row -->
                                 </div> <!-- .tab-pane -->
                                 </div> <!-- .tab-content -->
+                            @else
+                                </div> <!-- .row -->
                             @endif
 
                         </div><!-- panel-body -->
