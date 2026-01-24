@@ -7,6 +7,20 @@
   padding-bottom: 15px;
 }
 
+.site-settings-fields input {
+  max-width: 600px;
+}
+
+span.config-help {
+  color: #2a8dea;
+  font-size: 12px;
+}
+
+span.config-help i {
+  font-style: normal;
+  color: #e01313;
+}
+
 .site-settings-section-title h3 {
   display: flex;
   line-height: 18px;
