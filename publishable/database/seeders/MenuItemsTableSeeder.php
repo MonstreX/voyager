@@ -155,13 +155,16 @@ class MenuItemsTableSeeder extends Seeder
                 $itemByCriteria->key = $key;
             }
             $itemByCriteria->fill($this->refreshPayload($payload));
+            $this->syncParentIfMissing($itemByCriteria, $payload);
             $itemByCriteria->save();
             return $itemByCriteria;
         }
 
         if ($itemByKey) {
             if ($refresh) {
-                $itemByKey->fill($this->refreshPayload($payload))->save();
+                $itemByKey->fill($this->refreshPayload($payload));
+                $this->syncParentIfMissing($itemByKey, $payload);
+                $itemByKey->save();
             }
             return $itemByKey;
         }
@@ -172,6 +175,7 @@ class MenuItemsTableSeeder extends Seeder
             }
             if ($refresh) {
                 $itemByCriteria->fill($this->refreshPayload($payload));
+                $this->syncParentIfMissing($itemByCriteria, $payload);
             }
             $itemByCriteria->save();
             return $itemByCriteria;
@@ -185,5 +189,22 @@ class MenuItemsTableSeeder extends Seeder
         unset($payload['parent_id'], $payload['order']);
 
         return $payload;
+    }
+
+    protected function syncParentIfMissing(MenuItem $item, array $payload): void
+    {
+        $targetParent = $payload['parent_id'] ?? null;
+        if (is_null($item->parent_id)) {
+            return;
+        }
+
+        $parentExists = MenuItem::where('menu_id', $item->menu_id)
+            ->where('id', $item->parent_id)
+            ->exists();
+        if ($parentExists) {
+            return;
+        }
+
+        $item->parent_id = $targetParent;
     }
 }
