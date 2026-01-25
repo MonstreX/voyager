@@ -306,4 +306,15 @@ return [
     */
 
     'clone_enabled' => env('VOYAGER_CLONE_ENABLED', true),
+
+    /*
+    |----------------------------------------------------------------------
+    | Seed Refresh
+    |----------------------------------------------------------------------
+    |
+    | When enabled, seeders may update existing Voyager records.
+    |
+    */
+
+    'seed_refresh' => false,
 ];

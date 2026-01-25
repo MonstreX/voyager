@@ -12,8 +12,9 @@ class DataTypesTableSeeder extends Seeder
      */
     public function run()
     {
+        $refresh = config('voyager.seed_refresh', false);
         $dataType = $this->dataType('slug', 'users');
-        if (!$dataType->exists) {
+        if ($refresh || !$dataType->exists) {
             $dataType->fill([
                 'name'                  => 'users',
                 'display_name_singular' => __('voyager::seeders.data_types.user.singular'),
@@ -28,7 +29,7 @@ class DataTypesTableSeeder extends Seeder
         }
 
         $dataType = $this->dataType('slug', 'menus');
-        if (!$dataType->exists) {
+        if ($refresh || !$dataType->exists) {
             $dataType->fill([
                 'name'                  => 'menus',
                 'display_name_singular' => __('voyager::seeders.data_types.menu.singular'),
@@ -42,7 +43,7 @@ class DataTypesTableSeeder extends Seeder
         }
 
         $dataType = $this->dataType('slug', 'roles');
-        if (!$dataType->exists) {
+        if ($refresh || !$dataType->exists) {
             $dataType->fill([
                 'name'                  => 'roles',
                 'display_name_singular' => __('voyager::seeders.data_types.role.singular'),

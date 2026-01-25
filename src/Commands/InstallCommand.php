@@ -53,6 +53,8 @@ class InstallCommand extends Command
         return [
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production', null],
             ['with-dummy', null, InputOption::VALUE_NONE, 'Install with dummy data', null],
+            ['refresh', null, InputOption::VALUE_NONE, 'Refresh Voyager seed data', null],
+            ['locale', null, InputOption::VALUE_OPTIONAL, 'Locale to use while refreshing seed data', null],
         ];
     }
 
@@ -84,6 +86,11 @@ class InstallCommand extends Command
      */
     public function handle(Filesystem $filesystem)
     {
+        if ($this->option('refresh')) {
+            $this->refreshSeedData();
+            return;
+        }
+
         $this->info('Publishing the Voyager assets, database, and config files');
 
         // Publish only relevant resources on install
@@ -147,6 +154,31 @@ class InstallCommand extends Command
         $this->call('storage:link');
 
         $this->info('Successfully installed Voyager! Enjoy');
+    }
+
+    protected function refreshSeedData()
+    {
+        $this->info('Refreshing Voyager seed data');
+        $this->applySeedRefreshOptions();
+
+        $this->call('db:seed', ['--class' => 'VoyagerDatabaseSeeder', '--force' => $this->option('force')]);
+
+        if ($this->option('with-dummy')) {
+            $this->call('db:seed', ['--class' => 'VoyagerDummyDatabaseSeeder', '--force' => $this->option('force')]);
+        }
+
+        $this->info('Seed data refresh completed.');
+    }
+
+    protected function applySeedRefreshOptions()
+    {
+        $locale = $this->option('locale');
+        if ($locale) {
+            app()->setLocale($locale);
+            $this->line('Seeding locale: ' . $locale);
+        }
+
+        config(['voyager.seed_refresh' => true]);
     }
 
 }

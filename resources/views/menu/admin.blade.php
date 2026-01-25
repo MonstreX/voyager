@@ -49,6 +49,7 @@
                         <a href="javascript:;" class="btn btn-sm btn-primary edit"
                             data-id="{{ $item->id }}"
                             data-title="{{ $item->title }}"
+                            data-key="{{ $item->key }}"
                             data-url="{{ $item->url }}"
                             data-target="{{ $item->target }}"
                             data-icon_class="{{ $item->icon_class }}"

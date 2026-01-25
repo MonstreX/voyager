@@ -2,6 +2,7 @@ import { getCsrfToken } from '../modules/csrf';
 import { showModal, hideModal } from '../core/bootstrap-compat';
 import { getToastr } from '../core/toastr';
 import { initMultilingual } from '../multilingual';
+import { initSlugifyField } from '../modules/slugify';
 
 let listenersAttached = false;
 
@@ -75,6 +76,7 @@ export const initMenusBuilder = () => {
 
     const idInput = document.getElementById('m_id');
     const titleInput = document.getElementById('m_title');
+    const keyInput = document.getElementById('m_key');
     const titleTranslationsInput = document.getElementById('title_i18n');
     const urlInput = document.getElementById('m_url');
     const routeInput = document.getElementById('m_route');
@@ -91,6 +93,7 @@ export const initMenusBuilder = () => {
     const submitButton = menuForm.querySelector('input[type="submit"]');
 
     let modalMultilingualInstance = null;
+    let keySlugifyInstance = null;
 
     const prepareHeading = (element) => {
         if (!element) return;
@@ -125,8 +128,12 @@ export const initMenusBuilder = () => {
         menuForm.reset();
         if (paramsInput) paramsInput.value = '';
         if (titleTranslationsInput) titleTranslationsInput.value = '';
+        if (keyInput) keyInput.value = '';
         if (modalMultilingualInstance && typeof modalMultilingualInstance.refresh === 'function') {
             modalMultilingualInstance.refresh();
+        }
+        if (keySlugifyInstance) {
+            keySlugifyInstance.refresh();
         }
     };
 
@@ -159,6 +166,7 @@ export const initMenusBuilder = () => {
         const id = button.dataset.id || '';
         if (idInput) idInput.value = id;
         if (titleInput) titleInput.value = button.dataset.title || '';
+        if (keyInput) keyInput.value = button.dataset.key || '';
 
         if (titleTranslationsInput) {
             const translationSource = document.getElementById('title' + id + '_i18n');
@@ -188,6 +196,10 @@ export const initMenusBuilder = () => {
         if (statusInput) {
             statusInput.checked = String(button.dataset.status || '1') !== '0';
             statusInput.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+
+        if (keySlugifyInstance) {
+            keySlugifyInstance.refresh();
         }
 
         showModal(menuModal);
@@ -221,6 +233,10 @@ export const initMenusBuilder = () => {
         });
         modalMultilingualInstance = Array.isArray(modalInstance) ? modalInstance[0] : modalInstance;
     };
+
+    if (keyInput && !keySlugifyInstance) {
+        keySlugifyInstance = initSlugifyField(keyInput);
+    }
 
     initMultilingualSections();
 

@@ -13,6 +13,8 @@ return [
     'icon_class2'          => 'Voyager Font Class</a>)',
     'icon_class_ph'        => 'Иконка (необязательно)',
     'item_route'           => 'Путь для пункта меню',
+    'item_key'             => 'Ключ пункта меню',
+    'item_key_ph'          => 'Ключ (необязательно)',
     'item_title'           => 'Название пункта меню',
     'link_type'            => 'Тип ссылки',
     'new_menu_item'        => 'Новый пункт меню',

@@ -12,6 +12,7 @@ class PermissionsTableSeeder extends Seeder
      */
     public function run()
     {
+        $refresh = config('voyager.seed_refresh', false);
         $keys = [
             'browse_admin',
             'browse_bread',

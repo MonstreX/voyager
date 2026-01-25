@@ -13,6 +13,8 @@ return [
     'icon_class2'          => 'Voyager Font Class</a>)',
     'icon_class_ph'        => 'Icon Class (optional)',
     'item_route'           => 'Route for the menu item',
+    'item_key'             => 'Menu item key',
+    'item_key_ph'          => 'Key (optional)',
     'item_title'           => 'Title of the Menu Item',
     'link_type'            => 'Link type',
     'new_menu_item'        => 'New Menu Item',

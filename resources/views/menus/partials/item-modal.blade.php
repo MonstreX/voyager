@@ -40,13 +40,15 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-12">
-                            <div>
-                                @include('voyager::multilingual.language-selector')
-                                <label for="name">{{ __('voyager::menu_builder.item_title') }}</label>
-                                @include('voyager::multilingual.input-hidden', ['_field_name' => 'title', '_field_trans' => ''])
-                                <input type="text" class="form-control" id="m_title" name="title" placeholder="{{ __('voyager::generic.title') }}"><br>
-                            </div>
+                        <div class="col-md-6 form-group">
+                            @include('voyager::multilingual.language-selector')
+                            <label for="m_title">{{ __('voyager::menu_builder.item_title') }}</label>
+                            @include('voyager::multilingual.input-hidden', ['_field_name' => 'title', '_field_trans' => ''])
+                            <input type="text" class="form-control" id="m_title" name="title" placeholder="{{ __('voyager::generic.title') }}">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="m_key">{{ __('voyager::menu_builder.item_key') }}</label>
+                            <input type="text" class="form-control" id="m_key" name="key" data-slug-origin="title" placeholder="{{ __('voyager::menu_builder.item_key_ph') }}">
                         </div>
                     </div>
 
