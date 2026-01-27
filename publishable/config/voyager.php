@@ -144,7 +144,12 @@ return [
         ],
 
         'widgets' => [
-
+            'TCG\\Voyager\\Widgets\\UserDimmer',
+            'TCG\\Voyager\\Widgets\\PostDimmer',
+            'TCG\\Voyager\\Widgets\\PageDimmer',
+            'TCG\\Voyager\\Widgets\\SystemInfoDimmer',
+            'TCG\\Voyager\\Widgets\\RuntimeLimitsDimmer',
+            'TCG\\Voyager\\Widgets\\StorageStatusDimmer',
         ],
 
     ],
