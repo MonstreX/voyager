@@ -1,22 +1,32 @@
 # Advanced Media Files (`adv_media_files`)
 
-`adv_media_files` is a gallery/collection field built on top of Voyager's Media Storage subsystem (polymorphic `media` table). It supports uploading multiple files, reordering, bulk selection, replacing a file, editing props, and cropping images.
+Gallery/collection field for **multiple files** (images or documents).
 
-This field is designed as a "power gallery" for admins:
-- supports mixed file types (images + documents)
-- shows file-type icons for non-images
-- persists ordering immediately on drag-and-drop
-- stores additional metadata per media item in `media.props`
+![Advanced Media Files](../../images/adv-media-files.png)
 
-## Details JSON
+## What editors can do
+
+- Upload many files.
+- Drag-and-drop to reorder.
+- Edit metadata per file (Title, Alt, plus custom fields).
+- Replace a file without losing its metadata.
+- Crop images (if the item is an image).
+
+## How to add it in BREAD
+
+1) Create a database column (nullable integer is fine).
+2) In **Tools -> BREAD -> Edit BREAD**, set the field type to `adv_media_files`.
+3) Add Details JSON (example below).
+
+## Details JSON (example)
 
 ```json
 {
-  "collection_name": "files",
+  "collection_name": "gallery",
   "input_accept": "image/*,.pdf,.zip",
   "extra_fields": {
     "subtitle": { "type": "text", "title": "Subtitle" },
-    "content":  { "type": "ace",  "title": "Content", "class": "col-md-12" },
+    "content":  { "type": "ace",  "title": "HTML", "class": "col-md-12" },
     "link":     { "type": "text", "title": "Link" }
   }
 }
@@ -24,55 +34,44 @@ This field is designed as a "power gallery" for admins:
 
 ### Options
 
-- `collection_name` (string, optional): media collection name (defaults to the field name).
-- `input_accept` (string, optional): forwarded to the `<input type="file" accept="...">`.
-- `extra_fields` (object, optional): additional props shown in the "Edit meta" modal and stored in `media.props`.
-  - Supported `type`: `text`, `textarea`, `ace`.
-  - `ace` uses HTML mode + `monokai` theme by default.
-  - `class` (optional): extra CSS class for the wrapper (`col-md-*` etc).
-
-## Behaviour
-
-- Reorder is saved immediately on drag-and-drop (server-side update of `media.order`).
-- Replacing a file keeps the same media record (updates file/path/mime/size).
-- Cropping is available for image items only.
+- **collection_name**: media collection name (defaults to the field name).
+- **input_accept**: value for the file input `accept` attribute.
+- **extra_fields**: extra metadata fields stored in `media.props`.
+  - Supported types: `text`, `textarea`, `ace`.
+  - `class` can be any grid class (e.g. `col-md-6`).
 
 ## Stored data
 
-Each uploaded file becomes a row in the `media` table:
+Each file is a row in the `media` table with:
 
-- `model_type/model_id` → your model
-- `collection_name` → from details (`collection_name`) or the field name
-- `order` → list position
-- `props` → `title`, `alt`, and keys from `extra_fields`
+- `collection_name` (from details or field name)
+- `order` (after drag-and-drop)
+- `props` (Title, Alt, plus extra fields)
 
-## Crop
+The model column stores a compact link to the collection (internally managed).
 
-The crop modal supports:
-- aspect ratio presets (including free crop)
-- max width / max height constraints (downscale after crop)
+## Using in Blade / controllers
 
-Crop is performed server-side via the media API endpoint and the preview is refreshed using cache-busting.
-
-## Notes
-
-- If you change `collection_name` later, existing media items will not move automatically; treat it as part of your data contract.
-- For JSON in `props`, always store arrays/objects; avoid invalid UTF-8 (the backend tolerates it, but it should not be a normal workflow).
-
-## Example: field that accepts mixed files + extra meta
-
-```json
-{
-  "collection_name": "attachments",
-  "input_accept": "image/*,.pdf,.zip,.doc,.docx,.xls,.xlsx",
-  "extra_fields": {
-    "subtitle": { "type": "text", "title": "Subtitle" },
-    "content": { "type": "ace", "title": "HTML snippet", "class": "col-md-12" },
-    "link": { "type": "text", "title": "Link" }
-  }
-}
+```php
+// model must use TCG\Voyager\Traits\HasMedia
+$items = $post->getMedia('gallery');
 ```
 
-Stored values:
-- Each file is a `media` row with `collection_name="attachments"`.
-- Extra fields are stored in `media.props` (JSON) under the same keys.
+```blade
+@foreach ($items as $media)
+    @if ($media->isImage())
+        <img src="{{ $media->url() }}?v={{ $media->updated_at?->getTimestamp() ?? $media->id }}"
+             alt="{{ $media->prop('alt') }}"
+             title="{{ $media->prop('title') }}">
+    @else
+        <a href="{{ $media->url() }}">{{ $media->fileName() }}</a>
+    @endif
+@endforeach
+```
+
+Extra fields are in `props`:
+
+```blade
+{{ $media->prop('subtitle') }}
+{{ $media->prop('link') }}
+```

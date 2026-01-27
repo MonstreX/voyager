@@ -1,10 +1,22 @@
 # Advanced Image (`adv_image`)
 
-`adv_image` stores a single uploaded image using Voyager's Media Storage subsystem (polymorphic `media` table). It supports basic image props and cropping.
+This field is for a **single image** with title/alt metadata and cropping.
 
-Use this field when you need exactly one image per record (cover, hero, thumbnail) with simple metadata.
+![Advanced Image](../../images/adv-image.png)
 
-## Details JSON
+## What editors can do
+
+- Upload or replace the image.
+- Edit **Title** and **Alt** values.
+- Crop the image.
+
+## How to add it in BREAD
+
+1) Create a database column for the image id (recommended: nullable integer).
+2) In **Tools -> BREAD -> Edit BREAD**, set the field type to `adv_image`.
+3) Add optional JSON details (example below).
+
+## Details JSON (optional)
 
 ```json
 {
@@ -12,48 +24,46 @@ Use this field when you need exactly one image per record (cover, hero, thumbnai
 }
 ```
 
-### Options
-
-- `collection_name` (string, optional): media collection name (defaults to the field name).
-
-## Behaviour
-
-- Upload replaces the previous image in the same collection.
-- Props are stored in `media.props` (JSON): `title`, `alt`.
-- Deleting clears the model field and removes the corresponding media record + file.
-- Crop uses the same crop API as the Media Manager (CropperJS UI).
+**collection_name**  
+Optional media collection name. If omitted, the field name is used.
 
 ## Stored data
 
-The model column stores the selected media id:
+The model column stores the **media id**:
 
-```text
-cover_image = 123
+```
+cover_image_id = 123
 ```
 
-The actual file and metadata are stored in `media`:
+The actual file and metadata are stored in the `media` table.
 
-- `collection_name` = `cover`
-- `props.title` / `props.alt`
+## Using in Blade / controllers
 
+### Option A: via media relation (recommended)
 
-## Example: BREAD field setup
-
-1) Create a database column (recommended type: nullable integer):
-
-```sql
-ALTER TABLE posts ADD COLUMN cover_image_id INT NULL;
+```php
+// model must use TCG\Voyager\Traits\HasMedia
+$media = $post->getFirstMedia('cover');
 ```
 
-2) In BREAD, set:
-- Field: `cover_image_id`
-- Type: `adv_image`
-- Details:
-
-```json
-{
-  "collection_name": "cover"
-}
+```blade
+@if ($media)
+    <img src="{{ $media->url() }}?v={{ $media->updated_at?->getTimestamp() ?? $media->id }}"
+         alt="{{ $media->prop('alt') }}"
+         title="{{ $media->prop('title') }}">
+@endif
 ```
 
-The model will store the `media.id` of the uploaded image in `cover_image_id`.
+### Option B: via stored media id
+
+```php
+$media = $post->media()->find($post->cover_image_id);
+```
+
+```blade
+@if ($media)
+    <img src="{{ $media->url() }}?v={{ $media->updated_at?->getTimestamp() ?? $media->id }}"
+         alt="{{ $media->prop('alt') }}"
+         title="{{ $media->prop('title') }}">
+@endif
+```

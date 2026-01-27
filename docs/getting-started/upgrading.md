@@ -1,29 +1,44 @@
 # Upgrading
 
-## Upgrading 1.5 to 1.6
+## Upgrading from the original TCG Voyager
 
-### Update your Composer.json
+1) Update your Composer dependency:
 
-To update to the latest version inside of your composer.json file make sure to update the version of Voyager inside the require declaration of your composer.json to:
+```
+composer require monstrex/voyager
+```
 
-`tcg/voyager": "1.6.*`
+2) Run an update and migrations:
 
-And then run `composer update`
+```
+composer update
+php artisan migrate
+```
 
-### Check your rich text configuration
+3) Publish updated assets (required after any UI changes):
 
-Voyager no longer ships TinyMCE. The `rich_text_box` field now mounts [Jodit Editor](https://xdsoft.net/jodit/), so any legacy `window.voyagerTinyMCE...` customizations will stop working.
+```
+php artisan vendor:publish --tag=voyager_assets --force
+```
 
-If you previously injected custom TinyMCE scripts/options, remove them and use the new lazy-loaded editors API instead: `Voyager.loadEditors().then(({ initJodit }) => initJodit(...))` (documented in the Rich Text form field guide).
+4) If you want the latest config defaults:
 
-### Troubleshooting
+```
+php artisan vendor:publish --tag=config --provider="TCG\Voyager\VoyagerServiceProvider"
+```
 
-Be sure to ask us on our slack channel if you are experiencing any issues and we will try and assist. Thanks.
+5) Clear caches:
+
+```
+php artisan config:clear
+php artisan view:clear
+```
 
 ## Notes for this fork
 
-This repository diverges from the original Voyager 1.x line and includes breaking modernizations:
+- **TinyMCE is removed** -> `rich_text_box` uses **Jodit** (lazy-loaded).
+- **Webpack/Mix replaced by Vite** -> rebuild assets and re-publish.
+- **Media Storage** replaces Spatie Media Library from legacy extensions.
+- Several advanced BREAD features are merged from the legacy `voyager-extension` package.
 
-- TinyMCE is removed in favor of Jodit (see `../bread/formfields/rich-text.md`).
-- Legacy Webpack/Mix build pipeline is replaced by Vite (see `../fork/assets-and-editors.md`).
-- Some advanced features are migrated from a legacy `voyager-extension` codebase (see `../fork/overview.md`).
+See `docs/fork/overview.md` for the full list of changes.

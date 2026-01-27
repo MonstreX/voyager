@@ -18,6 +18,37 @@ You may also choose to specify what form type you want to use for each field. Th
 
 Each field also has additional details or options that can be included. These types are checkbox, dropdown, radio button, and image.
 
+## BREAD builder extras (this fork)
+
+The BREAD builder UI is extended to make advanced options easier to discover.
+
+![BREAD Layout](../images/bread-layout.png)
+![BREAD Extra Options](../images/bread-extra.png)
+
+## Tabs in Edit/Add
+
+You can split large forms into tabs using the `tab_title` detail option.
+
+![Tabs](../images/tabs.png)
+
+## Inline checkbox on browse
+
+Checkbox fields can be toggled directly in the browse list.
+
+![Inline Checkbox](../images/inline-checkbox.png)
+
+## Tree browse mode
+
+If your model uses `parent_id`, you can enable tree browse mode.
+
+![Tree View](../images/tree-view.png)
+
+## Sticky action panel
+
+The edit/add page can use a sticky action panel for the main buttons.
+
+![Sticky Panel](../images/sticky-panel.png)
+
 ## Validation
 
 Inside of the _Optional Details_ section for each row in your BREAD you can also specify validation rules with some simple JSON. Here is an example of how to add a validation rule for _required_ and _max length of 12_

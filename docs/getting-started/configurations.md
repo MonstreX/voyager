@@ -17,16 +17,14 @@ Below we will take a deep dive into the configuration file and give a detailed d
 'user' => [
     'add_default_role_on_register' => true,
     'default_role'                 => 'user',
-    'admin_permission'             => 'browse_admin',
-    'namespace'                    => App\User::class,
-    'redirect'                     => '/admin'
+    'default_avatar'               => 'users/default.png',
+    'redirect'                     => '/admin',
 ],
 ```
 
 **add\_default\_role\_on\_register:** Specify whether you would like to add the default role to any new user that is created.  
 **default\_role:** You can also specify what the **default\_role** is of the user.  
-**admin\_permission:** The permission needed to view the admin dashboard.  
-**namespace:** The namespace of your apps User Class.  
+**default\_avatar:** Default avatar path for new users.  
 **redirect:** Redirect path after the user logged in.
 
 ## Controller
@@ -53,25 +51,11 @@ If you only want to overwrite a single controller, you might consider adding the
 <?php
 
 'models' => [
-    //'namespace' => 'App\\',
+    'namespace' => 'App\\Models\\',
 ],
 ```
 
-You can specify the namespace or location of your models. This is used when creating the Models from the database section of Voyager. If not defined the default application namespace will be used.
-
-## Assets
-
-```php
-<?php
-
-'assets_path' => '/vendor/tcg/voyager/assets',
-```
-
-You may wish to specify a different asset path. If your site lives in a subfolder you may need to include that directory to the beginning of the path. This may also be used in case you wish to duplicate the published assets and customize your own.
-
-{% hint style="info" %}
-When upgrading to new version of voyager the assets located in the `/vendor/tcg/voyager/assets` directory may need to be overwritten, so if you wish to customize any styles you will want to duplicate that directory and specify the new location of your asset\_path.
-{% endhint %}
+You can specify the namespace or location of your models. This is used when creating the Models from the database section of Voyager. The default in this fork is `App\\Models\\`.
 
 ## Storage
 
@@ -106,9 +90,19 @@ It uses the same disk setting as Voyager storage by default (`voyager.storage.di
     'allow_delete' => true,
     'allow_create_folder' => true,
     'allow_rename' => true,
-    'allow_crop' => true,
+    'delete_on_soft_delete' => true,
+    'api' => [
+        'allowed_model_types' => [],
+        'require_has_media_trait' => true,
+        'expose_exception_messages' => null,
+    ],
 ],
 ```
+
+**delete\_on\_soft\_delete:** When a model uses SoftDeletes, controls whether media is removed on soft-delete or only on force-delete.  
+**api.allowed\_model\_types:** Optional whitelist of model FQCNs allowed to use media API endpoints.  
+**api.require\_has\_media\_trait:** Require `TCG\Voyager\Traits\HasMedia` on model types.  
+**api.expose\_exception\_messages:** If `null`, respects `app.debug`.
 
 ### Optional: custom path generator for stored media files
 
@@ -189,17 +183,43 @@ Read more about multilanguage [here](../core-concepts/multilanguage.md).
         'TCG\\Voyager\\Widgets\\UserDimmer',
         'TCG\\Voyager\\Widgets\\PostDimmer',
         'TCG\\Voyager\\Widgets\\PageDimmer',
+        'TCG\\Voyager\\Widgets\\SystemInfoDimmer',
+        'TCG\\Voyager\\Widgets\\RuntimeLimitsDimmer',
+        'TCG\\Voyager\\Widgets\\StorageStatusDimmer',
     ],
 ],
 ```
 
-In the dashboard config you can add **navbar\_items**, make the **data\_tables** responsive, and manage your dashboard **widgets**.
+In the dashboard config you can add **navbar\_items** and manage your dashboard **widgets**.
 
 **navbar\_items** Include a new route in the main user navbar dropdown by including a 'route', 'icon\_class', and 'target\_blank'.
 
 **data\_tables** If you set 'responsive' to true the datatables will be responsive.
 
-**widgets** Here you can manage the widgets that live on your dashboard. You can take a look at an example widget class by viewing the current widgets inside of `tcg/voyager/src/Widgets`.
+**widgets** Here you can manage the widgets that live on your dashboard. You can take a look at an example widget class by viewing the current widgets inside of `vendor/monstrex/voyager/src/Widgets`.
+
+## BREAD
+
+```php
+<?php
+
+'bread' => [
+    'add_menu_item' => true,
+    'default_menu' => 'admin',
+    'add_permission' => true,
+    'default_role' => 'admin',
+    'sticky_action_panel' => [
+        'enabled' => true,
+        'autohide' => false,
+    ],
+],
+```
+
+**add\_menu\_item:** Automatically add a menu item when a new BREAD is created.  
+**default\_menu:** Which menu should receive the auto-created item.  
+**add\_permission:** Automatically create permissions for new BREAD.  
+**default\_role:** Role that receives the generated permissions.  
+**sticky\_action\_panel:** Enables the sticky action buttons on BREAD edit/add screens.
 
 ## Primary color
 
@@ -295,4 +315,24 @@ The user can only upload files with the given mimetypes. If you want to allow al
 
 'allowed_mimetypes' => '*',
 ```
+
+## Clone Record Action
+
+```php
+<?php
+
+'clone_enabled' => env('VOYAGER_CLONE_ENABLED', true),
+```
+
+Enables or disables the Clone action globally. You can further restrict cloning per-model using the `$clone` property on the model.
+
+## Seed Refresh (this fork)
+
+```php
+<?php
+
+'seed_refresh' => false,
+```
+
+When enabled, seeders can update existing Voyager records during refresh operations instead of skipping them.
 

@@ -1,28 +1,59 @@
 # Advanced Fields Group (`adv_fields_group`)
 
-`adv_fields_group` is a layout/helper field used to group multiple fields in the BREAD form.
+Simple grouped fields stored as JSON.
 
-This field is migrated from a legacy `voyager-extension` implementation. It does not store data by itself; it affects only the UI layout.
+![Fields Group](../../images/fields-group.png)
 
-## Recommended usage
+## What editors can do
 
-Use `adv_fields_group` when:
-- you have a long form and want visual grouping
-- you want consistent section headers inside the BREAD edit/add screen
+- Fill a small group of related fields (e.g. SEO block).
+- Keep them visually grouped inside the edit screen.
 
-## Details JSON
+## How to add it in BREAD
 
-The exact layout options depend on the current view template, but a typical pattern is:
+1) Create a database column (TEXT recommended).
+2) In **Tools -> BREAD -> Edit BREAD**, set the field type to `adv_fields_group`.
+3) Add Details JSON.
+
+## Details JSON (example)
 
 ```json
 {
-  "title": "SEO",
-  "description": "Metadata for the page",
-  "class": "col-md-12"
+  "fields": {
+    "seo_title": {
+      "label": "SEO Title",
+      "type": "text"
+    },
+    "meta_description": {
+      "label": "Meta Description",
+      "type": "textarea"
+    },
+    "meta_keywords": {
+      "label": "Meta Keywords",
+      "type": "textarea"
+    }
+  }
 }
 ```
 
-## Notes
+### Supported field types
 
-- This field should not be used for actual data storage.
-- Prefer grouping via `adv_fields_group` over duplicating custom Blade overrides.
+`text`, `textarea`
+
+## Stored data
+
+Stored as JSON in the model field.
+
+## Using in Blade / controllers
+
+```php
+$seo = json_decode($post->seo, true);
+```
+
+```blade
+@if ($seo)
+    <title>{{ $seo['fields']['seo_title']['value'] ?? '' }}</title>
+    <meta name="description" content="{{ $seo['fields']['meta_description']['value'] ?? '' }}">
+    <meta name="keywords" content="{{ $seo['fields']['meta_keywords']['value'] ?? '' }}">
+@endif
+```

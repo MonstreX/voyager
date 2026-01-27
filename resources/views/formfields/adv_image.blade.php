@@ -30,7 +30,7 @@
                 </div>
 
                 <div class="adv-media-files-file">
-                    <img src="{{ $media->cacheBustedFullUrl() }}"
+                    <img src="{{ $media->url() }}?v={{ $media->updated_at?->getTimestamp() ?? $media->id }}"
                          alt="{{ $media->prop('alt', $media->fileName()) }}"
                          draggable="false">
                 </div>

@@ -81,7 +81,7 @@
 
                         <div class="adv-media-files-file">
                             @if($media->isImage())
-                                <img src="{{ $media->cacheBustedFullUrl() }}">
+                                <img src="{{ $media->url() }}?v={{ $media->updated_at?->getTimestamp() ?? $media->id }}">
                             @else
                                 @php
                                     $extension = strtolower(pathinfo($media->file_name, PATHINFO_EXTENSION));

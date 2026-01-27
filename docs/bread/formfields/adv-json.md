@@ -1,54 +1,51 @@
 # Advanced JSON (`adv_json`)
 
-`adv_json` provides a structured JSON editor UI for storing JSON in a model column.
+Sortable list of key/value rows stored as JSON.
 
-This field is migrated from a legacy `voyager-extension` implementation. The exact UI and options depend on the current template and can be extended via the `details` JSON for the DataRow.
+![Advanced JSON](../../images/fields-json-multi.png)
 
-## Recommended usage
+## What editors can do
 
-Use `adv_json` when:
-- you need to store structured configuration per record
-- you want an editor UI instead of a plain textarea
-- you are OK with application-level validation (JSON schema is not enforced by default)
+- Add multiple rows of fields.
+- Reorder rows.
+- Remove rows.
 
-## Details JSON
+## How to add it in BREAD
 
-The field can be used with minimal configuration:
+1) Create a database column (TEXT recommended).
+2) In **Tools -> BREAD -> Edit BREAD**, set the field type to `adv_json`.
+3) Add Details JSON.
 
-```json
-{}
-```
-
-If you need to provide defaults, use the standard Voyager `default` key:
+## Details JSON (example)
 
 ```json
 {
-  "default": {
-    "enabled": true,
-    "items": []
+  "json_fields": {
+    "group": "Group",
+    "name": "Name",
+    "value": "Value"
   }
 }
 ```
 
-> Note: the value is stored as JSON in the model column. Make sure the column type is `json` or `text`.
+This defines the columns shown in each row.
 
-## Accessing the value in code
+## Stored data
 
-```php
-$config = $model->config_field;
-if (is_string($config)) {
-    $config = json_decode($config, true);
-}
-```
+Stored as JSON in the model field, with rows array.
 
-## Validation tip
-
-If you want to ensure the value is valid JSON, add a model cast:
+## Using in Blade / controllers
 
 ```php
-protected $casts = [
-    'config_field' => 'array',
-];
+$data = json_decode($post->specs, true) ?: [];
+$rows = $data['rows'] ?? [];
 ```
 
-Then the field will be returned as an array and Laravel will re-encode it automatically.
+```blade
+@foreach ($rows as $row)
+    <div>
+        <strong>{{ $row['name'] ?? '' }}</strong>:
+        {{ $row['value'] ?? '' }}
+    </div>
+@endforeach
+```

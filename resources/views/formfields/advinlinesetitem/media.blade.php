@@ -36,7 +36,7 @@
                         <i class="voyager-x"></i>
                     </div>
                     @if($media->isImage())
-                        <img src="{{ $media->cacheBustedFullUrl() }}" alt="">
+                        <img src="{{ $media->url() }}?v={{ $media->updated_at?->getTimestamp() ?? $media->id }}" alt="">
                     @else
                         @php
                             $extension = strtolower(pathinfo($media->file_name, PATHINFO_EXTENSION));

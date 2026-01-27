@@ -1,120 +1,74 @@
-<p align="center"><a href="https://voyager.devdojo.com" target="_blank"><img width="400" src="https://s3.amazonaws.com/thecontrolgroup/voyager.png"></a></p>
+<p align="center"><img width="400" src="https://s3.amazonaws.com/thecontrolgroup/voyager.png" alt="Voyager"></p>
 
-# **V**oyager - The Missing Laravel Admin
-Made with ❤️ by [The Control Group](https://www.thecontrolgroup.com)
+# Voyager
 
-![Voyager Screenshot](https://s3.amazonaws.com/thecontrolgroup/voyager-screenshot.png)
+This repository is a fork of the classic **TCG Voyager** admin panel.  
+The goal is to preserve the classic Voyager experience while running on a modern PHP/Laravel stack and keeping the codebase actively maintained.
 
-Website & Documentation: https://voyager.devdojo.com/
+## What changed in this fork
 
-Video Tutorial Here: https://voyager.devdojo.com/academy/
+- **Modern stack:** PHP 8.2+ and Laravel 11/12.
+- **Build tooling:** Webpack/Mix -> Vite.
+- **Editors:** TinyMCE -> Jodit (lazy-loaded); Ace for code fields.
+- **Media layer:** Custom Media Storage subsystem (no Spatie Media Library).
+- **Advanced BREAD fields:** `adv_image`, `adv_media_files`, `adv_inline_set`, `adv_related`, `adv_select_dropdown_tree`, `adv_json`, `adv_fields_group`.
+- **UX improvements:** browse filters, inline editing, tree view, sticky action panel, improved media crop UI.
 
-Join our Slack chat: https://voyager-slack-invitation.herokuapp.com/
+This fork is not affiliated with The Control Group and is maintained independently.
 
-View the Voyager Cheat Sheet: https://voyager-cheatsheet.ulties.com/
-
-<hr>
-
-> **⚠️ IMPORTANT NOTE: Voyager Reborn (v1.8+)**
->
-> This repository is a modernized, drop-in replacement for the original TCG Voyager, revived to support the latest PHP and Laravel ecosystems.
->
-> **Key Modernization Features:**
-> *   **Modern Stack Support:** Fully compatible with **PHP 8.2+** and **Laravel 11 / 12**.
-> *   **Zero Legacy Dependencies:** Removed `jQuery`, `Intervention/Image v2`, `TinyMCE`, and other outdated libraries.
-> *   **New Rich Text Editor:** Replaced TinyMCE with **Jodit Editor** (lightweight, fast, and reliable).
-> *   **Native Image Processing:** Replaced Intervention with a custom lightweight GD-based processor (faster, no external deps).
-> *   **Modern Build Tooling:** Migrated from Webpack/Mix to **Vite**.
-> *   **CSS Grid Shim:** Replaced Bootstrap 3's float-based grid with a modern **Flexbox implementation** (preserving visual compatibility).
-> *   **Google Maps:** Updated to work with modern APIs (removed dependency on deprecated Map IDs).
->
-> This version aims to keep the classic Voyager experience alive while running on a strictly modern technology stack.
-
-Laravel Admin & BREAD System (Browse, Read, Edit, Add, & Delete), supporting Laravel 8 and newer!
-
-> Want to use Laravel 6 or 7? Use [Voyager 1.5](https://github.com/the-control-group/voyager/tree/1.5)
-
-## Installation Steps
-
-### 1. Require the Package
-
-After creating your new Laravel application you can include the Voyager package with the following command:
+## Installation
 
 ```bash
-composer require tcg/voyager
+composer require monstrex/voyager
 ```
 
-> If you are installing this on Laravel 10, we are working on getting a permanent release available; however, you can still use this with Larvel 10 by requiring the following:
-
-```bash
-composer require tcg/voyager dev-1.6-l10
-```
-
-### 2. Add the DB Credentials & APP_URL
-
-Next make sure to create a new database and add your database credentials to your .env file:
-
-```
-DB_HOST=localhost
-DB_DATABASE=homestead
-DB_USERNAME=homestead
-DB_PASSWORD=secret
-```
-
-You will also want to update your website URL inside of the `APP_URL` variable inside the .env file:
-
-```
-APP_URL=http://localhost:8000
-```
-
-### 3. Run The Installer
-
-Lastly, we can install voyager. You can do this either with or without dummy data.
-The dummy data will include 1 admin account (if no users already exists), 1 demo page, 4 demo posts, 2 categories and 7 settings.
-
-To install Voyager without dummy simply run
+Run the installer (with or without dummy data):
 
 ```bash
 php artisan voyager:install
-```
-
-If you prefer installing it with dummy run
-
-```bash
+# or
 php artisan voyager:install --with-dummy
 ```
 
-And we're all good to go!
+### Installer options
 
-Start up a local development server with `php artisan serve` And, visit [http://localhost:8000/admin](http://localhost:8000/admin).
+```
+--with-dummy   Install demo data (pages, posts, categories, settings)
+--force        Force operations in production
+--refresh      Refresh Voyager seed data only (no migrations)
+--locale=xx    Locale to use when refreshing seed data
+```
+
+### Refresh seed data
+
+Use this when you want to restore/update Voyager BREAD, menus, permissions,
+and settings to the package defaults without re-installing:
+
+```bash
+php artisan voyager:install --refresh
+```
+
+With a specific locale:
+
+```bash
+php artisan voyager:install --refresh --locale=ru
+```
 
 ## Creating an Admin User
-
-If you did go ahead with the dummy data, a user should have been created for you with the following login credentials:
-
->**email:** `admin@admin.com`   
->**password:** `password`
-
-NOTE: Please note that a dummy user is **only** created if there are no current users in your database.
-
-If you did not go with the dummy user, you may wish to assign admin privileges to an existing user.
-This can easily be done by running this command:
 
 ```bash
 php artisan voyager:admin your@email.com
 ```
 
-If you did not install the dummy data and you wish to create a new admin user, you can pass the `--create` flag, like so:
+To create a new admin user in one step:
 
 ```bash
 php artisan voyager:admin your@email.com --create
 ```
 
-And you will be prompted for the user's name and password.
+## Frontend Assets (Admin UI)
 
-## Frontend Assets
-
-Voyager's admin panel assets are built with [Vite](https://vitejs.dev/). When working on the UI locally run:
+Voyager's admin assets are built with Vite. When you modify frontend assets:
 
 ```bash
 npm install
@@ -122,44 +76,43 @@ npm run build
 php artisan vendor:publish --tag=voyager_assets --force
 ```
 
-The `vendor:publish` step copies the compiled files from `publishable/assets` into your application's `public/vendor/voyager` directory so that the admin panel can serve them directly.
-This path is now the only runtime source of Voyager's CSS/JS, so rerun the publish command every time you rebuild assets.
+Published assets live in `public/vendor/voyager` and are required at runtime.
 
-## Additions in this fork
+## Uninstall (manual)
 
-This fork includes additional features migrated from a legacy `voyager-extension` codebase and a custom Media Storage subsystem (instead of Spatie Media Library).
+Voyager does not ship a dedicated uninstall command. To remove it:
 
-**Modernization summary (fork)**
-- Modern stack: PHP 8.2+ and Laravel 11/12
-- Build: Webpack/Mix → Vite (`publishable/assets` → publish to `public/vendor/voyager`)
-- Editors: TinyMCE → Jodit; Ace is bundled and lazy-loaded via `js/editors.js`
-- JS: native JS modules + bootstrap compatibility layer; unified confirm modals
-- Media: custom polymorphic `media` table + media API + CropperJS crop UI
+1) Remove the package:
 
-**Custom BREAD formfields**
-- `adv_select_dropdown_tree` (hierarchical dropdown)
-- `adv_related` (native JS autocomplete + sortable)
-- `adv_image` (single media item with props + crop)
-- `adv_media_files` (gallery/collection with props, reorder, bulk, crop)
-- `adv_inline_set` (inline sets, JSON-only storage, supports Jodit/Ace/media)
-- `adv_json`, `adv_fields_group`
+```bash
+composer remove monstrex/voyager
+```
 
-**Media Storage**
-- Polymorphic `media` table (`model_type/model_id`), `collection_name`, `order`, `props`, `disk`, `path`
-- Services: `TCG\\Voyager\\Services\\MediaService`, `MediaUploadService`, `PathGeneratorService`
-- Dated path strategy: `{table}/media/{Y}/{m}`
+2) Roll back or delete Voyager tables (if you want to clean the DB).
 
-For fork-specific documentation see:
+3) Remove the Voyager routes block from `routes/web.php`:
+
+```php
+Route::group(['prefix' => 'admin'], function () {
+    Voyager::routes();
+});
+```
+
+4) Delete published assets/config if needed:
+
+- `public/vendor/voyager`
+- `config/voyager.php`
+
+5) (Optional) Remove the storage symlink:
+
+```
+public/storage
+```
+
+## Documentation
+
+Docs live in `docs/` and include fork-specific guides:
+
 - `docs/fork/overview.md`
+- `docs/fork/assets-and-editors.md`
 - `docs/fork/media-storage.md`
-
-For implementation/migration notes (workspace):
-- `E:\\www.osp6\\voyager\\VE-MIGRATION.md`
-- `E:\\www.osp6\\voyager\\ADMIN-REVIEW.md`
-
-## Sponsors
-
-Voyager is proudly supported by our amazing sponsors. A big thank you to:
-
-[![DigitalOcean Referral Badge](https://web-platforms.sfo2.cdn.digitaloceanspaces.com/WWW/Badge%203.svg)](https://www.digitalocean.com/?refcode=dc19b9819d06&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge)
-

@@ -3,7 +3,7 @@
 Voyager is super easy to install. After creating your new Laravel application you can include the Voyager package with the following command:
 
 ```bash
-composer require tcg/voyager
+composer require monstrex/voyager
 ```
 
 Next make sure to create a new database and add your database credentials to your .env file, you will also want to add your application URL in the `APP_URL` variable:
@@ -29,6 +29,10 @@ If you prefer installing it with the dummy data run the following command:
 ```bash
 php artisan voyager:install --with-dummy
 ```
+
+{% hint style="info" %}
+The installer publishes admin assets and the default config automatically. If you rebuild assets later, re-publish them with `php artisan vendor:publish --tag=voyager_assets --force`.
+{% endhint %}
 
 {% hint style="danger" %}
 **Specified key was too long error**  
@@ -67,11 +71,11 @@ And you will be prompted for the users name and password.
 
 This section is meant for users who are installing Voyager on an already existing Laravel installation or for users who want to perform a manual install. If this is not the case, you should go back to the [installation](installation.md) documentation or skip this section.
 
-The first thing you should do is publish the assets that come with Voyager. You can do that by running the following commands:
+The first thing you should do is publish the assets and config that come with Voyager:
 
 ```bash
-php artisan vendor:publish --provider="TCG\Voyager\VoyagerServiceProvider"
-php artisan vendor:publish --provider="Intervention\Image\ImageServiceProviderLaravelRecent"
+php artisan vendor:publish --tag=voyager_assets --force
+php artisan vendor:publish --tag=config --provider="TCG\Voyager\VoyagerServiceProvider"
 ```
 
 Next, call `php artisan migrate` to migrate all Voyager table.
@@ -80,7 +84,7 @@ Next, call `php artisan migrate` to migrate all Voyager table.
 If you want to change migrations, for example to use a different table for users, don't migrate. Instead copy Voyagers migrations to `database/migrations`, make your changes, turn off the config option `database.autoload_migrations` and then migrate.
 {% endhint %}
 
-Now, open your User-Model \(usually `app/User.php`\) and make the class extend `\TCG\Voyager\Models\User` instead of `Authenticatable`.
+Now, open your User-Model \(usually `app/Models/User.php`\) and make the class extend `\TCG\Voyager\Models\User` instead of `Authenticatable`.
 
 ```php
 <?php

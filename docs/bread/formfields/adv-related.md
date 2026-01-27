@@ -1,71 +1,56 @@
 # Advanced Related (`adv_related`)
 
-`adv_related` is a native JavaScript autocomplete field for selecting related records and storing a compact JSON payload in the model column. It supports drag-and-drop ordering via SortableJS.
+Sortable list of related records with autocomplete.
 
-This field is useful when you want:
-- an ordered list of related entities
-- to store a snapshot of selected fields (id/title/slug/etc.)
-- to avoid building pivot tables for simple use cases
+![Advanced Related](../../images/adv-related.png)
 
-## Details JSON
+## What editors can do
+
+- Search and add related items.
+- Reorder the list by drag-and-drop.
+- Remove items from the list.
+
+## How to add it in BREAD
+
+1) Create a database column (TEXT recommended).
+2) In **Tools -> BREAD -> Edit BREAD**, set the field type to `adv_related`.
+3) Add Details JSON.
+
+## Details JSON (example)
 
 ```json
 {
   "related_model": {
-    "source": "posts",
+    "source": "pages",
     "search_field": "title",
     "display_field": "title",
-    "fields": ["id", "title", "slug"]
+    "fields": ["title", "slug", "price"]
   }
 }
 ```
 
 ### Options
 
-- `source` (string): BREAD slug (DataType slug) used by the search endpoint.
-- `search_field` (string): field used for searching.
-- `display_field` (string): field shown as the item title in the UI.
-- `fields` (array): fields included in the stored JSON payload.
+- **source**: BREAD slug of the related model.
+- **search_field**: field used for search.
+- **display_field**: field shown in the list.
+- **fields**: list of fields to store in JSON for each item.
 
-## Search endpoint
+## Stored data
 
-The autocomplete queries an admin route and expects JSON results:
+Stored as JSON array in the model field.  
+Each item contains `id` plus the fields listed in the config.
 
-- Route: `voyager.related-records.search`
-- Parameters (from field `details`): `slug`, `search_field`, `display_field`, `fields`
-
-Typical URL shape:
-
-```
-GET /admin/related-records/search?slug=posts&s=term&search_field=title&display_field=title&fields=id,title,slug
-```
-
-## Stored JSON format
-
-```json
-[
-  {
-    "display_field": "title",
-    "fields": {
-      "id": 1,
-      "title": "Example",
-      "slug": "example"
-    }
-  }
-]
-```
-
-## Typical usage pattern
-
-Extract ids:
+## Using in Blade / controllers
 
 ```php
-$items = json_decode($model->related_field, true) ?: [];
-$ids = collect($items)->pluck('fields.id')->filter()->values();
+$items = json_decode($post->related_pages, true) ?: [];
 ```
 
-Extract display values:
-
-```php
-$titles = collect($items)->map(fn ($item) => data_get($item, 'fields.title'));
+```blade
+@foreach ($items as $item)
+    <a href="/pages/{{ $item['fields']['slug'] ?? '' }}">
+        {{ $item['fields']['title'] ?? '' }}
+    </a>
+@endforeach
 ```

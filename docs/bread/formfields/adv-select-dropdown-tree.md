@@ -1,31 +1,58 @@
 # Advanced Select Dropdown Tree (`adv_select_dropdown_tree`)
 
-`adv_select_dropdown_tree` renders a hierarchical dropdown for `belongsTo` relationships where the related table represents a parent/child tree (usually via `parent_id`).
+Dropdown selector for hierarchical (parent/child) models.
 
-## Details JSON
+## What editors can do
+
+- Choose a parent item from a tree-like dropdown.
+- Use it for categories, sections, menus, etc.
+
+## How to add it in BREAD
+
+1) Add a `parent_id` (or similar) column in your table.
+2) In **Tools -> BREAD -> Edit BREAD**, set the field type to `adv_select_dropdown_tree`.
+3) Add Details JSON with a relationship config.
+
+## Details JSON (example)
 
 ```json
 {
+  "browse_filter": true,
   "relationship": {
     "model": "App\\\\Models\\\\Category",
-    "field": "category",
     "key": "id",
-    "label": "name",
-    "ref_field": "category_id"
+    "label": "title",
+    "field": "category",
+    "ref_field": "category_id",
+    "filter_label": "Category"
   }
 }
 ```
 
 ### Options
 
-- `model`: related model class.
-- `field`: relationship method name on the current model.
-- `key`: primary key on the related model.
-- `label`: display field on the related model.
-- `ref_field`: foreign key field on the current model.
+- **model**: related model class
+- **key**: primary key
+- **label**: display label
+- **ref_field**: local field referencing the related model
+- **filter_label**: label for browse filters (if enabled)
 
-## Behaviour
+## Notes
 
-- Browse/Read display shows the related label instead of the raw ID.
-- Edit/Add view shows a `<select>` built from a flattened tree, with `--` indentation based on depth.
+To use browse filters, enable `browse_filter: true` (see Browse Filters doc).
 
+## Using in Blade / controllers
+
+This field stores a standard foreign key (e.g. `category_id`).
+
+```php
+// In your model
+public function category()
+{
+    return $this->belongsTo(Category::class);
+}
+```
+
+```blade
+{{ $post->category?->title }}
+```

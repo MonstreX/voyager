@@ -11,8 +11,8 @@ This repository is a fork of the classic TCG Voyager admin panel, updated for a 
 
 ### Frontend tooling
 
-- Build system: **Laravel Mix/Webpack** → **Vite**.
-- Admin assets are compiled into `publishable/assets` and must be published to the host app (see “Assets & Editors”).
+- Build system: **Laravel Mix/Webpack** -> **Vite**.
+- Admin assets are compiled into `publishable/assets` and must be published to the host app (see "Assets & Editors").
 
 ### JavaScript architecture
 
@@ -22,7 +22,7 @@ This repository is a fork of the classic TCG Voyager admin panel, updated for a 
 
 ### Editors
 
-- WYSIWYG: **TinyMCE** → **Jodit** (lazy-loaded).
+- WYSIWYG: **TinyMCE** -> **Jodit** (lazy-loaded).
 - Code editor: **Ace** (lazy-loaded; used by core `code_editor` and advanced fields).
 
 ### Media layer
@@ -51,4 +51,3 @@ This repository is a fork of the classic TCG Voyager admin panel, updated for a 
 - Media Manager crop improvements (aspect ratios + max width/height + preview refresh).
 
 For a chronological migration log see `VE-MIGRATION.md` (project root) and `ADMIN-REVIEW.md` (project root).
-

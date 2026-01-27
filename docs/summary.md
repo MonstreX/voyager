@@ -24,6 +24,7 @@
 * [Introduction](bread/introduction.md)
 * [Relationships](bread/relationships.md)
 * [Browse Filters](bread/browse-filters.md)
+* [BREAD Details Options (this fork)](bread/advanced-options.md)
 * [Formfields](bread/formfields/introduction.md)
   * [Checkbox/Multiple Checkbox/Radio](bread/formfields/checkbox.md)
   * [Coordinates](bread/formfields/coordinates.md)
