@@ -17,6 +17,42 @@ body, html {
   outline: none;
 }
 
+.voyager {
+  a,
+  button,
+  .btn,
+  .dropdown-toggle,
+  .dropdown-menu > li > a,
+  .nav > li > a,
+  .nav-tabs > li > a,
+  .pagination > li > a,
+  .pagination > li > span,
+  input[type="file"],
+  input[type="radio"],
+  input[type="checkbox"],
+  .jodit-ui-button,
+  .jodit-ui-button-variants_variant_default,
+  .jodit-ui-button-variants_variant_primary,
+  .jodit-ui-button-variants_variant_secondary,
+  .jodit-ui-button-variants_variant_success,
+  .jodit-ui-button-variants_variant_danger,
+  .jodit-ui-button_variant_default,
+  .jodit-ui-button_variant_primary,
+  .jodit-ui-button_variant_secondary,
+  .jodit-ui-button_variant_success,
+  .jodit-ui-button_variant_danger {
+    &:focus,
+    &:active,
+    &:focus-visible,
+    &.focus {
+      outline: 0 !important;
+      outline-offset: 0 !important;
+      box-shadow: none !important;
+      text-decoration: none;
+    }
+  }
+}
+
 .row > [class*="col-"] {
   // margin-bottom: 25px;
 }
