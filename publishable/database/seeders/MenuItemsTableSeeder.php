@@ -136,6 +136,11 @@ class MenuItemsTableSeeder extends Seeder
     {
         $criteria = array_merge(['menu_id' => $menu->id], $criteria);
         $payload = array_merge(['menu_id' => $menu->id], $payload);
+        foreach (['route', 'parameters'] as $field) {
+            if (array_key_exists($field, $criteria) && !array_key_exists($field, $payload)) {
+                $payload[$field] = $criteria[$field];
+            }
+        }
 
         $itemByKey = MenuItem::whereNotNull('key')
             ->where('menu_id', $menu->id)
