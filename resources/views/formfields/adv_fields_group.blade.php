@@ -11,19 +11,20 @@
                 $fieldValue = isset($field->value) ? $field->value : '';
                 $fieldId = "{$row->field}_{$fieldKey}";
                 $fieldName = "{$row->field}_{$fieldKey}";
+                $fieldType = $field->type ?? 'text';
             @endphp
 
             <div class="form-group">
                 <label for="{{ $fieldId }}">{{ $field->label ?? ucfirst($fieldKey) }}</label>
 
-                @if ($field->type === 'text')
+                @if ($fieldType === 'text')
                     <input type="text"
                            id="{{ $fieldId }}"
                            class="form-control"
                            name="{{ $fieldName }}"
                            value="{{ $fieldValue }}">
 
-                @elseif ($field->type === 'number')
+                @elseif ($fieldType === 'number')
                     <input type="number"
                            id="{{ $fieldId }}"
                            class="form-control"
@@ -31,7 +32,7 @@
                            value="{{ $fieldValue }}"
                            @if (isset($field->attributes->step)) step="{{ $field->attributes->step }}" @endif>
 
-                @elseif ($field->type === 'textarea')
+                @elseif ($fieldType === 'textarea')
                     <textarea id="{{ $fieldId }}"
                               class="form-control"
                               name="{{ $fieldName }}"
