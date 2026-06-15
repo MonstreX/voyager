@@ -41,9 +41,12 @@ class BreadWriteService
 
         $this->fillAdditionalAttributes($request, $data);
 
-        $this->fieldUploadService->handleAdvImageUploads($request, $rows, $data);
-
         $data->save();
+
+        $this->fieldUploadService->handleAdvImageUploads($request, $rows, $data);
+        if ($data->isDirty()) {
+            $data->save();
+        }
 
         if ($isCreating) {
             $this->fieldUploadService->handleAdvInlineSetUploads($request, $rows, $data);
