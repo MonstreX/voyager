@@ -9,71 +9,105 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [1.8.6] - 2026-07-17
 
-### Platform and compatibility
+This entry records the main changes introduced by the fork. Each item includes
+the timestamp of its original implementation commit (`UTC+05:00`).
 
-- Added support for Laravel 11 and Laravel 12.
-- Updated the package baseline to PHP 8.2+.
-- Restored database tools compatibility with Doctrine DBAL 4.
-- Modernized package installation: Voyager assets and configuration are published automatically.
+### 2025-11-24
 
-### Modern frontend stack
+- **11:01:15** — Added Laravel 12 compatibility scaffolding.
+- **13:15:51** — Restored database tools compatibility with Doctrine DBAL 4.
+- **15:26:13** — Made generated models use `app/Models` by default.
+- **19:04:44** — Added HTTP admin tests and isolated the legacy BrowserKit suite.
 
-- Replaced Laravel Mix with Vite.
-- Migrated the admin frontend to Vue 3 and native ES modules.
-- Removed the jQuery dependency and replaced legacy jQuery-based interactions with native JavaScript.
-- Replaced legacy UI dependencies and implementations: Select2, Bootstrap JS plugins,
-  bootstrap-toggle, jquery.nestable, jQuery UI, legacy date pickers, Toastr and DataTables.
-- Added modern replacements: Voyager Select, native toast notifications, SortableJS,
-  Flatpickr and vanilla Bootstrap compatibility helpers.
-- Reworked asset loading, lazy initialization and cache busting.
+### 2025-11-25
 
-### BREAD improvements
+- **08:52:54** — Migrated the frontend build from Laravel Mix to Vite and upgraded the admin bridge to Vue 3.
 
-- Added tabbed layouts for BREAD add/edit forms.
-- Added a sticky action panel for edit forms.
-- Added configurable browse-table presentation: column title, width, alignment and font size.
-- Added inline editing for text and number fields in browse tables.
-- Added browse filters.
-- Added configurable text links and routes in browse lists.
-- Added clone-record action with per-model configuration.
-- Added tree browse mode and improved ordering, drag-and-drop and action handling.
-- Improved JSON editing and formatting for BREAD field definitions.
-- Added previews for `adv_image` and `adv_media_files` fields in standard BREAD browse tables.
+### 2025-11-30
 
-### Advanced form fields
+- **14:00:55** — Replaced DataTables with lightweight vanilla tables.
+- **18:31:29** — Added Flatpickr date and timestamp pickers.
+- **19:04:03** — Replaced Bootstrap Toggle with a vanilla implementation.
+- **19:42:43** — Replaced Bootstrap JavaScript plugins with vanilla compatibility helpers.
+- **20:32:55** — Replaced Select2 with the native Voyager Select component.
 
-- Added `adv_fields_group` for grouped structured fields, including inline editing in browse mode.
-- Added `adv_json` for repeatable JSON field sets.
-- Added `adv_select_dropdown_tree` for hierarchical selections.
-- Added `adv_related` with native autocomplete.
-- Added `adv_inline_set` for inline related record sets.
+### 2025-12-01
 
-### Media library and image handling
+- **10:15:39** — Replaced jquery.nestable with SortableJS.
+- **17:23:25** — Replaced Toastr with a native toast notification component.
 
-- Added `adv_image` backed by the media library.
-- Added `adv_media_files` for media collections with sorting, metadata and file management.
-- Added image cropping for advanced media fields, including aspect-ratio selection and constraints.
-- Added sorting and cropping support for legacy multiple-image fields.
-- Improved media upload, deletion, crop handling, authorization, CSRF handling and API error responses.
-- Fixed `adv_image` uploads for newly created records.
-- Replaced Intervention Image with a built-in GD-based image processor.
-- Added cache-busting for media and image URLs.
+### 2025-12-02
 
-### Editors and admin interface
+- **10:17:46** — Removed the jQuery dependency and migrated remaining interactions to native JavaScript.
 
-- Migrated rich-text editing to Jodit Editor.
-- Improved Ace editor loading and automatic expansion.
-- Improved date and timestamp editing with Flatpickr.
-- Reworked admin layout from the legacy float grid to a Flexbox-based layout.
-- Refined menus, modals, confirmations, settings, dashboard widgets and form layouts.
-- Added consistent confirmation dialogs across admin actions.
+### 2025-12-04
 
-### Reliability and developer experience
+- **12:48:25** — Migrated rich-text editing from TinyMCE to Jodit Editor.
 
-- Added HTTP admin tests and expanded media subsystem coverage.
-- Refactored BREAD, media, menu, settings and tools scripts into maintainable modules.
-- Improved model generation defaults and permission generation.
-- Added safer handling for legacy database column types and incomplete advanced-field definitions.
+### 2025-12-06
+
+- **16:51:08** — Replaced Intervention Image with a built-in GD-based image processor.
+- **17:28:14** — Reworked the legacy float grid into a Flexbox-based admin layout.
+- **17:54:27** — Set the supported platform baseline to PHP 8.2+ and Laravel 11/12.
+
+### 2025-12-10
+
+- **20:18:26** — Added a sticky action panel to BREAD edit forms.
+- **22:44:39** — Added tabbed layouts to BREAD add/edit forms.
+
+### 2025-12-11
+
+- **09:15:36** — Added browse-table presentation options: title, width, alignment and font size.
+- **10:55:00** — Added tree browse mode.
+- **12:34:53** — Added configurable text links and routes in browse lists.
+- **15:31:01** — Added inline editing for text and number fields in browse tables.
+- **20:31:43** — Added clone-record action with per-model configuration.
+
+### 2025-12-12
+
+- **12:51:36** — Added `adv_fields_group`, including structured grouped fields and browse editing.
+- **14:57:40** — Added `adv_json` for repeatable JSON field sets.
+- **16:04:27** — Added `adv_select_dropdown_tree` for hierarchical selections.
+- **17:00:14** — Added BREAD browse filters.
+- **17:21:36** — Added `adv_related` with native autocomplete.
+
+### 2025-12-13
+
+- **16:27:01** — Added `adv_image` backed by the media library.
+
+### 2025-12-14
+
+- **20:12:57** — Added `adv_media_files` for media collections with sorting, metadata and file management.
+
+### 2025-12-15
+
+- **19:00:13** — Added image cropping for `adv_media_files`.
+
+### 2025-12-16
+
+- **10:22:13** — Added crop modal support for `adv_image`.
+- **16:03:30** — Added `adv_inline_set` for inline related record sets.
+
+### 2026-01-23
+
+- **19:29:31** — Added sorting for legacy multiple-image fields.
+- **20:31:55** — Added crop actions for legacy multiple-image fields.
+
+### 2026-01-27
+
+- **11:44:14** — Added dashboard system widgets.
+
+### 2026-06-11
+
+- **11:37:53** — Added safe fallback handling for advanced group fields with no explicit nested field type.
+
+### 2026-06-15
+
+- **12:51:34** — Fixed `adv_image` uploads for newly created records.
+
+### 2026-07-17
+
+- **11:13:59** — Added `adv_image` and `adv_media_files` previews to standard BREAD browse tables.
 
 [Unreleased]: https://github.com/MonstreX/voyager/compare/v1.8.6...HEAD
 [1.8.6]: https://github.com/MonstreX/voyager/releases/tag/v1.8.6
