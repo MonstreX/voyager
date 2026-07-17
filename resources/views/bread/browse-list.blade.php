@@ -214,6 +214,31 @@
                                                         }
                                                     @endphp
                                                     <img src="@if( !filter_var($data->{$row->field}, FILTER_VALIDATE_URL)){{ Voyager::image( $data->{$row->field} ) }}@else{{ $data->{$row->field} }}@endif" style="{{ $imageStyle }}">
+                                                @elseif(in_array($row->type, ['adv_image', 'adv_media_files'], true))
+                                                    @php
+                                                        $collectionName = $row->details->collection_name ?? $row->field;
+                                                        $mediaItems = method_exists($data, 'getMedia')
+                                                            ? $data->getMedia($collectionName)
+                                                            : collect();
+                                                        $preview = $mediaItems->first(static fn ($media) => $media->isImage());
+                                                        $imageStyle = 'width:100px;max-height:72px;object-fit:cover';
+
+                                                        if ($row->details && property_exists($row->details, 'browse_image_max_height') && $row->details->browse_image_max_height) {
+                                                            $imageStyle = 'width:auto;max-height:' . $row->details->browse_image_max_height . ';object-fit:cover';
+                                                        }
+                                                    @endphp
+                                                    @if($preview)
+                                                        <a href="{{ $preview->url() }}" target="_blank" rel="noopener" style="display:inline-block;position:relative">
+                                                            <img src="{{ $preview->url() }}?v={{ $preview->updated_at?->getTimestamp() ?? $preview->id }}"
+                                                                 alt="{{ $preview->prop('alt', $preview->fileName()) }}"
+                                                                 style="{{ $imageStyle }}">
+                                                            @if($row->type === 'adv_media_files' && $mediaItems->count() > 1)
+                                                                <span style="position:absolute;right:3px;bottom:3px;padding:1px 5px;border-radius:10px;background:rgba(0,0,0,.72);color:#fff;font-size:11px;line-height:16px">+{{ $mediaItems->count() - 1 }}</span>
+                                                            @endif
+                                                        </a>
+                                                    @else
+                                                        <span class="text-muted">{{ __('voyager::generic.none') }}</span>
+                                                    @endif
                                                 @elseif($row->type == 'relationship')
                                                     @include('voyager::formfields.relationship', ['view' => 'browse','options' => $row->details])
                                                 @elseif($row->type == 'adv_select_dropdown_tree')
